@@ -326,7 +326,7 @@ export default defineComponent({
 			objectStorageUseSSL: false,
 			objectStorageUseProxy: false,
 			objectStorageSetPublicRead: false,
-			oobjectStorageForcePathStyle: false,
+			objectStorageForcePathStyle: false,
 			enableTwitterIntegration: false,
 			twitterConsumerKey: null,
 			twitterConsumerSecret: null,
