@@ -4,6 +4,7 @@
 		<img :src="image.url" :alt="image.name" :title="image.name" @click="$refs.modal.close()"/>
 	</div>
 </MkModal>
+
 </template>
 
 <script lang="ts">
@@ -11,8 +12,8 @@ import { defineComponent } from 'vue';
 import bytes from '@/filters/bytes';
 import number from '@/filters/number';
 import MkModal from '@/components/ui/modal.vue';
-import 'viewerjs/dist/viewer.css'
-import Viewer from 'viewerjs'
+import 'viewerjs/dist/viewer.css';
+import Viewer from 'viewerjs';
 
 export default defineComponent({
 	components: {
@@ -43,11 +44,7 @@ export default defineComponent({
 			this.$viewer && this.$viewer.destroy()
 		},
 		createViewer () {
-			if (image.properties && image.properties.width) {
-				let title=`${this.image.type} | ${bytes(this.image.size)} | ${this.image.name} (${number(this.image.properties.width)}px × ${number(this.image.properties.height)}px)`;
-			} else {
-				let title=`${this.image.type} | ${bytes(this.image.size)} | ${this.image.name}` ;
-			}
+			let title=(this.image.properties && this.image.properties.width)?`${this.image.type} | ${bytes(this.image.size)} | ${this.image.name} (${number(this.image.properties.width)}px × ${number(this.image.properties.height)}px)`:`${this.image.type} | ${bytes(this.image.size)} | ${this.image.name}`;
 			let toolbar={
 				zoomIn: 4,
 				zoomOut: 4,
