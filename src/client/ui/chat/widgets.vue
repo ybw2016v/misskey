@@ -9,8 +9,8 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import XWidgets from '@/components/widgets.vue';
-import { store } from './store.ts';
+import XWidgets from '@client/components/widgets.vue';
+import { store } from './store';
 
 export default defineComponent({
 	components: {
@@ -34,6 +34,7 @@ export default defineComponent({
 		},
 
 		updateWidget({ id, data }) {
+			// TODO: throttleしたい
 			store.set('widgets', store.state.widgets.map(w => w.id === id ? {
 				...w,
 				data: data

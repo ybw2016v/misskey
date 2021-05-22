@@ -1,6 +1,6 @@
 <template>
 <MkContainer :show-header="props.showHeader">
-	<template #header><Fa :icon="faHashtag"/>{{ $ts._widgets.trends }}</template>
+	<template #header><i class="fas fa-hashtag"></i>{{ $ts._widgets.trends }}</template>
 
 	<div class="wbrkwala">
 		<MkLoading v-if="fetching"/>
@@ -19,11 +19,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { faHashtag } from '@fortawesome/free-solid-svg-icons';
-import MkContainer from '@/components/ui/container.vue';
+import MkContainer from '@client/components/ui/container.vue';
 import define from './define';
-import MkMiniChart from '@/components/mini-chart.vue';
-import * as os from '@/os';
+import MkMiniChart from '@client/components/mini-chart.vue';
+import * as os from '@client/os';
 
 const widget = define({
 	name: 'hashtags',
@@ -44,7 +43,6 @@ export default defineComponent({
 		return {
 			stats: [],
 			fetching: true,
-			faHashtag
 		};
 	},
 	mounted() {
@@ -79,7 +77,7 @@ export default defineComponent({
 			display: flex;
 			align-items: center;
 			padding: 14px 16px;
-			border-bottom: solid 1px var(--divider);
+			border-bottom: solid 0.5px var(--divider);
 
 			> .tag {
 				flex: 1;

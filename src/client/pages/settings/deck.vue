@@ -31,15 +31,16 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { faImage, faCog, faColumns } from '@fortawesome/free-solid-svg-icons';
-import FormSwitch from '@/components/form/switch.vue';
-import FormLink from '@/components/form/link.vue';
-import FormRadios from '@/components/form/radios.vue';
-import FormInput from '@/components/form/input.vue';
-import FormBase from '@/components/form/base.vue';
-import FormGroup from '@/components/form/group.vue';
-import { deckStore } from '@/ui/deck/deck-store';
-import * as os from '@/os';
+import FormSwitch from '@client/components/form/switch.vue';
+import FormLink from '@client/components/form/link.vue';
+import FormRadios from '@client/components/form/radios.vue';
+import FormInput from '@client/components/form/input.vue';
+import FormBase from '@client/components/form/base.vue';
+import FormGroup from '@client/components/form/group.vue';
+import { deckStore } from '@client/ui/deck/deck-store';
+import * as os from '@client/os';
+import { unisonReload } from '@client/scripts/unison-reload';
+import * as symbols from '@client/symbols';
 
 export default defineComponent({
 	components: {
@@ -55,11 +56,10 @@ export default defineComponent({
 
 	data() {
 		return {
-			INFO: {
+			[symbols.PAGE_INFO]: {
 				title: this.$ts.deck,
-				icon: faColumns
+				icon: 'fas fa-columns'
 			},
-			faImage, faCog,
 		}
 	},
 
@@ -81,12 +81,12 @@ export default defineComponent({
 			});
 			if (canceled) return;
 
-			location.reload();
+			unisonReload();
 		}
 	},
 
 	mounted() {
-		this.$emit('info', this.INFO);
+		this.$emit('info', this[symbols.PAGE_INFO]);
 	},
 
 	methods: {
@@ -99,7 +99,7 @@ export default defineComponent({
 			});
 			if (canceled) return;
 			this.profile = name;
-			location.reload();
+			unisonReload();
 		}
 	}
 });

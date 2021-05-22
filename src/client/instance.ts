@@ -3,9 +3,16 @@ import { api } from './os';
 
 // TODO: 他のタブと永続化されたstateを同期
 
-type Instance = {
+export type Instance = {
 	emojis: {
 		category: string;
+	}[];
+	ads: {
+		id: string;
+		ratio: number;
+		place: string;
+		url: string;
+		imageUrl: string;
 	}[];
 };
 
@@ -35,6 +42,16 @@ export const emojiCategories = computed(() => {
 		categories.add(emoji.category);
 	}
 	return Array.from(categories);
+});
+
+export const emojiTags = computed(() => {
+	const tags = new Set();
+	for (const emoji of instance.emojis) {
+		for (const tag of emoji.aliases) {
+			tags.add(tag);
+		}
+	}
+	return Array.from(tags);
 });
 
 // このファイルに書きたくないけどここに書かないと何故かVeturが認識しない
