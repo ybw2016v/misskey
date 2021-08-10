@@ -2,7 +2,7 @@
 <MkModal ref="modal" @click="$refs.modal.close()" @closed="$emit('closed')">
 	<div class="xubzgfga">
 		<header>{{ image.name }}</header>
-		<img :src="image.url" :alt="image.name" :title="image.name" @click="$refs.modal.close()"/>
+		<img :src="image.url" :alt="image.comment" :title="image.comment" @click="$refs.modal.close()"/>
 		<footer>
 			<span>{{ image.type }}</span>
 			<span>{{ bytes(image.size) }}</span>
@@ -14,9 +14,9 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import bytes from '@/filters/bytes';
-import number from '@/filters/number';
-import MkModal from '@/components/ui/modal.vue';
+import bytes from '@client/filters/bytes';
+import number from '@client/filters/number';
+import MkModal from '@client/components/ui/modal.vue';
 
 export default defineComponent({
 	components: {

@@ -1,26 +1,26 @@
 <template>
 <div class="_section">
 	<div class="_content">
-		<div class="_card _vMargin">
+		<div class="_card _gap">
 			<div class="_title">Dialog</div>
 			<div class="_content">
-				<MkInput v-model:value="dialogTitle">
-					<span>Title</span>
+				<MkInput v-model="dialogTitle">
+					<template #label>Title</template>
 				</MkInput>
-				<MkInput v-model:value="dialogBody">
-					<span>Body</span>
+				<MkInput v-model="dialogBody">
+					<template #label>Body</template>
 				</MkInput>
 				<MkRadio v-model="dialogType" value="info">Info</MkRadio>
 				<MkRadio v-model="dialogType" value="success">Success</MkRadio>
 				<MkRadio v-model="dialogType" value="warning">Warn</MkRadio>
 				<MkRadio v-model="dialogType" value="error">Error</MkRadio>
-				<MkSwitch v-model:value="dialogCancel">
+				<MkSwitch v-model="dialogCancel">
 					<span>With cancel button</span>
 				</MkSwitch>
-				<MkSwitch v-model:value="dialogCancelByBgClick">
+				<MkSwitch v-model="dialogCancelByBgClick">
 					<span>Can cancel by modal bg click</span>
 				</MkSwitch>
-				<MkSwitch v-model:value="dialogInput">
+				<MkSwitch v-model="dialogInput">
 					<span>With input field</span>
 				</MkSwitch>
 				<MkButton @click="showDialog()">Show</MkButton>
@@ -30,14 +30,14 @@
 			</div>
 		</div>
 
-		<div class="_card _vMargin">
+		<div class="_card _gap">
 			<div class="_title">Form</div>
 			<div class="_content">
-				<MkInput v-model:value="formTitle">
-					<span>Title</span>
+				<MkInput v-model="formTitle">
+					<template #label>Title</template>
 				</MkInput>
-				<MkTextarea v-model:value="formForm">
-					<span>Form</span>
+				<MkTextarea v-model="formForm">
+					<template #label>Form</template>
 				</MkTextarea>
 				<MkButton @click="form()">Show</MkButton>
 			</div>
@@ -46,11 +46,11 @@
 			</div>
 		</div>
 
-		<div class="_card _vMargin">
+		<div class="_card _gap">
 			<div class="_title">MFM</div>
 			<div class="_content">
-				<MkTextarea v-model:value="mfm">
-					<span>MFM</span>
+				<MkTextarea v-model="mfm">
+					<template #label>MFM</template>
 				</MkTextarea>
 			</div>
 			<div class="_content">
@@ -58,10 +58,10 @@
 			</div>
 		</div>
 
-		<div class="_card _vMargin">
+		<div class="_card _gap">
 			<div class="_title">selectDriveFile</div>
 			<div class="_content">
-				<MkSwitch v-model:value="selectDriveFileMultiple">
+				<MkSwitch v-model="selectDriveFileMultiple">
 					<span>Multiple</span>
 				</MkSwitch>
 				<MkButton @click="selectDriveFile()">selectDriveFile</MkButton>
@@ -71,10 +71,10 @@
 			</div>
 		</div>
 
-		<div class="_card _vMargin">
+		<div class="_card _gap">
 			<div class="_title">selectDriveFolder</div>
 			<div class="_content">
-				<MkSwitch v-model:value="selectDriveFolderMultiple">
+				<MkSwitch v-model="selectDriveFolderMultiple">
 					<span>Multiple</span>
 				</MkSwitch>
 				<MkButton @click="selectDriveFolder()">selectDriveFolder</MkButton>
@@ -84,7 +84,7 @@
 			</div>
 		</div>
 
-		<div class="_card _vMargin">
+		<div class="_card _gap">
 			<div class="_title">selectUser</div>
 			<div class="_content">
 				<MkButton @click="selectUser()">selectUser</MkButton>
@@ -94,23 +94,23 @@
 			</div>
 		</div>
 
-		<div class="_card _vMargin">
+		<div class="_card _gap">
 			<div class="_title">Notification</div>
 			<div class="_content">
-				<MkInput v-model:value="notificationIconUrl">
-					<span>Icon URL</span>
+				<MkInput v-model="notificationIconUrl">
+					<template #label>Icon URL</template>
 				</MkInput>
-				<MkInput v-model:value="notificationHeader">
-					<span>Header</span>
+				<MkInput v-model="notificationHeader">
+					<template #label>Header</template>
 				</MkInput>
-				<MkTextarea v-model:value="notificationBody">
-					<span>Body</span>
+				<MkTextarea v-model="notificationBody">
+					<template #label>Body</template>
 				</MkTextarea>
 				<MkButton @click="createNotification()">createNotification</MkButton>
 			</div>
 		</div>
 
-		<div class="_card _vMargin">
+		<div class="_card _gap">
 			<div class="_title">Waiting dialog</div>
 			<div class="_content">
 				<MkButton inline @click="openWaitingDialog()">icon only</MkButton>
@@ -118,7 +118,7 @@
 			</div>
 		</div>
 
-		<div class="_card _vMargin">
+		<div class="_card _gap">
 			<div class="_title">Messaging window</div>
 			<div class="_content">
 				<MkButton @click="messagingWindowOpen()">open</MkButton>
@@ -132,13 +132,13 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { faExclamationTriangle } from '@fortawesome/free-solid-svg-icons';
-import MkButton from '@/components/ui/button.vue';
-import MkInput from '@/components/ui/input.vue';
-import MkSwitch from '@/components/ui/switch.vue';
-import MkTextarea from '@/components/ui/textarea.vue';
-import MkRadio from '@/components/ui/radio.vue';
-import * as os from '@/os';
+import MkButton from '@client/components/ui/button.vue';
+import MkInput from '@client/components/ui/input.vue';
+import MkSwitch from '@client/components/ui/switch.vue';
+import MkTextarea from '@client/components/ui/textarea.vue';
+import MkRadio from '@client/components/ui/radio.vue';
+import * as os from '@client/os';
+import * as symbols from '@client/symbols';
 
 export default defineComponent({
 	components: {
@@ -151,9 +151,9 @@ export default defineComponent({
 
 	data() {
 		return {
-			INFO: {
+			[symbols.PAGE_INFO]: {
 				title: 'TEST',
-				icon: faExclamationTriangle
+				icon: 'fas fa-exclamation-triangle'
 			},
 			dialogTitle: 'Hello',
 			dialogBody: 'World!',

@@ -9,10 +9,10 @@
 <script lang="ts">
 import { defineComponent } from 'vue';
 import define from './define';
-import MkButton from '@/components/ui/button.vue';
-import * as os from '@/os';
+import MkButton from '@client/components/ui/button.vue';
+import * as os from '@client/os';
 import { AiScript, parse, utils } from '@syuilo/aiscript';
-import { createAiScriptEnv } from '@/scripts/aiscript/api';
+import { createAiScriptEnv } from '@client/scripts/aiscript/api';
 
 const widget = define({
 	name: 'button',
@@ -45,7 +45,8 @@ export default defineComponent({
 	methods: {
 		async run() {
 			const aiscript = new AiScript(createAiScriptEnv({
-				storageKey: 'scratchpad'
+				storageKey: 'widget',
+				token: this.$i?.token,
 			}), {
 				in: (q) => {
 					return new Promise(ok => {

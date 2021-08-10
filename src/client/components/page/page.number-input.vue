@@ -1,15 +1,17 @@
 <template>
 <div>
-	<MkInput class="kudkigyw" :value="value" @update:value="updateValue($event)" type="number">{{ hpml.interpolate(block.text) }}</MkInput>
+	<MkInput class="kudkigyw" :model-value="value" @update:modelValue="updateValue($event)" type="number">
+		<template #label>{{ hpml.interpolate(block.text) }}</template>
+	</MkInput>
 </div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 import MkInput from '../ui/input.vue';
-import * as os from '@/os';
-import { Hpml } from '@/scripts/hpml/evaluator';
-import { NumberInputVarBlock } from '@/scripts/hpml/block';
+import * as os from '@client/os';
+import { Hpml } from '@client/scripts/hpml/evaluator';
+import { NumberInputVarBlock } from '@client/scripts/hpml/block';
 
 export default defineComponent({
 	components: {

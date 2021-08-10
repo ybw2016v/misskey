@@ -1,32 +1,58 @@
 <template>
-<div class="fdidabkb" :style="`--height:${height};`">
+<div class="fdidabkb" :class="{ center }" :style="`--height:${height};`" :key="key">
 	<transition :name="$store.state.animation ? 'header' : ''" mode="out-in" appear>
-		<button class="_button back" v-if="withBack && canBack" @click.stop="back()"><Fa :icon="faChevronLeft"/></button>
+		<div class="buttons left" v-if="backButton">
+			<button class="_button button back" @click.stop="$emit('back')" v-tooltip="$ts.goBack"><i class="fas fa-chevron-left"></i></button>
+		</div>
 	</transition>
 	<template v-if="info">
 		<div class="titleContainer">
+			<i v-if="info.icon" class="icon" :class="info.icon"></i>
+			<MkAvatar v-else-if="info.avatar" class="avatar" :user="info.avatar" :disable-preview="true" :show-indicator="true"/>
+
 			<div class="title">
-				<Fa v-if="info.icon" :icon="info.icon" :key="info.icon" class="icon"/>
-				<MkAvatar v-else-if="info.avatar" class="avatar" :user="info.avatar" :disable-preview="true"/>
-				<span v-if="info.title" class="text">{{ info.title }}</span>
-				<MkUserName v-else-if="info.userName" :user="info.userName" :nowrap="false" class="text"/>
+				<MkUserName v-if="info.userName" :user="info.userName" :nowrap="false" class="title"/>
+				<div v-else-if="info.title" class="title">{{ info.title }}</div>
+				<div class="subtitle" v-if="info.subtitle">
+					{{ info.subtitle }}
+				</div>
 			</div>
 		</div>
-		<button class="_button action" v-if="info.action" @click.stop="info.action.handler"><Fa :icon="info.action.icon" :key="info.action.icon"/></button>
+		<div class="buttons right">
+			<template v-if="info.actions && showActions">
+				<button v-for="action in info.actions" class="_button button" :class="{ highlighted: action.highlighted }" @click.stop="action.handler" v-tooltip="action.text"><i :class="action.icon"></i></button>
+			</template>
+			<button v-if="shouldShowMenu" class="_button button" @click.stop="showMenu" v-tooltip="$ts.menu"><i class="fas fa-ellipsis-h"></i></button>
+			<button v-if="closeButton" class="_button button" @click.stop="$emit('close')" v-tooltip="$ts.close"><i class="fas fa-times"></i></button>
+		</div>
 	</template>
 </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { faChevronLeft, faCircle } from '@fortawesome/free-solid-svg-icons';
+import { popupMenu } from '@client/os';
+import { url } from '@client/config';
 
 export default defineComponent({
 	props: {
 		info: {
 			required: true
 		},
-		withBack: {
+		menu: {
+			required: false
+		},
+		backButton: {
+			type: Boolean,
+			required: false,
+			default: false,
+		},
+		closeButton: {
+			type: Boolean,
+			required: false,
+			default: false,
+		},
+		center: {
 			type: Boolean,
 			required: false,
 			default: true,
@@ -35,116 +61,160 @@ export default defineComponent({
 
 	data() {
 		return {
-			canBack: false,
+			showActions: false,
 			height: 0,
-			faChevronLeft, faCircle
+			key: 0,
 		};
 	},
 
+	computed: {
+		shouldShowMenu() {
+			if (this.info.actions != null && !this.showActions) return true;
+			if (this.info.menu != null) return true;
+			if (this.info.share != null) return true;
+			if (this.menu != null) return true;
+			return false;
+		}
+	},
+
 	watch: {
-		$route: {
-			handler(to, from) {
-				this.canBack = (window.history.length > 0 && !['index'].includes(to.name));
-			},
-			immediate: true
+		info() {
+			this.key++;
 		},
 	},
 
 	mounted() {
 		this.height = this.$el.parentElement.offsetHeight + 'px';
+		this.showActions = this.$el.parentElement.offsetWidth >= 500;
 		new ResizeObserver((entries, observer) => {
 			this.height = this.$el.parentElement.offsetHeight + 'px';
+			this.showActions = this.$el.parentElement.offsetWidth >= 500;
 		}).observe(this.$el);
 	},
 
 	methods: {
-		back() {
-			if (this.canBack) this.$router.back();
+		share() {
+			navigator.share({
+				url: url + this.info.path,
+				...this.info.share,
+			});
 		},
+
+		showMenu(ev) {
+			let menu = this.info.menu ? this.info.menu() : [];
+			if (!this.showActions && this.info.actions) {
+				menu = [...this.info.actions.map(x => ({
+					text: x.text,
+					icon: x.icon,
+					action: x.handler
+				})), menu.length > 0 ? null : undefined, ...menu];
+			}
+			if (this.info.share) {
+				if (menu.length > 0) menu.push(null);
+				menu.push({
+					text: this.$ts.share,
+					icon: 'fas fa-share-alt',
+					action: this.share
+				});
+			}
+			if (this.menu) {
+				if (menu.length > 0) menu.push(null);
+				menu = menu.concat(this.menu);
+			}
+			popupMenu(menu, ev.currentTarget || ev.target);
+		}
 	}
 });
 </script>
 
 <style lang="scss" scoped>
 .fdidabkb {
-	text-align: center;
+	display: flex;
 
-	> .back {
-		height: var(--height);
-		width: var(--height);
-	}
+	&.center {
+		text-align: center;
 
-	> .action {
-		height: var(--height);
-		width: var(--height);
-	}
+		> .titleContainer {
+			margin: 0 auto;
+		}
 
-	> .titleContainer {
-		width: calc(100% - (var(--height) * 2));
-
-		> .title {
-			height: var(--height);
-
-			> .avatar {
-				$size: 32px;
-				margin: calc((var(--height) - #{$size}) / 2) 8px calc((var(--height) - #{$size}) / 2) 0;
-				pointer-events: none;
+		> .buttons {
+			&.right {
+				margin-left: 0;
 			}
 		}
 	}
-}
-</style>
 
-<style lang="scss" scoped>
-.fdidabkb {
-	> .back {
-		position: absolute;
-		z-index: 1;
-		top: 0;
-		left: 0;
-	}
+	> .buttons {
+		--margin: 8px;
+		display: flex;
+    align-items: center;
+		height: var(--height);
+		margin: 0 var(--margin);
 
-	> .action {
-		position: absolute;
-		z-index: 1;
-		top: 0;
-		right: 0;
+		&.right {
+			margin-left: auto;
+		}
+
+		&:empty {
+			width: var(--height);
+		}
+
+		> .button {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			height: calc(var(--height) - (var(--margin) * 2));
+			width: calc(var(--height) - (var(--margin) * 2));
+			box-sizing: border-box;
+			position: relative;
+			border-radius: 5px;
+
+			&:hover {
+				background: rgba(0, 0, 0, 0.05);
+			}
+
+			&.highlighted {
+				color: var(--accent);
+			}
+		}
 	}
 
 	> .titleContainer {
-		margin: 0 auto;
+		display: flex;
+		align-items: center;
 		overflow: auto;
 		white-space: nowrap;
+		text-align: left;
+
+		> .avatar {
+			$size: 32px;
+			display: inline-block;
+			width: $size;
+			height: $size;
+			vertical-align: bottom;
+			margin: 0 8px;
+			pointer-events: none;
+		}
+
+		> .icon {
+			margin-right: 8px;
+		}
 
 		> .title {
-			display: inline-block;
-			vertical-align: bottom;
-			white-space: nowrap;
+			min-width: 0;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			padding: 0 16px;
-			position: relative;
+			white-space: nowrap;
+			line-height: 1.1;
 
-			> .indicator {
-				position: absolute;
-				top: initial;
-				right: 8px;
-				top: 8px;
-				color: var(--indicator);
-				font-size: 12px;
-				animation: blink 1s infinite;
-			}
-
-			> .icon + .text {
-				margin-left: 8px;
-			}
-
-			> .avatar {
-				$size: 32px;
-				display: inline-block;
-				width: $size;
-				height: $size;
-				vertical-align: bottom;
+			> .subtitle {
+				opacity: 0.6;
+				font-size: 0.8em;
+				font-weight: normal;
+				white-space: nowrap;
+				overflow: hidden;
+				text-overflow: ellipsis;
 			}
 		}
 	}

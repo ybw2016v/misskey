@@ -3,14 +3,14 @@
 	<h1>Welcome to Misskey!</h1>
 	<div>
 		<p>{{ $ts.intro }}</p>
-		<MkInput v-model:value="username" pattern="^[a-zA-Z0-9_]{1,20}$" spellcheck="false" required>
-			<span>{{ $ts.username }}</span>
+		<MkInput v-model="username" pattern="^[a-zA-Z0-9_]{1,20}$" spellcheck="false" required>
+			<template #label>{{ $ts.username }}</template>
 			<template #prefix>@</template>
 			<template #suffix>@{{ host }}</template>
 		</MkInput>
-		<MkInput v-model:value="password" type="password">
-			<span>{{ $ts.password }}</span>
-			<template #prefix><Fa :icon="faLock"/></template>
+		<MkInput v-model="password" type="password">
+			<template #label>{{ $ts.password }}</template>
+			<template #prefix><i class="fas fa-lock"></i></template>
 		</MkInput>
 		<footer>
 			<MkButton primary type="submit" :disabled="submitting">{{ submitting ? $ts.processing : $ts.done }}<MkEllipsis v-if="submitting"/></MkButton>
@@ -21,12 +21,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { faLock } from '@fortawesome/free-solid-svg-icons';
-import MkButton from '@/components/ui/button.vue';
-import MkInput from '@/components/ui/input.vue';
-import { host } from '@/config';
-import * as os from '@/os';
-import { login } from '@/account';
+import MkButton from '@client/components/ui/button.vue';
+import MkInput from '@client/components/ui/input.vue';
+import { host } from '@client/config';
+import * as os from '@client/os';
+import { login } from '@client/account';
 
 export default defineComponent({
 	components: {
@@ -40,7 +39,6 @@ export default defineComponent({
 			password: '',
 			submitting: false,
 			host,
-			faLock
 		}
 	},
 
@@ -72,6 +70,8 @@ export default defineComponent({
 	border-radius: var(--radius);
 	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
 	overflow: hidden;
+	max-width: 500px;
+	margin: 32px auto;
 
 	> h1 {
 		margin: 0;

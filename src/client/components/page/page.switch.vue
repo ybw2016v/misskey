@@ -1,15 +1,15 @@
 <template>
 <div class="hkcxmtwj">
-	<MkSwitch :value="value" @update:value="updateValue($event)">{{ hpml.interpolate(block.text) }}</MkSwitch>
+	<MkSwitch :model-value="value" @update:modelValue="updateValue($event)">{{ hpml.interpolate(block.text) }}</MkSwitch>
 </div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent, PropType } from 'vue';
 import MkSwitch from '../ui/switch.vue';
-import * as os from '@/os';
-import { Hpml } from '@/scripts/hpml/evaluator';
-import { SwitchVarBlock } from '@/scripts/hpml/block';
+import * as os from '@client/os';
+import { Hpml } from '@client/scripts/hpml/evaluator';
+import { SwitchVarBlock } from '@client/scripts/hpml/block';
 
 export default defineComponent({
 	components: {

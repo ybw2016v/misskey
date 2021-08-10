@@ -1,6 +1,6 @@
 <script lang="ts">
 import { defineComponent, h } from 'vue';
-import MkRadio from '@/components/ui/radio.vue';
+import MkRadio from '@client/components/ui/radio.vue';
 import './form.scss';
 
 export default defineComponent({
@@ -18,13 +18,19 @@ export default defineComponent({
 		}
 	},
 	watch: {
+		modelValue() {
+			this.value = this.modelValue;
+		},
 		value() {
 			this.$emit('update:modelValue', this.value);
 		}
 	},
 	render() {
 		const label = this.$slots.desc();
-		const options = this.$slots.default();
+		let options = this.$slots.default();
+
+		// なぜかFragmentになることがあるため
+		if (options.length === 1 && options[0].props == null) options = options[0].children;
 
 		return h('div', {
 			class: 'cnklmpwm _formItem'
@@ -34,7 +40,7 @@ export default defineComponent({
 			}, label),
 			...options.map(option => h('button', {
 				class: '_button _formPanel _formClickable',
-				key: option.props.value,
+				key: option.key,
 				onClick: () => this.value = option.props.value,
 			}, [h('span', {
 				class: ['check', { checked: this.value === option.props.value }],
@@ -69,8 +75,8 @@ export default defineComponent({
 			display: inline-block;
 			vertical-align: bottom;
 			position: relative;
-			width: 20px;
-			height: 20px;
+			width: 16px;
+			height: 16px;
 			margin-right: 8px;
 			background: none;
 			border: 2px solid var(--inputBorder);

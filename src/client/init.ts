@@ -2,64 +2,37 @@
  * Client entry point
  */
 
-import '@/style.scss';
-
-// TODO: そのうち消す
-if (localStorage.getItem('vuex') != null) {
-	const vuex = JSON.parse(localStorage.getItem('vuex'));
-
-	localStorage.setItem('account', JSON.stringify({
-		...vuex.i,
-		token: localStorage.getItem('i')
-	}));
-	localStorage.setItem('accounts', JSON.stringify(vuex.device.accounts));
-	localStorage.setItem('miux:themes', JSON.stringify(vuex.device.themes));
-
-	for (const [k, v] of 	Object.entries(vuex.device.userData)) {
-		localStorage.setItem('pizzax::base::' + k, JSON.stringify({
-			widgets: v.widgets
-		}));
-
-		if (v.deck) {
-			localStorage.setItem('pizzax::deck::' + k, JSON.stringify({
-				columns: v.deck.columns,
-				layout: v.deck.layout,
-			}));
-		}
-	}
-
-	localStorage.setItem('vuex-old', JSON.stringify(vuex));
-	localStorage.removeItem('vuex');
-	localStorage.removeItem('i');
-	localStorage.removeItem('locale');
-
-	location.reload();
-}
+import '@client/style.scss';
 
 import * as Sentry from '@sentry/browser';
 import { Integrations } from '@sentry/tracing';
-import { createApp, watch } from 'vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { computed, createApp, watch, markRaw } from 'vue';
 
-import widgets from '@/widgets';
-import directives from '@/directives';
-import components from '@/components';
-import { version, ui, lang, host } from '@/config';
-import { router } from '@/router';
-import { applyTheme } from '@/scripts/theme';
-import { isDeviceDarkmode } from '@/scripts/is-device-darkmode';
-import { i18n } from '@/i18n';
-import { stream, isMobile, dialog, post } from '@/os';
-import * as sound from '@/scripts/sound';
-import { $i, refreshAccount, login, updateAccount, signout } from '@/account';
-import { defaultStore, ColdDeviceStorage } from '@/store';
-import { fetchInstance, instance } from '@/instance';
-import { makeHotkey } from './scripts/hotkey';
-import { search } from './scripts/search';
-import { getThemes } from './theme-store';
-import { initializeSw } from './scripts/initialize-sw';
+import widgets from '@client/widgets';
+import directives from '@client/directives';
+import components from '@client/components';
+import { version, ui, lang, host } from '@client/config';
+import { router } from '@client/router';
+import { applyTheme } from '@client/scripts/theme';
+import { isDeviceDarkmode } from '@client/scripts/is-device-darkmode';
+import { i18n } from '@client/i18n';
+import { stream, dialog, post } from '@client/os';
+import * as sound from '@client/scripts/sound';
+import { $i, refreshAccount, login, updateAccount, signout } from '@client/account';
+import { defaultStore, ColdDeviceStorage } from '@client/store';
+import { fetchInstance, instance } from '@client/instance';
+import { makeHotkey } from '@client/scripts/hotkey';
+import { search } from '@client/scripts/search';
+import { isMobile } from '@client/scripts/is-mobile';
+import { initializeSw } from '@client/scripts/initialize-sw';
+import { reloadChannel } from '@client/scripts/unison-reload';
+import { reactionPicker } from '@client/scripts/reaction-picker';
 
 console.info(`Misskey v${version}`);
+
+// boot.jsのやつを解除
+window.onerror = null;
+window.onunhandledrejection = null;
 
 if (_DEV_) {
 	console.warn('Development mode!!!');
@@ -104,6 +77,9 @@ if (defaultStore.state.reportError && !_DEV_) {
 
 // タッチデバイスでCSSの:hoverを機能させる
 document.addEventListener('touchend', () => {}, { passive: true });
+
+// 一斉リロード
+reloadChannel.addEventListener('message', () => location.reload());
 
 //#region SEE: https://css-tricks.com/the-trick-to-viewport-units-on-mobile/
 // TODO: いつの日にか消したい
@@ -175,14 +151,14 @@ fetchInstance().then(() => {
 	initializeSw();
 });
 
-stream.init($i);
-
 const app = createApp(await (
-	window.location.search === '?zen' ? import('@/ui/zen.vue') :
-	!$i                               ? import('@/ui/visitor.vue') :
-	ui === 'deck'                     ? import('@/ui/deck.vue') :
-	ui === 'desktop'                  ? import('@/ui/desktop.vue') :
-	import('@/ui/default.vue')
+	window.location.search === '?zen' ? import('@client/ui/zen.vue') :
+	!$i                               ? import('@client/ui/visitor.vue') :
+	ui === 'deck'                     ? import('@client/ui/deck.vue') :
+	ui === 'desktop'                  ? import('@client/ui/desktop.vue') :
+	ui === 'chat'                     ? import('@client/ui/chat/index.vue') :
+	ui === 'pope'                     ? import('@client/ui/universal.vue') :
+	import('@client/ui/default.vue')
 ).then(x => x.default));
 
 if (_DEV_) {
@@ -198,8 +174,6 @@ app.config.globalProperties = {
 };
 
 app.use(router);
-// eslint-disable-next-line vue/component-definition-name-casing
-app.component('Fa', FontAwesomeIcon);
 
 widgets(app);
 directives(app);
@@ -207,16 +181,41 @@ components(app);
 
 await router.isReady();
 
-//document.body.innerHTML = '<div id="app"></div>';
+const splash = document.getElementById('splash');
+// 念のためnullチェック(HTMLが古い場合があるため(そのうち消す))
+if (splash) splash.addEventListener('transitionend', () => {
+	splash.remove();
+});
 
-app.mount('body');
+const rootEl = document.createElement('div');
+document.body.appendChild(rootEl);
+app.mount(rootEl);
+
+reactionPicker.init();
+
+if (splash) {
+	splash.style.opacity = '0';
+	splash.style.pointerEvents = 'none';
+}
 
 watch(defaultStore.reactiveState.darkMode, (darkMode) => {
-	import('@/scripts/theme').then(({ builtinThemes }) => {
-		const themes = builtinThemes.concat(getThemes());
-		applyTheme(themes.find(x => x.id === (darkMode ? ColdDeviceStorage.get('darkTheme') : ColdDeviceStorage.get('lightTheme'))));
-	});
+	applyTheme(darkMode ? ColdDeviceStorage.get('darkTheme') : ColdDeviceStorage.get('lightTheme'));
 }, { immediate: localStorage.theme == null });
+
+const darkTheme = computed(ColdDeviceStorage.makeGetterSetter('darkTheme'));
+const lightTheme = computed(ColdDeviceStorage.makeGetterSetter('lightTheme'));
+
+watch(darkTheme, (theme) => {
+	if (defaultStore.state.darkMode) {
+		applyTheme(theme);
+	}
+});
+
+watch(lightTheme, (theme) => {
+	if (!defaultStore.state.darkMode) {
+		applyTheme(theme);
+	}
+});
 
 //#region Sync dark mode
 if (ColdDeviceStorage.get('syncDeviceDarkMode')) {
@@ -283,7 +282,7 @@ if ($i) {
 		}
 	}
 
-	const main = stream.useSharedConnection('main', 'System');
+	const main = markRaw(stream.useChannel('main', null, 'System'));
 
 	// 自分の情報が更新されたとき
 	main.on('meUpdated', i => {
@@ -343,10 +342,6 @@ if ($i) {
 	main.on('unreadChannel', () => {
 		updateAccount({ hasUnreadChannel: true });
 		sound.play('channel');
-	});
-
-	main.on('readAllAnnouncements', () => {
-		updateAccount({ hasUnreadAnnouncement: false });
 	});
 
 	// トークンが再生成されたとき

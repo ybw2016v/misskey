@@ -7,74 +7,83 @@
 	@drop.stop="onDrop"
 >
 	<header>
-		<button v-if="!fixed" class="cancel _button" @click="cancel"><Fa :icon="faTimes"/></button>
+		<button v-if="!fixed" class="cancel _button" @click="cancel"><i class="fas fa-times"></i></button>
 		<div>
 			<span class="text-count" :class="{ over: textLength > max }">{{ max - textLength }}</span>
-			<span class="local-only" v-if="localOnly"><Fa :icon="faBiohazard"/></span>
+			<span class="local-only" v-if="localOnly"><i class="fas fa-biohazard"></i></span>
 			<button class="_button visibility" @click="setVisibility" ref="visibilityButton" v-tooltip="$ts.visibility" :disabled="channel != null">
-				<span v-if="visibility === 'public'"><Fa :icon="faGlobe"/></span>
-				<span v-if="visibility === 'home'"><Fa :icon="faHome"/></span>
-				<span v-if="visibility === 'followers'"><Fa :icon="faUnlock"/></span>
-				<span v-if="visibility === 'specified'"><Fa :icon="faEnvelope"/></span>
+				<span v-if="visibility === 'public'"><i class="fas fa-globe"></i></span>
+				<span v-if="visibility === 'home'"><i class="fas fa-home"></i></span>
+				<span v-if="visibility === 'followers'"><i class="fas fa-unlock"></i></span>
+				<span v-if="visibility === 'specified'"><i class="fas fa-envelope"></i></span>
 			</button>
-			<button class="submit _buttonPrimary" :disabled="!canPost" @click="post">{{ submitText }}<Fa :icon="reply ? faReply : renote ? faQuoteRight : faPaperPlane"/></button>
+			<button class="submit _buttonPrimary" :disabled="!canPost" @click="post">{{ submitText }}<i :class="reply ? 'fas fa-reply' : renote ? 'fas fa-quote-right' : 'fas fa-paper-plane'"></i></button>
 		</div>
 	</header>
 	<div class="form" :class="{ fixed }">
 		<XNotePreview class="preview" v-if="reply" :note="reply"/>
 		<XNotePreview class="preview" v-if="renote" :note="renote"/>
-		<div class="with-quote" v-if="quoteId"><Fa icon="quote-left"/> {{ $ts.quoteAttached }}<button @click="quoteId = null"><Fa icon="times"/></button></div>
+		<div class="with-quote" v-if="quoteId"><i class="fas fa-quote-left"></i> {{ $ts.quoteAttached }}<button @click="quoteId = null"><i class="fas fa-times"></i></button></div>
 		<div v-if="visibility === 'specified'" class="to-specified">
 			<span style="margin-right: 8px;">{{ $ts.recipient }}</span>
 			<div class="visibleUsers">
 				<span v-for="u in visibleUsers" :key="u.id">
 					<MkAcct :user="u"/>
-					<button class="_button" @click="removeVisibleUser(u)"><Fa :icon="faTimes"/></button>
+					<button class="_button" @click="removeVisibleUser(u)"><i class="fas fa-times"></i></button>
 				</span>
-				<button @click="addVisibleUser" class="_buttonPrimary"><Fa :icon="faPlus" fixed-width/></button>
+				<button @click="addVisibleUser" class="_buttonPrimary"><i class="fas fa-plus fa-fw"></i></button>
 			</div>
 		</div>
+		<MkInfo warn v-if="hasNotSpecifiedMentions" class="hasNotSpecifiedMentions">{{ $ts.notSpecifiedMentionWarning }} - <button class="_textButton" @click="addMissingMention()">{{ $ts.add }}</button></MkInfo>
 		<input v-show="useCw" ref="cw" class="cw" v-model="cw" :placeholder="$ts.annotation" @keydown="onKeydown">
 		<textarea v-model="text" class="text" :class="{ withCw: useCw }" ref="text" :disabled="posting" :placeholder="placeholder" @keydown="onKeydown" @paste="onPaste" @compositionupdate="onCompositionUpdate" @compositionend="onCompositionEnd" />
+		<input v-show="withHashtags" ref="hashtags" class="hashtags" v-model="hashtags" :placeholder="$ts.hashtags" list="hashtags">
 		<XPostFormAttaches class="attaches" :files="files" @updated="updateFiles" @detach="detachFile" @changeSensitive="updateFileSensitive" @changeName="updateFileName"/>
 		<XPollEditor v-if="poll" :poll="poll" @destroyed="poll = null" @updated="onPollUpdate"/>
 		<footer>
-			<button class="_button" @click="chooseFileFrom" v-tooltip="$ts.attachFile"><Fa :icon="faPhotoVideo"/></button>
-			<button class="_button" @click="togglePoll" :class="{ active: poll }" v-tooltip="$ts.poll"><Fa :icon="faPollH"/></button>
-			<button class="_button" @click="useCw = !useCw" :class="{ active: useCw }" v-tooltip="$ts.useCw"><Fa :icon="faEyeSlash"/></button>
-			<button class="_button" @click="insertMention" v-tooltip="$ts.mention"><Fa :icon="faAt"/></button>
-			<button class="_button" @click="insertEmoji" v-tooltip="$ts.emoji"><Fa :icon="faLaughSquint"/></button>
-			<button class="_button" @click="showActions" v-tooltip="$ts.plugin" v-if="postFormActions.length > 0"><Fa :icon="faPlug"/></button>
+			<button class="_button" @click="chooseFileFrom" v-tooltip="$ts.attachFile"><i class="fas fa-photo-video"></i></button>
+			<button class="_button" @click="togglePoll" :class="{ active: poll }" v-tooltip="$ts.poll"><i class="fas fa-poll-h"></i></button>
+			<button class="_button" @click="useCw = !useCw" :class="{ active: useCw }" v-tooltip="$ts.useCw"><i class="fas fa-eye-slash"></i></button>
+			<button class="_button" @click="insertMention" v-tooltip="$ts.mention"><i class="fas fa-at"></i></button>
+			<button class="_button" @click="withHashtags = !withHashtags" v-tooltip="$ts.hashtags"><i class="fas fa-hashtag"></i></button>
+			<button class="_button" @click="insertEmoji" v-tooltip="$ts.emoji"><i class="fas fa-laugh-squint"></i></button>
+			<button class="_button" @click="showActions" v-tooltip="$ts.plugin" v-if="postFormActions.length > 0"><i class="fas fa-plug"></i></button>
 		</footer>
+		<datalist id="hashtags">
+			<option v-for="hashtag in recentHashtags" :value="hashtag" :key="hashtag"/>
+		</datalist>
 	</div>
 </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent } from 'vue';
-import { faReply, faQuoteRight, faPaperPlane, faTimes, faUpload, faPollH, faGlobe, faHome, faUnlock, faEnvelope, faPlus, faPhotoVideo, faAt, faBiohazard, faPlug } from '@fortawesome/free-solid-svg-icons';
-import { faEyeSlash, faLaughSquint } from '@fortawesome/free-regular-svg-icons';
 import insertTextAtCursor from 'insert-text-at-cursor';
 import { length } from 'stringz';
-import { toASCII } from 'punycode';
+import { toASCII } from 'punycode/';
 import XNotePreview from './note-preview.vue';
-import { parse } from '../../mfm/parse';
-import { host, url } from '@/config';
+import * as mfm from 'mfm-js';
+import { host, url } from '@client/config';
 import { erase, unique } from '../../prelude/array';
-import extractMentions from '../../misc/extract-mentions';
-import getAcct from '../../misc/acct/render';
-import { formatTimeString } from '../../misc/format-time-string';
-import { Autocomplete } from '@/scripts/autocomplete';
+import { extractMentions } from '@/misc/extract-mentions';
+import { getAcct } from '@/misc/acct';
+import { formatTimeString } from '@/misc/format-time-string';
+import { Autocomplete } from '@client/scripts/autocomplete';
 import { noteVisibilities } from '../../types';
-import * as os from '@/os';
-import { selectFile } from '@/scripts/select-file';
-import { notePostInterruptors, postFormActions } from '@/store';
+import * as os from '@client/os';
+import { selectFile } from '@client/scripts/select-file';
+import { defaultStore, notePostInterruptors, postFormActions } from '@client/store';
+import { isMobile } from '@client/scripts/is-mobile';
+import { throttle } from 'throttle-debounce';
+import MkInfo from '@client/components/ui/info.vue';
+import { defaultStore } from '@client/store';
 
 export default defineComponent({
 	components: {
 		XNotePreview,
 		XPostFormAttaches: defineAsyncComponent(() => import('./post-form-attaches.vue')),
-		XPollEditor: defineAsyncComponent(() => import('./poll-editor.vue'))
+		XPollEditor: defineAsyncComponent(() => import('./poll-editor.vue')),
+		MkInfo,
 	},
 
 	inject: ['modal'],
@@ -141,10 +150,15 @@ export default defineComponent({
 			autocomplete: null,
 			draghover: false,
 			quoteId: null,
+			hasNotSpecifiedMentions: false,
 			recentHashtags: JSON.parse(localStorage.getItem('hashtags') || '[]'),
 			imeText: '',
+			typing: throttle(3000, () => {
+				if (this.channel) {
+					os.stream.send('typingOnChannel', { channel: this.channel.id });
+				}
+			}),
 			postFormActions,
-			faReply, faQuoteRight, faPaperPlane, faTimes, faUpload, faPollH, faGlobe, faHome, faUnlock, faEnvelope, faEyeSlash, faLaughSquint, faPlus, faPhotoVideo, faAt, faBiohazard, faPlug
 		};
 	},
 
@@ -204,6 +218,21 @@ export default defineComponent({
 
 		max(): number {
 			return this.$instance ? this.$instance.maxNoteTextLength : 1000;
+		},
+
+		withHashtags: defaultStore.makeGetterSetter('postFormWithHashtags'),
+		hashtags: defaultStore.makeGetterSetter('postFormHashtags'),
+	},
+
+	watch: {
+		text() {
+			this.checkMissingMention();
+		},
+		visibleUsers: {
+			handler() {
+				this.checkMissingMention();
+			},
+			deep: true
 		}
 	},
 
@@ -222,7 +251,7 @@ export default defineComponent({
 		}
 
 		if (this.reply && this.reply.text != null) {
-			const ast = parse(this.reply.text);
+			const ast = mfm.parse(this.reply.text);
 
 			for (const x of extractMentions(ast)) {
 				const mention = x.host ? `@${x.username}@${toASCII(x.host)}` : `@${x.username}`;
@@ -283,6 +312,7 @@ export default defineComponent({
 		// TODO: detach when unmount
 		new Autocomplete(this.$refs.text, this, { model: 'text' });
 		new Autocomplete(this.$refs.cw, this, { model: 'cw' });
+		new Autocomplete(this.$refs.hashtags, this, { model: 'hashtags' });
 
 		this.$nextTick(() => {
 			// 書きかけの投稿を復元
@@ -329,6 +359,32 @@ export default defineComponent({
 			this.$watch('files', () => this.saveDraft(), { deep: true });
 			this.$watch('visibility', () => this.saveDraft());
 			this.$watch('localOnly', () => this.saveDraft());
+		},
+
+		checkMissingMention() {
+			if (this.visibility === 'specified') {
+				const ast = mfm.parse(this.text);
+
+				for (const x of extractMentions(ast)) {
+					if (!this.visibleUsers.some(u => (u.username === x.username) && (u.host == x.host))) {
+						this.hasNotSpecifiedMentions = true;
+						return;
+					}
+				}
+				this.hasNotSpecifiedMentions = false;
+			}
+		},
+
+		addMissingMention() {
+			const ast = mfm.parse(this.text);
+
+			for (const x of extractMentions(ast)) {
+				if (!this.visibleUsers.some(u => (u.username === x.username) && (u.host == x.host))) {
+					os.api('users/show', { username: x.username, host: x.host }).then(user => {
+						this.visibleUsers.push(user);
+					});
+				}
+			}
 		},
 
 		togglePoll() {
@@ -433,10 +489,12 @@ export default defineComponent({
 		onKeydown(e: KeyboardEvent) {
 			if ((e.which === 10 || e.which === 13) && (e.ctrlKey || e.metaKey) && this.canPost) this.post();
 			if (e.which === 27) this.$emit('esc');
+			this.typing();
 		},
 
 		onCompositionUpdate(e: CompositionEvent) {
 			this.imeText = e.data;
+			this.typing();
 		},
 
 		onCompositionEnd(e: CompositionEvent) {
@@ -554,8 +612,13 @@ export default defineComponent({
 				localOnly: this.localOnly,
 				visibility: this.visibility,
 				visibleUserIds: this.visibility == 'specified' ? this.visibleUsers.map(u => u.id) : undefined,
-				viaMobile: os.isMobile
+				viaMobile: isMobile
 			};
+
+			if (this.withHashtags) {
+				const hashtags = this.hashtags.trim().split(' ').map(x => x.startsWith('#') ? x : '#' + x).join(' ');
+				data.text = data.text ? `${data.text} ${hashtags}` : hashtags;
+			}
 
 			// plugin
 			if (notePostInterruptors.length > 0) {
@@ -570,8 +633,8 @@ export default defineComponent({
 				this.$nextTick(() => {
 					this.deleteDraft();
 					this.$emit('posted');
-					if (this.text && this.text != '') {
-						const hashtags = parse(this.text).filter(x => x.node.type === 'hashtag').map(x => x.node.props.hashtag);
+					if (data.text && data.text != '') {
+						const hashtags = mfm.parse(data.text).filter(x => x.type === 'hashtag').map(x => x.props.hashtag);
 						const history = JSON.parse(localStorage.getItem('hashtags') || '[]') as string[];
 						localStorage.setItem('hashtags', JSON.stringify(unique(hashtags.concat(history))));
 					}
@@ -597,13 +660,11 @@ export default defineComponent({
 		},
 
 		async insertEmoji(ev) {
-			os.pickEmoji(ev.currentTarget || ev.target).then(emoji => {
-				insertTextAtCursor(this.$refs.text, emoji);
-			});
+			os.openEmojiPicker(ev.currentTarget || ev.target, {}, this.$refs.text);
 		},
 
 		showActions(ev) {
-			os.modalMenu(postFormActions.map(action => ({
+			os.popupMenu(postFormActions.map(action => ({
 				text: action.title,
 				action: () => {
 					action.handler({
@@ -675,7 +736,7 @@ export default defineComponent({
 					opacity: 0.7;
 				}
 
-				> [data-icon] {
+				> i {
 					margin-left: 6px;
 				}
 			}
@@ -734,7 +795,12 @@ export default defineComponent({
 			}
 		}
 
+		> .hasNotSpecifiedMentions {
+			margin: 0 20px 16px 20px;
+		}
+
 		> .cw,
+		> .hashtags,
 		> .text {
 			display: block;
 			box-sizing: border-box;
@@ -760,7 +826,14 @@ export default defineComponent({
 		> .cw {
 			z-index: 1;
 			padding-bottom: 8px;
-			border-bottom: solid 1px var(--divider);
+			border-bottom: solid 0.5px var(--divider);
+		}
+
+		> .hashtags {
+			z-index: 1;
+			padding-top: 8px;
+			padding-bottom: 8px;
+			border-top: solid 0.5px var(--divider);
 		}
 
 		> .text {
@@ -822,6 +895,7 @@ export default defineComponent({
 			}
 
 			> .cw,
+			> .hashtags,
 			> .text {
 				padding: 0 16px;
 			}

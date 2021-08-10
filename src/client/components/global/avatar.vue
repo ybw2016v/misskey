@@ -1,19 +1,25 @@
 <template>
-<span class="eiwwqkts" :class="{ cat }" :title="acct(user)" v-if="disableLink" v-user-preview="disablePreview ? undefined : user.id" @click="onClick">
+<span class="eiwwqkts _noSelect" :class="{ cat, square: $store.state.squareAvatars }" :title="acct(user)" v-if="disableLink" v-user-preview="disablePreview ? undefined : user.id" @click="onClick">
 	<img class="inner" :src="url" decoding="async"/>
+	<MkUserOnlineIndicator v-if="showIndicator" class="indicator" :user="user"/>
 </span>
-<MkA class="eiwwqkts" :class="{ cat }" :to="userPage(user)" :title="acct(user)" :target="target" v-else v-user-preview="disablePreview ? undefined : user.id">
+<MkA class="eiwwqkts _noSelect" :class="{ cat, square: $store.state.squareAvatars }" :to="userPage(user)" :title="acct(user)" :target="target" v-else v-user-preview="disablePreview ? undefined : user.id">
 	<img class="inner" :src="url" decoding="async"/>
+	<MkUserOnlineIndicator v-if="showIndicator" class="indicator" :user="user"/>
 </MkA>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { getStaticImageUrl } from '@/scripts/get-static-image-url';
-import { extractAvgColorFromBlurhash } from '@/scripts/extract-avg-color-from-blurhash';
-import { acct, userPage } from '@/filters/user';
+import { getStaticImageUrl } from '@client/scripts/get-static-image-url';
+import { extractAvgColorFromBlurhash } from '@client/scripts/extract-avg-color-from-blurhash';
+import { acct, userPage } from '@client/filters/user';
+import MkUserOnlineIndicator from '@client/components/user-online-indicator.vue';
 
 export default defineComponent({
+	components: {
+		MkUserOnlineIndicator
+	},
 	props: {
 		user: {
 			type: Object,
@@ -28,6 +34,10 @@ export default defineComponent({
 			default: false
 		},
 		disablePreview: {
+			required: false,
+			default: false
+		},
+		showIndicator: {
 			required: false,
 			default: false
 		}
@@ -71,6 +81,37 @@ export default defineComponent({
 	border-radius: 100%;
 	line-height: 16px;
 
+	> .inner {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		top: 0;
+		border-radius: 100%;
+		z-index: 1;
+		overflow: hidden;
+		object-fit: cover;
+		width: 100%;
+		height: 100%;
+	}
+
+	> .indicator {
+		position: absolute;
+		z-index: 1;
+		bottom: 0;
+		left: 0;
+		width: 20%;
+		height: 20%;
+	}
+
+	&.square {
+		border-radius: 20%;
+
+		> .inner {
+			border-radius: 20%;
+		}
+	}
+
 	&.cat {
 		&:before, &:after {
 			background: #df548f;
@@ -91,20 +132,6 @@ export default defineComponent({
 			border-radius: 75% 0 75% 75%;
 			transform: rotate(-37.5deg) skew(-30deg);
 		}
-	}
-
-	.inner {
-		position: absolute;
-		bottom: 0;
-		left: 0;
-		right: 0;
-		top: 0;
-		border-radius: 100%;
-		z-index: 1;
-		overflow: hidden;
-		object-fit: cover;
-		width: 100%;
-		height: 100%;
 	}
 }
 </style>

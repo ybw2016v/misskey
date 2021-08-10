@@ -17,11 +17,11 @@
 			</header>
 
 			<div>
-				<div class="random" v-if="game.map == null"><fa icon="dice"/></div>
+				<div class="random" v-if="game.map == null"><i class="fas fa-dice"></i></div>
 				<div class="board" v-else :style="{ 'grid-template-rows': `repeat(${ game.map.length }, 1fr)`, 'grid-template-columns': `repeat(${ game.map[0].length }, 1fr)` }">
 					<div v-for="(x, i) in game.map.join('')" :class="{ none: x == ' ' }" @click="onPixelClick(i, x)">
-						<fa v-if="x == 'b'" :icon="fasCircle"/>
-						<fa v-if="x == 'w'" :icon="farCircle"/>
+						<i v-if="x === 'b'" class="fas fa-circle"></i>
+						<i v-if="x === 'w'" class="far fa-circle"></i>
 					</div>
 				</div>
 			</div>
@@ -57,9 +57,9 @@
 			</header>
 
 			<div>
-				<MkSwitch v-model:value="game.isLlotheo" @update:value="updateSettings('isLlotheo')">{{ $ts._reversi.isLlotheo }}</MkSwitch>
-				<MkSwitch v-model:value="game.loopedBoard" @update:value="updateSettings('loopedBoard')">{{ $ts._reversi.loopedMap }}</MkSwitch>
-				<MkSwitch v-model:value="game.canPutEverywhere" @update:value="updateSettings('canPutEverywhere')">{{ $ts._reversi.canPutEverywhere }}</MkSwitch>
+				<MkSwitch v-model="game.isLlotheo" @update:modelValue="updateSettings('isLlotheo')">{{ $ts._reversi.isLlotheo }}</MkSwitch>
+				<MkSwitch v-model="game.loopedBoard" @update:modelValue="updateSettings('loopedBoard')">{{ $ts._reversi.loopedMap }}</MkSwitch>
+				<MkSwitch v-model="game.canPutEverywhere" @update:modelValue="updateSettings('canPutEverywhere')">{{ $ts._reversi.canPutEverywhere }}</MkSwitch>
 			</div>
 		</div>
 
@@ -70,7 +70,7 @@
 
 			<div>
 				<template v-for="item in form">
-					<MkSwitch v-if="item.type == 'switch'" v-model:value="item.value" :key="item.id" @change="onChangeForm(item)">{{ item.label || item.desc || '' }}</MkSwitch>
+					<MkSwitch v-if="item.type == 'switch'" v-model="item.value" :key="item.id" @change="onChangeForm(item)">{{ item.label || item.desc || '' }}</MkSwitch>
 
 					<div class="card" v-if="item.type == 'radio'" :key="item.id">
 						<header>
@@ -125,12 +125,10 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { faCircle as fasCircle } from '@fortawesome/free-solid-svg-icons';
-import { faCircle as farCircle } from '@fortawesome/free-regular-svg-icons';
 import * as maps from '../../../games/reversi/maps';
-import MkButton from '@/components/ui/button.vue';
-import MkSwitch from '@/components/ui/switch.vue';
-import MkRadio from '@/components/ui/radio.vue';
+import MkButton from '@client/components/ui/button.vue';
+import MkSwitch from '@client/components/ui/switch.vue';
+import MkRadio from '@client/components/ui/radio.vue';
 
 export default defineComponent({
 	components: {
@@ -159,7 +157,6 @@ export default defineComponent({
 			maps: maps,
 			form: null,
 			messages: [],
-			fasCircle, farCircle
 		};
 	},
 

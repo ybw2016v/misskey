@@ -1,4 +1,4 @@
-import config from '../../config';
+import config from '@/config';
 import { Note } from '../../models/entities/note';
 import { User, IRemoteUser } from '../../models/entities/user';
 import { UserPublickey } from '../../models/entities/user-publickey';
@@ -6,7 +6,6 @@ import { MessagingMessage } from '../../models/entities/messaging-message';
 import { Notes, Users, UserPublickeys, MessagingMessages } from '../../models';
 import { IObject, getApId } from './type';
 import { resolvePerson } from './models/person';
-import { ensure } from '../../prelude/ensure';
 import escapeRegexp = require('escape-regexp');
 
 export default class DbResolver {
@@ -99,7 +98,7 @@ export default class DbResolver {
 
 		if (user == null) return null;
 
-		const key = await UserPublickeys.findOne(user.id).then(ensure);
+		const key = await UserPublickeys.findOne(user.id);
 
 		return {
 			user,
@@ -128,7 +127,7 @@ export default class DbResolver {
 
 export type AuthUser = {
 	user: IRemoteUser;
-	key: UserPublickey;
+	key?: UserPublickey;
 };
 
 type UriParseResult = {

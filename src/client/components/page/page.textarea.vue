@@ -1,10 +1,10 @@
 <template>
-<MkTextarea :value="text" readonly></MkTextarea>
+<MkTextarea :model-value="text" readonly></MkTextarea>
 </template>
 
 <script lang="ts">
-import { TextBlock } from '@/scripts/hpml/block';
-import { Hpml } from '@/scripts/hpml/evaluator';
+import { TextBlock } from '@client/scripts/hpml/block';
+import { Hpml } from '@client/scripts/hpml/evaluator';
 import { defineComponent, PropType } from 'vue';
 import MkTextarea from '../ui/textarea.vue';
 

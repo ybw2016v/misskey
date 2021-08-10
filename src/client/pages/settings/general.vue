@@ -1,6 +1,5 @@
 <template>
 <FormBase>
-	<FormSwitch v-model:value="titlebar">{{ $ts.showTitlebar }}</FormSwitch>
 	<FormSwitch v-model:value="showFixedPostForm">{{ $ts.showFixedPostForm }}</FormSwitch>
 
 	<FormSelect v-model:value="lang">
@@ -19,6 +18,7 @@
 		<template #label>{{ $ts.behavior }}</template>
 		<FormSwitch v-model:value="imageNewTab">{{ $ts.openImageInNewTab }}</FormSwitch>
 		<FormSwitch v-model:value="enableInfiniteScroll">{{ $ts.enableInfiniteScroll }}</FormSwitch>
+		<FormSwitch v-model:value="useReactionPickerForContextMenu">{{ $ts.useReactionPickerForContextMenu }}</FormSwitch>
 		<FormSwitch v-model:value="disablePagesScript">{{ $ts.disablePagesScript }}</FormSwitch>
 	</FormGroup>
 
@@ -37,6 +37,7 @@
 		<FormSwitch v-model:value="showGapBetweenNotesInTimeline">{{ $ts.showGapBetweenNotesInTimeline }}</FormSwitch>
 		<FormSwitch v-model:value="loadRawImages">{{ $ts.loadRawImages }}</FormSwitch>
 		<FormSwitch v-model:value="disableShowingAnimatedImages">{{ $ts.disableShowingAnimatedImages }}</FormSwitch>
+		<FormSwitch v-model:value="squareAvatars">{{ $ts.squareAvatars }}</FormSwitch>
 		<FormSwitch v-model:value="useSystemFont">{{ $ts.useSystemFont }}</FormSwitch>
 		<FormSwitch v-model:value="useOsNativeEmojis">{{ $ts.useOsNativeEmojis }}
 			<div><Mfm text="🍮🍦🍭🍩🍰🍫🍬🥞🍪" :key="useOsNativeEmojis"/></div>
@@ -78,24 +79,27 @@
 	</FormSelect>
 
 	<FormLink to="/settings/deck">{{ $ts.deck }}</FormLink>
+
+	<FormLink to="/settings/custom-css"><template #icon><i class="fas fa-code"></i></template>{{ $ts.customCss }}</FormLink>
 </FormBase>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import { faImage, faCog, faColumns, faCogs } from '@fortawesome/free-solid-svg-icons';
-import FormSwitch from '@/components/form/switch.vue';
-import FormSelect from '@/components/form/select.vue';
-import FormRadios from '@/components/form/radios.vue';
-import FormBase from '@/components/form/base.vue';
-import FormGroup from '@/components/form/group.vue';
-import FormLink from '@/components/form/link.vue';
-import FormButton from '@/components/form/button.vue';
-import MkLink from '@/components/link.vue';
-import { langs } from '@/config';
-import { defaultStore } from '@/store';
-import { ColdDeviceStorage } from '@/store';
-import * as os from '@/os';
+import FormSwitch from '@client/components/form/switch.vue';
+import FormSelect from '@client/components/form/select.vue';
+import FormRadios from '@client/components/form/radios.vue';
+import FormBase from '@client/components/form/base.vue';
+import FormGroup from '@client/components/form/group.vue';
+import FormLink from '@client/components/form/link.vue';
+import FormButton from '@client/components/form/button.vue';
+import MkLink from '@client/components/link.vue';
+import { langs } from '@client/config';
+import { defaultStore } from '@client/store';
+import { ColdDeviceStorage } from '@client/store';
+import * as os from '@client/os';
+import { unisonReload } from '@client/scripts/unison-reload';
+import * as symbols from '@client/symbols';
 
 export default defineComponent({
 	components: {
@@ -113,15 +117,14 @@ export default defineComponent({
 
 	data() {
 		return {
-			INFO: {
+			[symbols.PAGE_INFO]: {
 				title: this.$ts.general,
-				icon: faCogs
+				icon: 'fas fa-cogs'
 			},
 			langs,
 			lang: localStorage.getItem('lang'),
 			fontSize: localStorage.getItem('fontSize'),
 			useSystemFont: localStorage.getItem('useSystemFont') != null,
-			faImage, faCog, faColumns
 		}
 	},
 
@@ -134,7 +137,6 @@ export default defineComponent({
 		useOsNativeEmojis: defaultStore.makeGetterSetter('useOsNativeEmojis'),
 		disableShowingAnimatedImages: defaultStore.makeGetterSetter('disableShowingAnimatedImages'),
 		loadRawImages: defaultStore.makeGetterSetter('loadRawImages'),
-		titlebar: defaultStore.makeGetterSetter('titlebar'),
 		imageNewTab: defaultStore.makeGetterSetter('imageNewTab'),
 		nsfw: defaultStore.makeGetterSetter('nsfw'),
 		disablePagesScript: defaultStore.makeGetterSetter('disablePagesScript'),
@@ -143,6 +145,8 @@ export default defineComponent({
 		chatOpenBehavior: ColdDeviceStorage.makeGetterSetter('chatOpenBehavior'),
 		instanceTicker: defaultStore.makeGetterSetter('instanceTicker'),
 		enableInfiniteScroll: defaultStore.makeGetterSetter('enableInfiniteScroll'),
+		useReactionPickerForContextMenu: defaultStore.makeGetterSetter('useReactionPickerForContextMenu'),
+		squareAvatars: defaultStore.makeGetterSetter('squareAvatars'),
 	},
 
 	watch: {
@@ -174,11 +178,11 @@ export default defineComponent({
 			this.reloadAsk();
 		},
 
-		showGapBetweenNotesInTimeline() {
+		squareAvatars() {
 			this.reloadAsk();
 		},
 
-		titlebar() {
+		showGapBetweenNotesInTimeline() {
 			this.reloadAsk();
 		},
 
@@ -188,7 +192,7 @@ export default defineComponent({
 	},
 
 	mounted() {
-		this.$emit('info', this.INFO);
+		this.$emit('info', this[symbols.PAGE_INFO]);
 	},
 
 	methods: {
@@ -200,7 +204,7 @@ export default defineComponent({
 			});
 			if (canceled) return;
 
-			location.reload();
+			unisonReload();
 		}
 	}
 });
