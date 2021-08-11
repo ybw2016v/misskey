@@ -118,7 +118,7 @@
 	function renderError(code, details) {
 		document.documentElement.innerHTML = `
 			<h1>⚠发生了一些事情</h1>
-			<p>这个页面通常会出现在版本更行后，浏览器缓存的旧的前端文件与新的后端不匹配，通常刷新后恢复正常。如反复刷新后仍然看到这样页面，说明可能出了一些不好的事情，可以通知Email: neko@neko.red来处理。</p>
+			<p>这个页面通常会出现在版本更新后，浏览器缓存的旧的前端文件与新的后端不匹配，通常刷新后恢复正常。如反复刷新后仍然看到这样页面，说明可能出了一些不好的事情，可以通知Email: neko@neko.red来处理。</p>
 			<ul>
 				<li><a href="/cli">简易界面</a>启动</li>
 				<li><a href="/bios">BIOS</a>，模式</li>
