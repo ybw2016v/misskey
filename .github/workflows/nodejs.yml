@@ -4,6 +4,7 @@ on:
     branches:
       - master
       - develop
+      - neko
   pull_request:
 
 jobs:

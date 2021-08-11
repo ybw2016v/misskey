@@ -182,7 +182,7 @@ export default defineComponent({
 			this.chartInstance = markRaw(new Chart(this.$refs.chart, {
 				type: 'line',
 				data: {
-					labels: new Array(this.chartLimit).fill(0).map((_, i) => this.getDate(i).toLocaleString()).slice().reverse(),
+					labels: new Array(this.chartLimit).fill(0).map((_, i) => this.getDate(i).toISOString()).slice().reverse(),
 					datasets: this.data.series.map(x => ({
 						label: x.name,
 						data: x.data.slice().reverse(),
