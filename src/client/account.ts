@@ -1,8 +1,9 @@
-import { get, set } from '@client/scripts/idb-proxy';
+import { del, get, set } from '@client/scripts/idb-proxy';
 import { reactive } from 'vue';
 import { apiUrl } from '@client/config';
 import { waiting } from '@client/os';
 import { unisonReload, reloadChannel } from '@client/scripts/unison-reload';
+import { showSuspendedDialog } from './scripts/show-suspended-dialog';
 
 // TODO: 他のタブと永続化されたstateを同期
 
@@ -26,21 +27,33 @@ export async function signout() {
 	//#region Remove account
 	const accounts = await getAccounts();
 	accounts.splice(accounts.findIndex(x => x.id === $i.id), 1);
-	set('accounts', accounts);
+
+	if (accounts.length > 0) await set('accounts', accounts);
+	else await del('accounts');
 	//#endregion
 
-	//#region Remove push notification registration
+	//#region Remove service worker registration
 	try {
-		const registration = await navigator.serviceWorker.ready;
-		const push = await registration.pushManager.getSubscription();
-		if (!push) return;
-		await fetch(`${apiUrl}/sw/unregister`, {
-			method: 'POST',
-			body: JSON.stringify({
-				i: $i.token,
-				endpoint: push.endpoint,
-			}),
-		});
+		if (navigator.serviceWorker.controller) {
+			const registration = await navigator.serviceWorker.ready;
+			const push = await registration.pushManager.getSubscription();
+			if (push) {
+				await fetch(`${apiUrl}/sw/unregister`, {
+					method: 'POST',
+					body: JSON.stringify({
+						i: $i.token,
+						endpoint: push.endpoint,
+					}),
+				});
+			}
+		}
+
+		if (accounts.length === 0) {
+			await navigator.serviceWorker.getRegistrations()
+				.then(registrations => {
+					return Promise.all(registrations.map(registration => registration.unregister()));
+				});
+		}
 	} catch (e) {}
 	//#endregion
 
@@ -70,17 +83,20 @@ function fetchAccount(token): Promise<Account> {
 				i: token
 			})
 		})
+		.then(res => res.json())
 		.then(res => {
-			// When failed to authenticate user
-			if (res.status !== 200 && res.status < 500) {
-				return signout();
+			if (res.error) {
+				if (res.error.id === 'a8c724b3-6e9c-4b46-b1a8-bc3ed6258370') {
+					showSuspendedDialog().then(() => {
+						signout();
+					});
+				} else {
+					signout();
+				}
+			} else {
+				res.token = token;
+				done(res);
 			}
-
-			// Parse response
-			res.json().then(i => {
-				i.token = token;
-				done(i);
-			});
 		})
 		.catch(fail);
 	});

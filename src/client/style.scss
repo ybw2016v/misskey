@@ -156,6 +156,7 @@ hr {
 
 ._button {
 	appearance: none;
+	display: inline-block;
 	padding: 0;
 	margin: 0; // for Safari
 	background: none;
@@ -201,6 +202,11 @@ hr {
 	}
 }
 
+._help {
+	color: var(--accent);
+	cursor: help
+}
+
 ._textButton {
 	@extend ._button;
 	color: var(--accent);
@@ -239,7 +245,6 @@ hr {
 ._panel {
 	background: var(--panel);
 	border-radius: var(--radius);
-	border: var(--panelBorder);
 	overflow: clip;
 }
 
