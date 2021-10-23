@@ -135,7 +135,7 @@ export default defineComponent({
 			chartInstance = new Chart(chartEl.value, {
 				type: 'line',
 				data: {
-					labels: new Array(props.limit).fill(0).map((_, i) => getDate(i).toLocaleString()).slice().reverse(),
+					labels: new Array(props.limit).fill(0).map((_, i) => getDate(i).toISOString()).slice().reverse(),
 					datasets: data.series.map((x, i) => ({
 						parsing: false,
 						label: x.name,
