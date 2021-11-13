@@ -2,7 +2,7 @@
 <MkModal ref="modal" @click="$refs.modal.close()" @closed="$emit('closed')">
 	<div class="xubzgfga">
 		<header>{{ image.name }}</header>
-		<img :src="image.url" :alt="image.comment" :title="image.comment" @click="$refs.modal.close()"/>
+		<img :src="image.url" :alt="image.name" :title="image.name" @click="$refs.modal.close()"/>
 		<footer>
 			<span>{{ image.type }}</span>
 			<span>{{ bytes(image.size) }}</span>
@@ -14,6 +14,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+<<<<<<< HEAD
 <<<<<<< HEAD:src/client/components/image-viewer.vue
 import bytes from '@client/filters/bytes';
 import number from '@client/filters/number';
@@ -21,21 +22,31 @@ import MkModal from '@client/components/ui/modal.vue';
 import 'viewerjs/dist/viewer.css';
 import Viewer from 'viewerjs';
 =======
+=======
+>>>>>>> 2795fe457909c687f668d020ef65d52abc3182fb
 import bytes from '@/filters/bytes';
 import number from '@/filters/number';
 import MkModal from '@/components/ui/modal.vue';
 
+<<<<<<< HEAD
 >>>>>>> 2795fe457909c687f668d020ef65d52abc3182fb:packages/client/src/components/image-viewer.vue
+=======
+>>>>>>> 2795fe457909c687f668d020ef65d52abc3182fb
 export default defineComponent({
 	components: {
 		MkModal,
 	},
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2795fe457909c687f668d020ef65d52abc3182fb
 	props: {
 		image: {
 			type: Object,
 			required: true
 		},
 	},
+<<<<<<< HEAD
 	emits: ['closed'],
 	mounted ()
 	{
@@ -76,6 +87,15 @@ export default defineComponent({
 			this.$refs.modal.close(); //Fix the bug that one same image show twice
 		}
 		}
+=======
+
+	emits: ['closed'],
+
+	methods: {
+		bytes,
+		number,
+	}
+>>>>>>> 2795fe457909c687f668d020ef65d52abc3182fb
 });
 </script>
 
@@ -84,6 +104,10 @@ export default defineComponent({
 	display: flex;
 	flex-direction: column;
 	height: 100%;
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2795fe457909c687f668d020ef65d52abc3182fb
 	> header,
 	> footer {
 		align-self: center;
@@ -94,10 +118,18 @@ export default defineComponent({
 		border-radius: 6px;
 		color: #fff;
 	}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2795fe457909c687f668d020ef65d52abc3182fb
 	> header {
 		margin-bottom: 8px;
 		opacity: 0.9;
 	}
+<<<<<<< HEAD
+=======
+
+>>>>>>> 2795fe457909c687f668d020ef65d52abc3182fb
 	> img {
 		display: block;
 		flex: 1;
@@ -107,9 +139,17 @@ export default defineComponent({
 		cursor: zoom-out;
 		image-orientation: from-image;
 	}
+<<<<<<< HEAD
 	> footer {
 		margin-top: 8px;
 		opacity: 0.8;
+=======
+
+	> footer {
+		margin-top: 8px;
+		opacity: 0.8;
+
+>>>>>>> 2795fe457909c687f668d020ef65d52abc3182fb
 		> span + span {
 			margin-left: 0.5em;
 			padding-left: 0.5em;
