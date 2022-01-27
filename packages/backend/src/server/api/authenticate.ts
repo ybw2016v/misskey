@@ -10,7 +10,7 @@ export class AuthenticationError extends Error {
 	}
 }
 
-export default async (token: string): Promise<[User | null | undefined, App | null | undefined]> => {
+export default async (token: string | null): Promise<[User | null | undefined, AccessToken | null | undefined]> => {
 	if (token == null) {
 		return [null, null];
 	}
@@ -28,9 +28,9 @@ export default async (token: string): Promise<[User | null | undefined, App | nu
 	} else {
 		const accessToken = await AccessTokens.findOne({
 			where: [{
-				hash: token.toLowerCase() // app
+				hash: token.toLowerCase(), // app
 			}, {
-				token: token // miauth
+				token: token, // miauth
 			}],
 		});
 
@@ -44,7 +44,7 @@ export default async (token: string): Promise<[User | null | undefined, App | nu
 
 		const user = await Users
 			.findOne({
-				id: accessToken.userId // findOne(accessToken.userId) のように書かないのは後方互換性のため
+				id: accessToken.userId, // findOne(accessToken.userId) のように書かないのは後方互換性のため
 			});
 
 		if (accessToken.appId) {
@@ -53,7 +53,7 @@ export default async (token: string): Promise<[User | null | undefined, App | nu
 
 			return [user, {
 				id: accessToken.id,
-				permission: app.permission
+				permission: app.permission,
 			} as AccessToken];
 		} else {
 			return [user, accessToken];

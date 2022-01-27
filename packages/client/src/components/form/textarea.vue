@@ -3,8 +3,9 @@
 	<div class="label" @click="focus"><slot name="label"></slot></div>
 	<div class="input" :class="{ disabled, focused, tall, pre }">
 		<textarea ref="inputEl"
-			:class="{ code, _monospace: code }"
 			v-model="v"
+			v-adaptive-border
+			:class="{ code, _monospace: code }"
 			:disabled="disabled"
 			:required="required"
 			:readonly="readonly"
@@ -20,7 +21,7 @@
 	</div>
 	<div class="caption"><slot name="caption"></slot></div>
 
-	<MkButton v-if="manualSave && changed" @click="updated" primary><i class="fas fa-save"></i> {{ $ts.save }}</MkButton>
+	<MkButton v-if="manualSave && changed" primary class="save" @click="updated"><i class="fas fa-save"></i> {{ $ts.save }}</MkButton>
 </div>
 </template>
 
@@ -174,7 +175,7 @@ export default defineComponent({
 .adhpbeos {
 	> .label {
 		font-size: 0.85em;
-		padding: 0 0 8px 12px;
+		padding: 0 0 8px 0;
 		user-select: none;
 
 		&:empty {
@@ -183,8 +184,8 @@ export default defineComponent({
 	}
 
 	> .caption {
-		font-size: 0.8em;
-		padding: 8px 0 0 12px;
+		font-size: 0.85em;
+		padding: 8px 0 0 0;
 		color: var(--fgTransparentWeak);
 
 		&:empty {
@@ -210,7 +211,7 @@ export default defineComponent({
 			font-size: 1em;
 			color: var(--fg);
 			background: var(--panel);
-			border: solid 0.5px var(--inputBorder);
+			border: solid 1px var(--panel);
 			border-radius: 6px;
 			outline: none;
 			box-shadow: none;
@@ -218,13 +219,13 @@ export default defineComponent({
 			transition: border-color 0.1s ease-out;
 
 			&:hover {
-				border-color: var(--inputBorderHover);
+				border-color: var(--inputBorderHover) !important;
 			}
 		}
 
 		&.focused {
 			> textarea {
-				border-color: var(--accent);
+				border-color: var(--accent) !important;
 			}
 		}
 
@@ -247,6 +248,10 @@ export default defineComponent({
 				white-space: pre;
 			}
 		}
+	}
+
+	> .save {
+		margin: 8px 0 0 0;
 	}
 }
 </style>

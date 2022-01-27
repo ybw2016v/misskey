@@ -11,7 +11,7 @@ import { User } from '@/models/entities/user';
 export const meta = {
 	tags: ['users'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 
 	params: {
 		userId: {
@@ -23,18 +23,29 @@ export const meta = {
 		},
 
 		username: {
-			validator: $.optional.str
+			validator: $.optional.str,
 		},
 
 		host: {
-			validator: $.optional.nullable.str
-		}
+			validator: $.optional.nullable.str,
+		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
-		ref: 'User',
+		optional: false, nullable: false,
+		oneOf: [
+			{
+				type: 'object',
+				ref: 'UserDetailed',
+			},
+			{
+				type: 'array',
+				items: {
+					type: 'object',
+					ref: 'UserDetailed',
+				}
+			},
+		]
 	},
 
 	errors: {
@@ -42,17 +53,18 @@ export const meta = {
 			message: 'Failed to resolve remote user.',
 			code: 'FAILED_TO_RESOLVE_REMOTE_USER',
 			id: 'ef7b9be4-9cba-4e6f-ab41-90ed171c7d3c',
-			kind: 'server' as const
+			kind: 'server',
 		},
 
 		noSuchUser: {
 			message: 'No such user.',
 			code: 'NO_SUCH_USER',
-			id: '4362f8dc-731f-4ad8-a694-be5a88922a24'
+			id: '4362f8dc-731f-4ad8-a694-be5a88922a24',
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	let user;
 
@@ -64,10 +76,10 @@ export default define(meta, async (ps, me) => {
 		}
 
 		const users = await Users.find(isAdminOrModerator ? {
-			id: In(ps.userIds)
+			id: In(ps.userIds),
 		} : {
 			id: In(ps.userIds),
-			isSuspended: false
+			isSuspended: false,
 		});
 
 		// リクエストされた通りに並べ替え
@@ -77,7 +89,7 @@ export default define(meta, async (ps, me) => {
 		}
 
 		return await Promise.all(_users.map(u => Users.pack(u, me, {
-			detail: true
+			detail: true,
 		})));
 	} else {
 		// Lookup user
@@ -99,7 +111,7 @@ export default define(meta, async (ps, me) => {
 		}
 
 		return await Users.pack(user, me, {
-			detail: true
+			detail: true,
 		});
 	}
 });

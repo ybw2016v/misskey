@@ -8,25 +8,26 @@ import { readUserMessagingMessage, readGroupMessagingMessage } from '../../../co
 export const meta = {
 	tags: ['messaging'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:messaging',
 
 	params: {
 		messageId: {
 			validator: $.type(ID),
-		}
+		},
 	},
 
 	errors: {
 		noSuchMessage: {
 			message: 'No such message.',
 			code: 'NO_SUCH_MESSAGE',
-			id: '86d56a2f-a9c3-4afb-b13c-3e9bfef9aa14'
+			id: '86d56a2f-a9c3-4afb-b13c-3e9bfef9aa14',
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const message = await MessagingMessages.findOne(ps.messageId);
 

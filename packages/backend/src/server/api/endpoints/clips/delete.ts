@@ -7,29 +7,30 @@ import { Clips } from '@/models/index';
 export const meta = {
 	tags: ['clips'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:account',
 
 	params: {
 		clipId: {
 			validator: $.type(ID),
-		}
+		},
 	},
 
 	errors: {
 		noSuchClip: {
 			message: 'No such clip.',
 			code: 'NO_SUCH_CLIP',
-			id: '70ca08ba-6865-4630-b6fb-8494759aa754'
-		}
-	}
-};
+			id: '70ca08ba-6865-4630-b6fb-8494759aa754',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const clip = await Clips.findOne({
 		id: ps.clipId,
-		userId: user.id
+		userId: user.id,
 	});
 
 	if (clip == null) {

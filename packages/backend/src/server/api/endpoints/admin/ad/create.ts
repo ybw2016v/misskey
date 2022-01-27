@@ -6,34 +6,35 @@ import { genId } from '@/misc/gen-id';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireModerator: true,
 
 	params: {
 		url: {
-			validator: $.str.min(1)
+			validator: $.str.min(1),
 		},
 		memo: {
-			validator: $.str
+			validator: $.str,
 		},
 		place: {
-			validator: $.str
+			validator: $.str,
 		},
 		priority: {
-			validator: $.str
+			validator: $.str,
 		},
 		ratio: {
-			validator: $.num.int().min(0)
+			validator: $.num.int().min(0),
 		},
 		expiresAt: {
-			validator: $.num.int()
+			validator: $.num.int(),
 		},
 		imageUrl: {
-			validator: $.str.min(1)
-		}
+			validator: $.str.min(1),
+		},
 	},
-};
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps) => {
 	await Ads.insert({
 		id: genId(),

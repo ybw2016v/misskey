@@ -11,22 +11,22 @@ import { ApiError } from '../../error';
 import { validateEmailForAccount } from '@/services/validate-email-for-account';
 
 export const meta = {
-	requireCredential: true as const,
+	requireCredential: true,
 
 	secure: true,
 
 	limit: {
 		duration: ms('1hour'),
-		max: 3
+		max: 3,
 	},
 
 	params: {
 		password: {
-			validator: $.str
+			validator: $.str,
 		},
 
 		email: {
-			validator: $.optional.nullable.str
+			validator: $.optional.nullable.str,
 		},
 	},
 
@@ -34,17 +34,18 @@ export const meta = {
 		incorrectPassword: {
 			message: 'Incorrect password.',
 			code: 'INCORRECT_PASSWORD',
-			id: 'e54c1d7e-e7d6-4103-86b6-0a95069b4ad3'
+			id: 'e54c1d7e-e7d6-4103-86b6-0a95069b4ad3',
 		},
 
 		unavailable: {
 			message: 'Unavailable email address.',
 			code: 'UNAVAILABLE',
-			id: 'a2defefb-f220-8849-0af6-17f816099323'
+			id: 'a2defefb-f220-8849-0af6-17f816099323',
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const profile = await UserProfiles.findOneOrFail(user.id);
 
@@ -65,12 +66,12 @@ export default define(meta, async (ps, user) => {
 	await UserProfiles.update(user.id, {
 		email: ps.email,
 		emailVerified: false,
-		emailVerifyCode: null
+		emailVerifyCode: null,
 	});
 
 	const iObj = await Users.pack(user.id, user, {
 		detail: true,
-		includeSecrets: true
+		includeSecrets: true,
 	});
 
 	// Publish meUpdated event
@@ -80,7 +81,7 @@ export default define(meta, async (ps, user) => {
 		const code = rndstr('a-z0-9', 16);
 
 		await UserProfiles.update(user.id, {
-			emailVerifyCode: code
+			emailVerifyCode: code,
 		});
 
 		const link = `${config.url}/verify-email/${code}`;

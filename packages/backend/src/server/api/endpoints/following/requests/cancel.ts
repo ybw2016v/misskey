@@ -9,37 +9,38 @@ import { Users } from '@/models/index';
 export const meta = {
 	tags: ['following', 'account'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:following',
 
 	params: {
 		userId: {
 			validator: $.type(ID),
-		}
+		},
 	},
 
 	errors: {
 		noSuchUser: {
 			message: 'No such user.',
 			code: 'NO_SUCH_USER',
-			id: '4e68c551-fc4c-4e46-bb41-7d4a37bf9dab'
+			id: '4e68c551-fc4c-4e46-bb41-7d4a37bf9dab',
 		},
 
 		followRequestNotFound: {
 			message: 'Follow request not found.',
 			code: 'FOLLOW_REQUEST_NOT_FOUND',
-			id: '089b125b-d338-482a-9a09-e2622ac9f8d4'
+			id: '089b125b-d338-482a-9a09-e2622ac9f8d4',
 		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
-		ref: 'User'
-	}
-};
+		type: 'object',
+		optional: false, nullable: false,
+		ref: 'UserLite',
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	// Fetch followee
 	const followee = await getUser(ps.userId).catch(e => {

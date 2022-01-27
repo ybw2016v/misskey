@@ -7,11 +7,12 @@ import { generateMutedUserQuery } from '../../common/generate-muted-user-query';
 import { Brackets } from 'typeorm';
 import { Notes } from '@/models/index';
 import { generateBlockedUserQuery } from '../../common/generate-block-query';
+import { generateMutedInstanceQuery } from '../../common/generate-muted-instance-query';
 
 export const meta = {
 	tags: ['notes'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 
 	params: {
 		noteId: {
@@ -20,7 +21,7 @@ export const meta = {
 
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 
 		sinceId: {
@@ -33,16 +34,17 @@ export const meta = {
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
+			type: 'object',
+			optional: false, nullable: false,
 			ref: 'Note',
-		}
+		},
 	},
-};
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const query = makePaginationQuery(Notes.createQueryBuilder('note'), ps.sinceId, ps.untilId)
 		.andWhere(new Brackets(qb => { qb
@@ -65,6 +67,7 @@ export default define(meta, async (ps, user) => {
 	generateVisibilityQuery(query, user);
 	if (user) generateMutedUserQuery(query, user);
 	if (user) generateBlockedUserQuery(query, user);
+	if (user) generateMutedInstanceQuery(query, user);
 
 	const notes = await query.take(ps.limit!).getMany();
 

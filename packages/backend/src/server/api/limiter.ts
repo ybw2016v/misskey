@@ -7,8 +7,8 @@ import Logger from '@/services/logger';
 
 const logger = new Logger('limiter');
 
-export default (endpoint: IEndpoint, user: User) => new Promise<void>((ok, reject) => {
-	const limitation = endpoint.meta.limit!;
+export const limiter = (endpoint: IEndpoint & { meta: { limit: NonNullable<IEndpoint['meta']['limit']> } }, user: User) => new Promise<void>((ok, reject) => {
+	const limitation = endpoint.meta.limit;
 
 	const key = Object.prototype.hasOwnProperty.call(limitation, 'key')
 		? limitation.key
@@ -30,12 +30,12 @@ export default (endpoint: IEndpoint, user: User) => new Promise<void>((ok, rejec
 	}
 
 	// Short-term limit
-	function min() {
+	function min(): void {
 		const minIntervalLimiter = new Limiter({
 			id: `${user.id}:${key}:min`,
 			duration: limitation.minInterval,
 			max: 1,
-			db: redisClient
+			db: redisClient,
 		});
 
 		minIntervalLimiter.get((err, info) => {
@@ -58,12 +58,12 @@ export default (endpoint: IEndpoint, user: User) => new Promise<void>((ok, rejec
 	}
 
 	// Long term limit
-	function max() {
+	function max(): void {
 		const limiter = new Limiter({
 			id: `${user.id}:${key}`,
 			duration: limitation.duration,
 			max: limitation.max,
-			db: redisClient
+			db: redisClient,
 		});
 
 		limiter.get((err, info) => {

@@ -7,33 +7,33 @@ import { ApiError } from '../../../error';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireModerator: true,
 
 	params: {
 		id: {
-			validator: $.type(ID)
+			validator: $.type(ID),
 		},
 		memo: {
-			validator: $.str
+			validator: $.str,
 		},
 		url: {
-			validator: $.str.min(1)
+			validator: $.str.min(1),
 		},
 		imageUrl: {
-			validator: $.str.min(1)
+			validator: $.str.min(1),
 		},
 		place: {
-			validator: $.str
+			validator: $.str,
 		},
 		priority: {
-			validator: $.str
+			validator: $.str,
 		},
 		ratio: {
-			validator: $.num.int().min(0)
+			validator: $.num.int().min(0),
 		},
 		expiresAt: {
-			validator: $.num.int()
+			validator: $.num.int(),
 		},
 	},
 
@@ -41,11 +41,12 @@ export const meta = {
 		noSuchAd: {
 			message: 'No such ad.',
 			code: 'NO_SUCH_AD',
-			id: 'b7aa1727-1354-47bc-a182-3a9c3973d300'
-		}
-	}
-};
+			id: 'b7aa1727-1354-47bc-a182-3a9c3973d300',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	const ad = await Ads.findOne(ps.id);
 

@@ -10,7 +10,7 @@ import { NoteReaction } from '@/models/entities/note-reaction';
 export const meta = {
 	tags: ['notes', 'reactions'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 
 	params: {
 		noteId: {
@@ -23,12 +23,12 @@ export const meta = {
 
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 
 		offset: {
 			validator: $.optional.num,
-			default: 0
+			default: 0,
 		},
 
 		sinceId: {
@@ -41,24 +41,25 @@ export const meta = {
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
+			type: 'object',
+			optional: false, nullable: false,
 			ref: 'NoteReaction',
-		}
+		},
 	},
 
 	errors: {
 		noSuchNote: {
 			message: 'No such note.',
 			code: 'NO_SUCH_NOTE',
-			id: '263fff3d-d0e1-4af4-bea7-8408059b451a'
-		}
-	}
-};
+			id: '263fff3d-d0e1-4af4-bea7-8408059b451a',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const note = await getNote(ps.noteId).catch(e => {
 		if (e.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
@@ -66,7 +67,7 @@ export default define(meta, async (ps, user) => {
 	});
 
 	const query = {
-		noteId: note.id
+		noteId: note.id,
 	} as DeepPartial<NoteReaction>;
 
 	if (ps.type) {
@@ -82,8 +83,8 @@ export default define(meta, async (ps, user) => {
 		take: ps.limit!,
 		skip: ps.offset,
 		order: {
-			id: -1
-		}
+			id: -1,
+		},
 	});
 
 	return await Promise.all(reactions.map(reaction => NoteReactions.pack(reaction, user)));

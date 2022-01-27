@@ -4,13 +4,13 @@ import { RegistryItems } from '@/models/index';
 import { ApiError } from '../../../error';
 
 export const meta = {
-	requireCredential: true as const,
+	requireCredential: true,
 
 	secure: true,
 
 	params: {
 		key: {
-			validator: $.str
+			validator: $.str,
 		},
 
 		scope: {
@@ -23,11 +23,12 @@ export const meta = {
 		noSuchKey: {
 			message: 'No such key.',
 			code: 'NO_SUCH_KEY',
-			id: '97a1e8e7-c0f7-47d2-957a-92e61256e01a'
+			id: '97a1e8e7-c0f7-47d2-957a-92e61256e01a',
 		},
 	},
-};
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const query = RegistryItems.createQueryBuilder('item')
 		.where('item.domain IS NULL')

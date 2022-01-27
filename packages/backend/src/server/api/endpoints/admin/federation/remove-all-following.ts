@@ -6,24 +6,25 @@ import { Followings, Users } from '@/models/index';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireModerator: true,
 
 	params: {
 		host: {
-			validator: $.str
-		}
-	}
-};
+			validator: $.str,
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	const followings = await Followings.find({
-		followerHost: ps.host
+		followerHost: ps.host,
 	});
 
 	const pairs = await Promise.all(followings.map(f => Promise.all([
 		Users.findOneOrFail(f.followerId),
-		Users.findOneOrFail(f.followeeId)
+		Users.findOneOrFail(f.followeeId),
 	])));
 
 	for (const pair of pairs) {

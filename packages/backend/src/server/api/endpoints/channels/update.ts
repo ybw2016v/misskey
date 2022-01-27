@@ -7,7 +7,7 @@ import { Channels, DriveFiles } from '@/models/index';
 export const meta = {
 	tags: ['channels'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:channels',
 
@@ -17,21 +17,21 @@ export const meta = {
 		},
 
 		name: {
-			validator: $.optional.str.range(1, 128)
+			validator: $.optional.str.range(1, 128),
 		},
 
 		description: {
-			validator: $.nullable.optional.str.range(1, 2048)
+			validator: $.nullable.optional.str.range(1, 2048),
 		},
 
 		bannerId: {
 			validator: $.nullable.optional.type(ID),
-		}
+		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		ref: 'Channel',
 	},
 
@@ -39,23 +39,24 @@ export const meta = {
 		noSuchChannel: {
 			message: 'No such channel.',
 			code: 'NO_SUCH_CHANNEL',
-			id: 'f9c5467f-d492-4c3c-9a8d-a70dacc86512'
+			id: 'f9c5467f-d492-4c3c-9a8d-a70dacc86512',
 		},
 
 		accessDenied: {
 			message: 'You do not have edit privilege of the channel.',
 			code: 'ACCESS_DENIED',
-			id: '1fb7cb09-d46a-4fdf-b8df-057788cce513'
+			id: '1fb7cb09-d46a-4fdf-b8df-057788cce513',
 		},
 
 		noSuchFile: {
 			message: 'No such file.',
 			code: 'NO_SUCH_FILE',
-			id: 'e86c14a4-0da2-4032-8df3-e737a04c7f3b'
+			id: 'e86c14a4-0da2-4032-8df3-e737a04c7f3b',
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	const channel = await Channels.findOne({
 		id: ps.channelId,
@@ -74,7 +75,7 @@ export default define(meta, async (ps, me) => {
 	if (ps.bannerId != null) {
 		banner = await DriveFiles.findOne({
 			id: ps.bannerId,
-			userId: me.id
+			userId: me.id,
 		});
 
 		if (banner == null) {

@@ -9,7 +9,7 @@ import { genId } from '@/misc/gen-id';
 export const meta = {
 	tags: ['drive'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:drive',
 
@@ -21,24 +21,25 @@ export const meta = {
 
 		parentId: {
 			validator: $.optional.nullable.type(ID),
-		}
+		},
 	},
 
 	errors: {
 		noSuchFolder: {
 			message: 'No such folder.',
 			code: 'NO_SUCH_FOLDER',
-			id: '53326628-a00d-40a6-a3cd-8975105c0f95'
+			id: '53326628-a00d-40a6-a3cd-8975105c0f95',
 		},
 	},
 
 	res: {
 		type: 'object' as const,
 		optional: false as const, nullable: false as const,
-		ref: 'DriveFolder'
-	}
-};
+		ref: 'DriveFolder',
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	// If the parent folder is specified
 	let parent = null;
@@ -46,7 +47,7 @@ export default define(meta, async (ps, user) => {
 		// Fetch parent folder
 		parent = await DriveFolders.findOne({
 			id: ps.parentId,
-			userId: user.id
+			userId: user.id,
 		});
 
 		if (parent == null) {
@@ -60,7 +61,7 @@ export default define(meta, async (ps, user) => {
 		createdAt: new Date(),
 		name: ps.name,
 		parentId: parent !== null ? parent.id : null,
-		userId: user.id
+		userId: user.id,
 	}).then(x => DriveFolders.findOneOrFail(x.identifiers[0]));
 
 	const folderObj = await DriveFolders.pack(folder);

@@ -8,7 +8,7 @@ import { UserGroups, UserGroupJoinings } from '@/models/index';
 export const meta = {
 	tags: ['groups', 'users'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:user-groups',
 
@@ -23,8 +23,8 @@ export const meta = {
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		ref: 'UserGroup',
 	},
 
@@ -32,23 +32,24 @@ export const meta = {
 		noSuchGroup: {
 			message: 'No such group.',
 			code: 'NO_SUCH_GROUP',
-			id: '8e31d36b-2f88-4ccd-a438-e2d78a9162db'
+			id: '8e31d36b-2f88-4ccd-a438-e2d78a9162db',
 		},
 
 		noSuchUser: {
 			message: 'No such user.',
 			code: 'NO_SUCH_USER',
-			id: '711f7ebb-bbb9-4dfa-b540-b27809fed5e9'
+			id: '711f7ebb-bbb9-4dfa-b540-b27809fed5e9',
 		},
 
 		noSuchGroupMember: {
 			message: 'No such group member.',
 			code: 'NO_SUCH_GROUP_MEMBER',
-			id: 'd31bebee-196d-42c2-9a3e-9474d4be6cc4'
+			id: 'd31bebee-196d-42c2-9a3e-9474d4be6cc4',
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	// Fetch the group
 	const userGroup = await UserGroups.findOne({
@@ -68,7 +69,7 @@ export default define(meta, async (ps, me) => {
 
 	const joining = await UserGroupJoinings.findOne({
 		userGroupId: userGroup.id,
-		userId: user.id
+		userId: user.id,
 	});
 
 	if (joining == null) {
@@ -76,7 +77,7 @@ export default define(meta, async (ps, me) => {
 	}
 
 	await UserGroups.update(userGroup.id, {
-		userId: ps.userId
+		userId: ps.userId,
 	});
 
 	return await UserGroups.pack(userGroup.id);

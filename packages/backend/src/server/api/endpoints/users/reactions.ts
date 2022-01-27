@@ -9,7 +9,7 @@ import { ApiError } from '../../error';
 export const meta = {
 	tags: ['users', 'reactions'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 
 	params: {
 		userId: {
@@ -39,24 +39,25 @@ export const meta = {
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
+			type: 'object',
+			optional: false, nullable: false,
 			ref: 'NoteReaction',
-		}
+		},
 	},
 
 	errors: {
 		reactionsNotPublic: {
 			message: 'Reactions of the user is not public.',
 			code: 'REACTIONS_NOT_PUBLIC',
-			id: '673a7dd2-6924-1093-e0c0-e68456ceae5c'
+			id: '673a7dd2-6924-1093-e0c0-e68456ceae5c',
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	const profile = await UserProfiles.findOneOrFail(ps.userId);
 

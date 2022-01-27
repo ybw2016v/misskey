@@ -19,13 +19,13 @@ export default async function(follower: { id: User['id']; host: User['host']; ur
 		Blockings.findOne({
 			blockerId: followee.id,
 			blockeeId: follower.id,
-		})
+		}),
 	]);
 
 	if (blocking != null) throw new Error('blocking');
 	if (blocked != null) throw new Error('blocked');
 
-	const followRequest = await FollowRequests.save({
+	const followRequest = await FollowRequests.insert({
 		id: genId(),
 		createdAt: new Date(),
 		followerId: follower.id,
@@ -38,21 +38,21 @@ export default async function(follower: { id: User['id']; host: User['host']; ur
 		followerSharedInbox: Users.isRemoteUser(follower) ? follower.sharedInbox : undefined,
 		followeeHost: followee.host,
 		followeeInbox: Users.isRemoteUser(followee) ? followee.inbox : undefined,
-		followeeSharedInbox: Users.isRemoteUser(followee) ? followee.sharedInbox : undefined
-	});
+		followeeSharedInbox: Users.isRemoteUser(followee) ? followee.sharedInbox : undefined,
+	}).then(x => FollowRequests.findOneOrFail(x.identifiers[0]));
 
 	// Publish receiveRequest event
 	if (Users.isLocalUser(followee)) {
 		Users.pack(follower.id, followee).then(packed => publishMainStream(followee.id, 'receiveFollowRequest', packed));
 
 		Users.pack(followee.id, followee, {
-			detail: true
+			detail: true,
 		}).then(packed => publishMainStream(followee.id, 'meUpdated', packed));
 
 		// 通知を作成
 		createNotification(followee.id, 'receiveFollowRequest', {
 			notifierId: follower.id,
-			followRequestId: followRequest.id
+			followRequestId: followRequest.id,
 		});
 	}
 

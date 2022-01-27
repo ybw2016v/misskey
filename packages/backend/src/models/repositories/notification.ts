@@ -32,40 +32,40 @@ export class NotificationRepository extends Repository<Notification> {
 			...(notification.type === 'mention' ? {
 				note: Notes.pack(notification.note || notification.noteId!, { id: notification.notifieeId }, {
 					detail: true,
-					_hint_: options._hintForEachNotes_
+					_hint_: options._hintForEachNotes_,
 				}),
 			} : {}),
 			...(notification.type === 'reply' ? {
 				note: Notes.pack(notification.note || notification.noteId!, { id: notification.notifieeId }, {
 					detail: true,
-					_hint_: options._hintForEachNotes_
+					_hint_: options._hintForEachNotes_,
 				}),
 			} : {}),
 			...(notification.type === 'renote' ? {
 				note: Notes.pack(notification.note || notification.noteId!, { id: notification.notifieeId }, {
 					detail: true,
-					_hint_: options._hintForEachNotes_
+					_hint_: options._hintForEachNotes_,
 				}),
 			} : {}),
 			...(notification.type === 'quote' ? {
 				note: Notes.pack(notification.note || notification.noteId!, { id: notification.notifieeId }, {
 					detail: true,
-					_hint_: options._hintForEachNotes_
+					_hint_: options._hintForEachNotes_,
 				}),
 			} : {}),
 			...(notification.type === 'reaction' ? {
 				note: Notes.pack(notification.note || notification.noteId!, { id: notification.notifieeId }, {
 					detail: true,
-					_hint_: options._hintForEachNotes_
+					_hint_: options._hintForEachNotes_,
 				}),
-				reaction: notification.reaction
+				reaction: notification.reaction,
 			} : {}),
 			...(notification.type === 'pollVote' ? {
 				note: Notes.pack(notification.note || notification.noteId!, { id: notification.notifieeId }, {
 					detail: true,
-					_hint_: options._hintForEachNotes_
+					_hint_: options._hintForEachNotes_,
 				}),
-				choice: notification.choice
+				choice: notification.choice,
 			} : {}),
 			...(notification.type === 'groupInvited' ? {
 				invitation: UserGroupInvitations.pack(notification.userGroupInvitationId!),
@@ -102,74 +102,8 @@ export class NotificationRepository extends Repository<Notification> {
 
 		return await Promise.all(notifications.map(x => this.pack(x, {
 			_hintForEachNotes_: {
-				myReactions: myReactionsMap
-			}
+				myReactions: myReactionsMap,
+			},
 		})));
 	}
 }
-
-export const packedNotificationSchema = {
-	type: 'object' as const,
-	optional: false as const, nullable: false as const,
-	properties: {
-		id: {
-			type: 'string' as const,
-			optional: false as const, nullable: false as const,
-			format: 'id',
-			example: 'xxxxxxxxxx',
-		},
-		createdAt: {
-			type: 'string' as const,
-			optional: false as const, nullable: false as const,
-			format: 'date-time',
-		},
-		isRead: {
-			type: 'boolean' as const,
-			optional: false as const, nullable: false as const,
-		},
-		type: {
-			type: 'string' as const,
-			optional: false as const, nullable: false as const,
-			enum: [...notificationTypes],
-		},
-		user: {
-			type: 'object' as const,
-			ref: 'User' as const,
-			optional: true as const, nullable: true as const,
-		},
-		userId: {
-			type: 'string' as const,
-			optional: true as const, nullable: true as const,
-			format: 'id',
-		},
-		note: {
-			type: 'object' as const,
-			ref: 'Note' as const,
-			optional: true as const, nullable: true as const,
-		},
-		reaction: {
-			type: 'string' as const,
-			optional: true as const, nullable: true as const,
-		},
-		choice: {
-			type: 'number' as const,
-			optional: true as const, nullable: true as const,
-		},
-		invitation: {
-			type: 'object' as const,
-			optional: true as const, nullable: true as const,
-		},
-		body: {
-			type: 'string' as const,
-			optional: true as const, nullable: true as const,
-		},
-		header: {
-			type: 'string' as const,
-			optional: true as const, nullable: true as const,
-		},
-		icon: {
-			type: 'string' as const,
-			optional: true as const, nullable: true as const,
-		},
-	}
-};

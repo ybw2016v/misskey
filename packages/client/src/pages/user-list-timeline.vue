@@ -1,14 +1,12 @@
 <template>
-<div class="eqqrhokj" v-hotkey.global="keymap" v-size="{ min: [800] }">
-	<div class="new" v-if="queue > 0"><button class="_buttonPrimary" @click="top()">{{ $ts.newNoteRecived }}</button></div>
+<div v-hotkey.global="keymap" v-size="{ min: [800] }" class="eqqrhokj">
+	<div v-if="queue > 0" class="new"><button class="_buttonPrimary" @click="top()">{{ $ts.newNoteRecived }}</button></div>
 	<div class="tl _block">
-		<XTimeline ref="tl" class="tl"
-			:key="listId"
+		<XTimeline ref="tl" :key="listId"
+			class="tl"
 			src="list"
 			:list="listId"
 			:sound="true"
-			@before="before()"
-			@after="after()"
 			@queue="queueUpdated"
 		/>
 	</div>
@@ -17,7 +15,6 @@
 
 <script lang="ts">
 import { defineComponent, defineAsyncComponent, computed } from 'vue';
-import Progress from '@/scripts/loading';
 import XTimeline from '@/components/timeline.vue';
 import { scroll } from '@/scripts/scroll';
 import * as os from '@/os';
@@ -76,14 +73,6 @@ export default defineComponent({
 	},
 
 	methods: {
-		before() {
-			Progress.start();
-		},
-
-		after() {
-			Progress.done();
-		},
-
 		queueUpdated(q) {
 			this.queue = q;
 		},
@@ -97,15 +86,12 @@ export default defineComponent({
 		},
 
 		async timetravel() {
-			const { canceled, result: date } = await os.dialog({
+			const { canceled, result: date } = await os.inputDate({
 				title: this.$ts.date,
-				input: {
-					type: 'date'
-				}
 			});
 			if (canceled) return;
 
-			this.$refs.tl.timetravel(new Date(date));
+			this.$refs.tl.timetravel(date);
 		},
 
 		focus() {

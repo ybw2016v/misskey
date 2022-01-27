@@ -1,9 +1,12 @@
-import { Directive, ref } from 'vue';
-import { isDeviceTouch } from '@/scripts/is-device-touch';
-import { popup, dialog } from '@/os';
+// TODO: useTooltip関数使うようにしたい
+// ただディレクティブ内でonUnmountedなどのcomposition api使えるのか不明
 
-const start = isDeviceTouch ? 'touchstart' : 'mouseover';
-const end = isDeviceTouch ? 'touchend' : 'mouseleave';
+import { Directive, ref } from 'vue';
+import { isTouchUsing } from '@/scripts/touch';
+import { popup, alert } from '@/os';
+
+const start = isTouchUsing ? 'touchstart' : 'mouseover';
+const end = isTouchUsing ? 'touchend' : 'mouseleave';
 const delay = 100;
 
 export default {
@@ -18,7 +21,7 @@ export default {
 
 		self.close = () => {
 			if (self._close) {
-				clearInterval(self.checkTimer);
+				window.clearInterval(self.checkTimer);
 				self._close();
 				self._close = null;
 			}
@@ -28,7 +31,7 @@ export default {
 			el.addEventListener('click', (ev) => {
 				ev.preventDefault();
 				ev.stopPropagation();
-				dialog({
+				alert({
 					type: 'info',
 					text: binding.value,
 				});
@@ -58,19 +61,19 @@ export default {
 		});
 
 		el.addEventListener(start, () => {
-			clearTimeout(self.showTimer);
-			clearTimeout(self.hideTimer);
-			self.showTimer = setTimeout(self.show, delay);
+			window.clearTimeout(self.showTimer);
+			window.clearTimeout(self.hideTimer);
+			self.showTimer = window.setTimeout(self.show, delay);
 		}, { passive: true });
 
 		el.addEventListener(end, () => {
-			clearTimeout(self.showTimer);
-			clearTimeout(self.hideTimer);
-			self.hideTimer = setTimeout(self.close, delay);
+			window.clearTimeout(self.showTimer);
+			window.clearTimeout(self.hideTimer);
+			self.hideTimer = window.setTimeout(self.close, delay);
 		}, { passive: true });
 
 		el.addEventListener('click', () => {
-			clearTimeout(self.showTimer);
+			window.clearTimeout(self.showTimer);
 			self.close();
 		});
 	},
@@ -82,6 +85,6 @@ export default {
 
 	unmounted(el, binding, vn) {
 		const self = el._tooltipDirective_;
-		clearInterval(self.checkTimer);
+		window.clearInterval(self.checkTimer);
 	},
 } as Directive;

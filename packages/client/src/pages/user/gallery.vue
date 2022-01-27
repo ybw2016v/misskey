@@ -1,15 +1,15 @@
 <template>
 <div>
-	<MkPagination :pagination="pagination" #default="{items}">
+	<MkPagination v-slot="{items}" :pagination="pagination">
 		<div class="jrnovfpt">
-			<MkGalleryPostPreview v-for="post in items" :post="post" :key="post.id" class="post"/>
+			<MkGalleryPostPreview v-for="post in items" :key="post.id" :post="post" class="post"/>
 		</div>
 	</MkPagination>
 </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import MkGalleryPostPreview from '@/components/gallery-post-preview.vue';
 import MkPagination from '@/components/ui/pagination.vue';
 
@@ -29,20 +29,14 @@ export default defineComponent({
 	data() {
 		return {
 			pagination: {
-				endpoint: 'users/gallery/posts',
+				endpoint: 'users/gallery/posts' as const,
 				limit: 6,
-				params: () => ({
+				params: computed(() => ({
 					userId: this.user.id
-				})
+				})),
 			},
 		};
 	},
-
-	watch: {
-		user() {
-			this.$refs.list.reload();
-		}
-	}
 });
 </script>
 

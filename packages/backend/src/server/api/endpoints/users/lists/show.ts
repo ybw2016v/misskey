@@ -7,7 +7,7 @@ import { UserLists } from '@/models/index';
 export const meta = {
 	tags: ['lists', 'account'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'read:account',
 
@@ -18,8 +18,8 @@ export const meta = {
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		ref: 'UserList',
 	},
 
@@ -27,11 +27,12 @@ export const meta = {
 		noSuchList: {
 			message: 'No such list.',
 			code: 'NO_SUCH_LIST',
-			id: '7bc05c21-1d7a-41ae-88f1-66820f4dc686'
+			id: '7bc05c21-1d7a-41ae-88f1-66820f4dc686',
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	// Fetch the list
 	const userList = await UserLists.findOne({

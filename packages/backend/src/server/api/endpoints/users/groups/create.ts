@@ -8,23 +8,24 @@ import { UserGroupJoining } from '@/models/entities/user-group-joining';
 export const meta = {
 	tags: ['groups'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:user-groups',
 
 	params: {
 		name: {
-			validator: $.str.range(1, 100)
-		}
+			validator: $.str.range(1, 100),
+		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		ref: 'UserGroup',
 	},
-};
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const userGroup = await UserGroups.insert({
 		id: genId(),
@@ -38,7 +39,7 @@ export default define(meta, async (ps, user) => {
 		id: genId(),
 		createdAt: new Date(),
 		userId: user.id,
-		userGroupId: userGroup.id
+		userGroupId: userGroup.id,
 	} as UserGroupJoining);
 
 	return await UserGroups.pack(userGroup);

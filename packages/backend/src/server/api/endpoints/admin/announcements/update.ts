@@ -7,33 +7,34 @@ import { ApiError } from '../../../error';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireModerator: true,
 
 	params: {
 		id: {
-			validator: $.type(ID)
+			validator: $.type(ID),
 		},
 		title: {
-			validator: $.str.min(1)
+			validator: $.str.min(1),
 		},
 		text: {
-			validator: $.str.min(1)
+			validator: $.str.min(1),
 		},
 		imageUrl: {
-			validator: $.nullable.str.min(1)
-		}
+			validator: $.nullable.str.min(1),
+		},
 	},
 
 	errors: {
 		noSuchAnnouncement: {
 			message: 'No such announcement.',
 			code: 'NO_SUCH_ANNOUNCEMENT',
-			id: 'd3aae5a7-6372-4cb4-b61c-f511ffc2d7cc'
-		}
-	}
-};
+			id: 'd3aae5a7-6372-4cb4-b61c-f511ffc2d7cc',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	const announcement = await Announcements.findOne(ps.id);
 

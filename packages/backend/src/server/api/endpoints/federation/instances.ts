@@ -7,7 +7,7 @@ import { fetchMeta } from '@/misc/fetch-meta';
 export const meta = {
 	tags: ['federation'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 
 	params: {
 		host: {
@@ -40,30 +40,31 @@ export const meta = {
 
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 30
+			default: 30,
 		},
 
 		offset: {
 			validator: $.optional.num.min(0),
-			default: 0
+			default: 0,
 		},
 
 		sort: {
 			validator: $.optional.str,
-		}
+		},
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
-			ref: 'FederationInstance'
-		}
-	}
-};
+			type: 'object',
+			optional: false, nullable: false,
+			ref: 'FederationInstance',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	const query = Instances.createQueryBuilder('instance');
 

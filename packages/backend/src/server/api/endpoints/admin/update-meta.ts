@@ -9,7 +9,7 @@ import { ID } from '@/misc/cafy-id';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireAdmin: true,
 
 	params: {
@@ -246,59 +246,60 @@ export const meta = {
 		},
 
 		useObjectStorage: {
-			validator: $.optional.bool
+			validator: $.optional.bool,
 		},
 
 		objectStorageBaseUrl: {
-			validator: $.optional.nullable.str
+			validator: $.optional.nullable.str,
 		},
 
 		objectStorageBucket: {
-			validator: $.optional.nullable.str
+			validator: $.optional.nullable.str,
 		},
 
 		objectStoragePrefix: {
-			validator: $.optional.nullable.str
+			validator: $.optional.nullable.str,
 		},
 
 		objectStorageEndpoint: {
-			validator: $.optional.nullable.str
+			validator: $.optional.nullable.str,
 		},
 
 		objectStorageRegion: {
-			validator: $.optional.nullable.str
+			validator: $.optional.nullable.str,
 		},
 
 		objectStoragePort: {
-			validator: $.optional.nullable.num
+			validator: $.optional.nullable.num,
 		},
 
 		objectStorageAccessKey: {
-			validator: $.optional.nullable.str
+			validator: $.optional.nullable.str,
 		},
 
 		objectStorageSecretKey: {
-			validator: $.optional.nullable.str
+			validator: $.optional.nullable.str,
 		},
 
 		objectStorageUseSSL: {
-			validator: $.optional.bool
+			validator: $.optional.bool,
 		},
 
 		objectStorageUseProxy: {
-			validator: $.optional.bool
+			validator: $.optional.bool,
 		},
 
 		objectStorageSetPublicRead: {
-			validator: $.optional.bool
+			validator: $.optional.bool,
 		},
 
 		objectStorageS3ForcePathStyle: {
-			validator: $.optional.bool
+			validator: $.optional.bool,
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	const set = {} as Partial<Meta>;
 
@@ -593,8 +594,8 @@ export default define(meta, async (ps, me) => {
 	await getConnection().transaction(async transactionalEntityManager => {
 		const meta = await transactionalEntityManager.findOne(Meta, {
 			order: {
-				id: 'DESC'
-			}
+				id: 'DESC',
+			},
 		});
 
 		if (meta) {

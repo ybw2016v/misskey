@@ -1,4 +1,4 @@
-import { computed, ref } from 'vue';
+import { computed, ref, reactive } from 'vue';
 import { search } from '@/scripts/search';
 import * as os from '@/os';
 import { i18n } from '@/i18n';
@@ -7,7 +7,7 @@ import { $i } from './account';
 import { unisonReload } from '@/scripts/unison-reload';
 import { router } from './router';
 
-export const menuDef = {
+export const menuDef = reactive({
 	notifications: {
 		title: 'notifications',
 		icon: 'fas fa-bell',
@@ -163,21 +163,10 @@ export const menuDef = {
 		icon: 'fas fa-laugh',
 		to: '/emojis',
 	},
-	games: {
-		title: 'games',
-		icon: 'fas fa-gamepad',
-		to: '/games/reversi',
-	},
 	scratchpad: {
 		title: 'scratchpad',
 		icon: 'fas fa-terminal',
 		to: '/scratchpad',
-	},
-	rooms: {
-		title: 'rooms',
-		icon: 'fas fa-door-closed',
-		show: computed(() => $i != null),
-		to: computed(() => `/@${$i.username}/room`),
 	},
 	ui: {
 		title: 'switchUi',
@@ -204,13 +193,6 @@ export const menuDef = {
 					localStorage.setItem('ui', 'classic');
 					unisonReload();
 				}
-			}, {
-				text: 'Chat (β)',
-				active: ui === 'chat',
-				action: () => {
-					localStorage.setItem('ui', 'chat');
-					unisonReload();
-				}
 			}, /*{
 				text: i18n.locale.desktop + ' (β)',
 				active: ui === 'desktop',
@@ -221,4 +203,4 @@ export const menuDef = {
 			}*/], ev.currentTarget || ev.target);
 		},
 	},
-};
+});

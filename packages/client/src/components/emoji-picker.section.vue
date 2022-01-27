@@ -5,9 +5,9 @@
 	</header>
 	<div v-if="shown">
 		<button v-for="emoji in emojis"
-			class="_button"
-			@click="chosen(emoji, $event)"
 			:key="emoji"
+			class="_button"
+			@click="emit('chosen', emoji, $event)"
 		>
 			<MkEmoji :emoji="emoji" :normal="true"/>
 		</button>
@@ -15,35 +15,19 @@
 </section>
 </template>
 
-<script lang="ts">
-import { defineComponent, markRaw } from 'vue';
-import { getStaticImageUrl } from '@/scripts/get-static-image-url';
+<script lang="ts" setup>
+import { ref } from 'vue';
 
-export default defineComponent({
-	props: {
-		emojis: {
-			required: true,
-		},
-		initialShown: {
-			required: false
-		}
-	},
+const props = defineProps<{
+	emojis: string[];
+	initialShown?: boolean;
+}>();
 
-	emits: ['chosen'],
+const emit = defineEmits<{
+	(e: 'chosen', v: string, ev: MouseEvent): void;
+}>();
 
-	data() {
-		return {
-			getStaticImageUrl,
-			shown: this.initialShown,
-		};
-	},
-
-	methods: {
-		chosen(emoji: any, ev) {
-			this.$parent.chosen(emoji, ev);
-		},
-	}
-});
+const shown = ref(!!props.initialShown);
 </script>
 
 <style lang="scss" scoped>

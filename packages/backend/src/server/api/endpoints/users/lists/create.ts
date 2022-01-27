@@ -7,23 +7,24 @@ import { UserList } from '@/models/entities/user-list';
 export const meta = {
 	tags: ['lists'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:account',
 
 	params: {
 		name: {
-			validator: $.str.range(1, 100)
-		}
+			validator: $.str.range(1, 100),
+		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		ref: 'UserList',
 	},
-};
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const userList = await UserLists.insert({
 		id: genId(),

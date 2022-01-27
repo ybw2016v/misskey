@@ -1,8 +1,8 @@
 <template>
 <div class="mk-group-page">
-	<transition name="zoom" mode="out-in">
+	<transition :name="$store.state.animation ? 'zoom' : ''" mode="out-in">
 		<div v-if="group" class="_section">
-			<div class="_content">
+			<div class="_content" style="display: flex; gap: var(--margin); flex-wrap: wrap;">
 				<MkButton inline @click="invite()">{{ $ts.invite }}</MkButton>
 				<MkButton inline @click="renameGroup()">{{ $ts.rename }}</MkButton>
 				<MkButton inline @click="transfer()">{{ $ts.transfer }}</MkButton>
@@ -11,12 +11,12 @@
 		</div>
 	</transition>
 
-	<transition name="zoom" mode="out-in">
+	<transition :name="$store.state.animation ? 'zoom' : ''" mode="out-in">
 		<div v-if="group" class="_section members _gap">
 			<div class="_title">{{ $ts.members }}</div>
 			<div class="_content">
 				<div class="users">
-					<div class="user _panel" v-for="user in users" :key="user.id">
+					<div v-for="user in users" :key="user.id" class="user _panel">
 						<MkAvatar :user="user" class="avatar" :show-indicator="true"/>
 						<div class="body">
 							<MkUserName :user="user" class="name"/>
@@ -35,7 +35,6 @@
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import Progress from '@/scripts/loading';
 import MkButton from '@/components/ui/button.vue';
 import * as os from '@/os';
 import * as symbols from '@/symbols';
@@ -73,7 +72,6 @@ export default defineComponent({
 
 	methods: {
 		fetch() {
-			Progress.start();
 			os.api('users/groups/show', {
 				groupId: this.groupId
 			}).then(group => {
@@ -82,7 +80,6 @@ export default defineComponent({
 					userIds: this.group.userIds
 				}).then(users => {
 					this.users = users;
-					Progress.done();
 				});
 			});
 		},
@@ -106,11 +103,9 @@ export default defineComponent({
 		},
 
 		async renameGroup() {
-			const { canceled, result: name } = await os.dialog({
+			const { canceled, result: name } = await os.inputText({
 				title: this.$ts.groupName,
-				input: {
-					default: this.group.name
-				}
+				default: this.group.name
 			});
 			if (canceled) return;
 
@@ -132,10 +127,9 @@ export default defineComponent({
 		},
 
 		async deleteGroup() {
-			const { canceled } = await os.dialog({
+			const { canceled } = await os.confirm({
 				type: 'warning',
 				text: this.$t('removeAreYouSure', { x: this.group.name }),
-				showCancelButton: true
 			});
 			if (canceled) return;
 

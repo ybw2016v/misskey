@@ -6,23 +6,24 @@ import { Users, UserProfiles, PasswordResetRequests } from '@/models/index';
 import { ApiError } from '../error';
 
 export const meta = {
-	requireCredential: false as const,
+	requireCredential: false,
 
 	params: {
 		token: {
-			validator: $.str
+			validator: $.str,
 		},
 
 		password: {
-			validator: $.str
-		}
+			validator: $.str,
+		},
 	},
 
 	errors: {
 
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const req = await PasswordResetRequests.findOneOrFail({
 		token: ps.token,
@@ -38,7 +39,7 @@ export default define(meta, async (ps, user) => {
 	const hash = await bcrypt.hash(ps.password, salt);
 
 	await UserProfiles.update(req.userId, {
-		password: hash
+		password: hash,
 	});
 
 	PasswordResetRequests.delete(req.id);

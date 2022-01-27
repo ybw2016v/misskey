@@ -1,40 +1,41 @@
 <template>
-<div class="mk-list-page">
-	<transition name="zoom" mode="out-in">
-		<div v-if="list" class="_section">
-			<div class="_content">
-				<MkButton inline @click="addUser()">{{ $ts.addUser }}</MkButton>
-				<MkButton inline @click="renameList()">{{ $ts.rename }}</MkButton>
-				<MkButton inline @click="deleteList()">{{ $ts.delete }}</MkButton>
+<MkSpacer :content-max="700">
+	<div class="mk-list-page">
+		<transition :name="$store.state.animation ? 'zoom' : ''" mode="out-in">
+			<div v-if="list" class="_section">
+				<div class="_content">
+					<MkButton inline @click="addUser()">{{ $ts.addUser }}</MkButton>
+					<MkButton inline @click="renameList()">{{ $ts.rename }}</MkButton>
+					<MkButton inline @click="deleteList()">{{ $ts.delete }}</MkButton>
+				</div>
 			</div>
-		</div>
-	</transition>
+		</transition>
 
-	<transition name="zoom" mode="out-in">
-		<div v-if="list" class="_section members _gap">
-			<div class="_title">{{ $ts.members }}</div>
-			<div class="_content">
-				<div class="users">
-					<div class="user _panel" v-for="user in users" :key="user.id">
-						<MkAvatar :user="user" class="avatar" :show-indicator="true"/>
-						<div class="body">
-							<MkUserName :user="user" class="name"/>
-							<MkAcct :user="user" class="acct"/>
-						</div>
-						<div class="action">
-							<button class="_button" @click="removeUser(user)"><i class="fas fa-times"></i></button>
+		<transition :name="$store.state.animation ? 'zoom' : ''" mode="out-in">
+			<div v-if="list" class="_section members _gap">
+				<div class="_title">{{ $ts.members }}</div>
+				<div class="_content">
+					<div class="users">
+						<div v-for="user in users" :key="user.id" class="user _panel">
+							<MkAvatar :user="user" class="avatar" :show-indicator="true"/>
+							<div class="body">
+								<MkUserName :user="user" class="name"/>
+								<MkAcct :user="user" class="acct"/>
+							</div>
+							<div class="action">
+								<button class="_button" @click="removeUser(user)"><i class="fas fa-times"></i></button>
+							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-	</transition>
-</div>
+		</transition>
+	</div>
+</MkSpacer>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import Progress from '@/scripts/loading';
 import MkButton from '@/components/ui/button.vue';
 import * as os from '@/os';
 import * as symbols from '@/symbols';
@@ -49,6 +50,7 @@ export default defineComponent({
 			[symbols.PAGE_INFO]: computed(() => this.list ? {
 				title: this.list.name,
 				icon: 'fas fa-list-ul',
+				bg: 'var(--bg)',
 			} : null),
 			list: null,
 			users: [],
@@ -65,7 +67,6 @@ export default defineComponent({
 
 	methods: {
 		fetch() {
-			Progress.start();
 			os.api('users/lists/show', {
 				listId: this.$route.params.list
 			}).then(list => {
@@ -74,7 +75,6 @@ export default defineComponent({
 					userIds: this.list.userIds
 				}).then(users => {
 					this.users = users;
-					Progress.done();
 				});
 			});
 		},
@@ -100,11 +100,9 @@ export default defineComponent({
 		},
 
 		async renameList() {
-			const { canceled, result: name } = await os.dialog({
+			const { canceled, result: name } = await os.inputText({
 				title: this.$ts.enterListName,
-				input: {
-					default: this.list.name
-				}
+				default: this.list.name
 			});
 			if (canceled) return;
 
@@ -117,10 +115,9 @@ export default defineComponent({
 		},
 
 		async deleteList() {
-			const { canceled } = await os.dialog({
+			const { canceled } = await os.confirm({
 				type: 'warning',
 				text: this.$t('removeAreYouSure', { x: this.list.name }),
-				showCancelButton: true
 			});
 			if (canceled) return;
 

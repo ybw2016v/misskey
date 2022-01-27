@@ -6,7 +6,7 @@ import { Apps, AuthSessions, AccessTokens, Users } from '@/models/index';
 export const meta = {
 	tags: ['auth'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 
 	params: {
 		appSecret: {
@@ -15,51 +15,52 @@ export const meta = {
 
 		token: {
 			validator: $.str,
-		}
+		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		properties: {
 			accessToken: {
-				type: 'string' as const,
-				optional: false as const, nullable: false as const,
+				type: 'string',
+				optional: false, nullable: false,
 			},
 
 			user: {
-				type: 'object' as const,
-				optional: false as const, nullable: false as const,
-				ref: 'User',
+				type: 'object',
+				optional: false, nullable: false,
+				ref: 'UserDetailedNotMe',
 			},
-		}
+		},
 	},
 
 	errors: {
 		noSuchApp: {
 			message: 'No such app.',
 			code: 'NO_SUCH_APP',
-			id: 'fcab192a-2c5a-43b7-8ad8-9b7054d8d40d'
+			id: 'fcab192a-2c5a-43b7-8ad8-9b7054d8d40d',
 		},
 
 		noSuchSession: {
 			message: 'No such session.',
 			code: 'NO_SUCH_SESSION',
-			id: '5b5a1503-8bc8-4bd0-8054-dc189e8cdcb3'
+			id: '5b5a1503-8bc8-4bd0-8054-dc189e8cdcb3',
 		},
 
 		pendingSession: {
 			message: 'This session is not completed yet.',
 			code: 'PENDING_SESSION',
-			id: '8c8a4145-02cc-4cca-8e66-29ba60445a8e'
-		}
-	}
-};
+			id: '8c8a4145-02cc-4cca-8e66-29ba60445a8e',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps) => {
 	// Lookup app
 	const app = await Apps.findOne({
-		secret: ps.appSecret
+		secret: ps.appSecret,
 	});
 
 	if (app == null) {
@@ -69,7 +70,7 @@ export default define(meta, async (ps) => {
 	// Fetch token
 	const session = await AuthSessions.findOne({
 		token: ps.token,
-		appId: app.id
+		appId: app.id,
 	});
 
 	if (session == null) {
@@ -83,7 +84,7 @@ export default define(meta, async (ps) => {
 	// Lookup access token
 	const accessToken = await AccessTokens.findOneOrFail({
 		appId: app.id,
-		userId: session.userId
+		userId: session.userId,
 	});
 
 	// Delete session
@@ -92,7 +93,7 @@ export default define(meta, async (ps) => {
 	return {
 		accessToken: accessToken.token,
 		user: await Users.pack(session.userId, null, {
-			detail: true
-		})
+			detail: true,
+		}),
 	};
 });

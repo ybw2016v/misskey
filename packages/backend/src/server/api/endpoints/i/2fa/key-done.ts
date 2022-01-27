@@ -7,7 +7,7 @@ import {
 	UserProfiles,
 	UserSecurityKeys,
 	AttestationChallenges,
-	Users
+	Users,
 } from '@/models/index';
 import config from '@/config/index';
 import { procedures, hash } from '../../../2fa';
@@ -16,31 +16,32 @@ import { publishMainStream } from '@/services/stream';
 const cborDecodeFirst = promisify(cbor.decodeFirst) as any;
 
 export const meta = {
-	requireCredential: true as const,
+	requireCredential: true,
 
 	secure: true,
 
 	params: {
 		clientDataJSON: {
-			validator: $.str
+			validator: $.str,
 		},
 		attestationObject: {
-			validator: $.str
+			validator: $.str,
 		},
 		password: {
-			validator: $.str
+			validator: $.str,
 		},
 		challengeId: {
-			validator: $.str
+			validator: $.str,
 		},
 		name: {
-			validator: $.str
-		}
-	}
-};
+			validator: $.str,
+		},
+	},
+} as const;
 
 const rpIdHashReal = hash(Buffer.from(config.hostname, 'utf-8'));
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const profile = await UserProfiles.findOneOrFail(user.id);
 
@@ -99,7 +100,7 @@ export default define(meta, async (ps, user) => {
 		clientDataHash: clientDataJSONHash,
 		credentialId,
 		publicKey,
-		rpIdHash
+		rpIdHash,
 	});
 	if (!verificationData.valid) throw new Error('signature invalid');
 
@@ -107,7 +108,7 @@ export default define(meta, async (ps, user) => {
 		userId: user.id,
 		id: ps.challengeId,
 		registrationChallenge: true,
-		challenge: hash(clientData.challenge).toString('hex')
+		challenge: hash(clientData.challenge).toString('hex'),
 	});
 
 	if (!attestationChallenge) {
@@ -116,7 +117,7 @@ export default define(meta, async (ps, user) => {
 
 	await AttestationChallenges.delete({
 		userId: user.id,
-		id: ps.challengeId
+		id: ps.challengeId,
 	});
 
 	// Expired challenge (> 5min old)
@@ -129,22 +130,22 @@ export default define(meta, async (ps, user) => {
 
 	const credentialIdString = credentialId.toString('hex');
 
-	await UserSecurityKeys.save({
+	await UserSecurityKeys.insert({
 		userId: user.id,
 		id: credentialIdString,
 		lastUsed: new Date(),
 		name: ps.name,
-		publicKey: verificationData.publicKey.toString('hex')
+		publicKey: verificationData.publicKey.toString('hex'),
 	});
 
 	// Publish meUpdated event
 	publishMainStream(user.id, 'meUpdated', await Users.pack(user.id, user, {
 		detail: true,
-		includeSecrets: true
+		includeSecrets: true,
 	}));
 
 	return {
 		id: credentialIdString,
-		name: ps.name
+		name: ps.name,
 	};
 });

@@ -10,7 +10,7 @@ import { Notes, Users } from '@/models/index';
 export const meta = {
 	tags: ['users'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 
 	params: {
 		userId: {
@@ -19,29 +19,40 @@ export const meta = {
 
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
-			ref: 'User',
-		}
+			type: 'object',
+			optional: false, nullable: false,
+			properties: {
+				user: {
+					type: 'object',
+					optional: false, nullable: false,
+					ref: 'UserDetailed',
+				},
+				weight: {
+					type: 'number',
+					optional: false, nullable: false,
+				},
+			},
+		},
 	},
 
 	errors: {
 		noSuchUser: {
 			message: 'No such user.',
 			code: 'NO_SUCH_USER',
-			id: 'e6965129-7b2a-40a4-bae2-cd84cd434822'
-		}
-	}
-};
+			id: 'e6965129-7b2a-40a4-bae2-cd84cd434822',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	// Lookup user
 	const user = await getUser(ps.userId).catch(e => {
@@ -53,13 +64,13 @@ export default define(meta, async (ps, me) => {
 	const recentNotes = await Notes.find({
 		where: {
 			userId: user.id,
-			replyId: Not(IsNull())
+			replyId: Not(IsNull()),
 		},
 		order: {
-			id: -1
+			id: -1,
 		},
 		take: 1000,
-		select: ['replyId']
+		select: ['replyId'],
 	});
 
 	// 投稿が少なかったら中断
@@ -72,7 +83,7 @@ export default define(meta, async (ps, me) => {
 		where: {
 			id: In(recentNotes.map(p => p.replyId)),
 		},
-		select: ['userId']
+		select: ['userId'],
 	});
 
 	const repliedUsers: any = {};
@@ -98,7 +109,7 @@ export default define(meta, async (ps, me) => {
 	// Make replies object (includes weights)
 	const repliesObj = await Promise.all(topRepliedUsers.map(async (user) => ({
 		user: await Users.pack(user, me, { detail: true }),
-		weight: repliedUsers[user] / peak
+		weight: repliedUsers[user] / peak,
 	})));
 
 	return repliesObj;

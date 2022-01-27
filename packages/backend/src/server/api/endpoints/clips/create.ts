@@ -6,31 +6,32 @@ import { Clips } from '@/models/index';
 export const meta = {
 	tags: ['clips'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:account',
 
 	params: {
 		name: {
-			validator: $.str.range(1, 100)
+			validator: $.str.range(1, 100),
 		},
 
 		isPublic: {
-			validator: $.optional.bool
+			validator: $.optional.bool,
 		},
 
 		description: {
-			validator: $.optional.nullable.str.range(1, 2048)
-		}
+			validator: $.optional.nullable.str.range(1, 2048),
+		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
-		ref: 'Clip'
-	}
-};
+		type: 'object',
+		optional: false, nullable: false,
+		ref: 'Clip',
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const clip = await Clips.insert({
 		id: genId(),

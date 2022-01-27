@@ -3,24 +3,13 @@
 	<div class="mjndxjcg">
 		<img src="https://xn--931a.moe/assets/error.jpg" class="_ghost"/>
 		<p><i class="fas fa-exclamation-triangle"></i> {{ $ts.somethingHappened }}</p>
-		<MkButton @click="() => $emit('retry')" class="button">{{ $ts.retry }}</MkButton>
+		<MkButton class="button" @click="() => $emit('retry')">{{ $ts.retry }}</MkButton>
 	</div>
 </transition>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
 import MkButton from '@/components/ui/button.vue';
-
-export default defineComponent({
-	components: {
-		MkButton,
-	},
-	data() {
-		return {
-		};
-	},
-});
 </script>
 
 <style lang="scss" scoped>

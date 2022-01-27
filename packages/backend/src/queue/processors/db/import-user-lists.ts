@@ -22,7 +22,7 @@ export async function importUserLists(job: Bull.Job<DbUserImportJobData>, done: 
 	}
 
 	const file = await DriveFiles.findOne({
-		id: job.data.fileId
+		id: job.data.fileId,
 	});
 	if (file == null) {
 		done();
@@ -42,25 +42,25 @@ export async function importUserLists(job: Bull.Job<DbUserImportJobData>, done: 
 
 			let list = await UserLists.findOne({
 				userId: user.id,
-				name: listName
+				name: listName,
 			});
 
 			if (list == null) {
-				list = await UserLists.save({
+				list = await UserLists.insert({
 					id: genId(),
 					createdAt: new Date(),
 					userId: user.id,
 					name: listName,
-					userIds: []
-				});
+					userIds: [],
+				}).then(x => UserLists.findOneOrFail(x.identifiers[0]));
 			}
 
 			let target = isSelfHost(host!) ? await Users.findOne({
 				host: null,
-				usernameLower: username.toLowerCase()
+				usernameLower: username.toLowerCase(),
 			}) : await Users.findOne({
 				host: toPuny(host!),
-				usernameLower: username.toLowerCase()
+				usernameLower: username.toLowerCase(),
 			});
 
 			if (target == null) {

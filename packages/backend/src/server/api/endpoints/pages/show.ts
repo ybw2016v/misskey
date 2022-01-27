@@ -8,7 +8,7 @@ import { Page } from '@/models/entities/page';
 export const meta = {
 	tags: ['pages'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 
 	params: {
 		pageId: {
@@ -25,8 +25,8 @@ export const meta = {
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		ref: 'Page',
 	},
 
@@ -34,11 +34,12 @@ export const meta = {
 		noSuchPage: {
 			message: 'No such page.',
 			code: 'NO_SUCH_PAGE',
-			id: '222120c0-3ead-4528-811b-b96f233388d7'
-		}
-	}
-};
+			id: '222120c0-3ead-4528-811b-b96f233388d7',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	let page: Page | undefined;
 
@@ -47,12 +48,12 @@ export default define(meta, async (ps, user) => {
 	} else if (ps.name && ps.username) {
 		const author = await Users.findOne({
 			host: null,
-			usernameLower: ps.username.toLowerCase()
+			usernameLower: ps.username.toLowerCase(),
 		});
 		if (author) {
 			page = await Pages.findOne({
 				name: ps.name,
-				userId: author.id
+				userId: author.id,
 			});
 		}
 	}

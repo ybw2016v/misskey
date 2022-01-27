@@ -1,7 +1,5 @@
 <template>
-<component :is="self ? 'MkA' : 'a'" class="xlcxczvw _link" :[attr]="self ? url.substr(local.length) : url" :rel="rel" :target="target"
-	@mouseover="onMouseover"
-	@mouseleave="onMouseleave"
+<component :is="self ? 'MkA' : 'a'" ref="el" class="xlcxczvw _link" :[attr]="self ? url.substr(local.length) : url" :rel="rel" :target="target"
 	:title="url"
 >
 	<slot></slot>
@@ -9,74 +7,30 @@
 </component>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { } from 'vue';
 import { url as local } from '@/config';
-import { isDeviceTouch } from '@/scripts/is-device-touch';
+import { useTooltip } from '@/scripts/use-tooltip';
 import * as os from '@/os';
 
-export default defineComponent({
-	props: {
-		url: {
-			type: String,
-			required: true,
-		},
-		rel: {
-			type: String,
-			required: false,
-		}
-	},
-	data() {
-		const self = this.url.startsWith(local);
-		return {
-			local,
-			self: self,
-			attr: self ? 'to' : 'href',
-			target: self ? null : '_blank',
-			showTimer: null,
-			hideTimer: null,
-			checkTimer: null,
-			close: null,
-		};
-	},
-	methods: {
-		async showPreview() {
-			if (!document.body.contains(this.$el)) return;
-			if (this.close) return;
+const props = withDefaults(defineProps<{
+	url: string;
+	rel?: null | string;
+}>(), {
+});
 
-			const { dispose } = await os.popup(import('@/components/url-preview-popup.vue'), {
-				url: this.url,
-				source: this.$el
-			});
+const self = props.url.startsWith(local);
+const attr = self ? 'to' : 'href';
+const target = self ? null : '_blank';
 
-			this.close = () => {
-				dispose();
-			};
+const el = $ref();
 
-			this.checkTimer = setInterval(() => {
-				if (!document.body.contains(this.$el)) this.closePreview();
-			}, 1000);
-		},
-		closePreview() {
-			if (this.close) {
-				clearInterval(this.checkTimer);
-				this.close();
-				this.close = null;
-			}
-		},
-		onMouseover() {
-			if (isDeviceTouch) return;
-			clearTimeout(this.showTimer);
-			clearTimeout(this.hideTimer);
-			this.showTimer = setTimeout(this.showPreview, 500);
-		},
-		onMouseleave() {
-			if (isDeviceTouch) return;
-			clearTimeout(this.showTimer);
-			clearTimeout(this.hideTimer);
-			this.hideTimer = setTimeout(this.closePreview, 500);
-		}
-	}
+useTooltip($$(el), (showing) => {
+	os.popup(import('@/components/url-preview-popup.vue'), {
+		showing,
+		url: props.url,
+		source: el,
+	}, {}, 'closed');
 });
 </script>
 

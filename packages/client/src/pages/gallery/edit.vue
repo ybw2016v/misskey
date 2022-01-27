@@ -1,43 +1,41 @@
 <template>
-<FormBase>
+<div>
 	<FormSuspense :p="init">
 		<FormInput v-model="title">
-			<span>{{ $ts.title }}</span>
+			<template #label>{{ $ts.title }}</template>
 		</FormInput>
 
 		<FormTextarea v-model="description" :max="500">
-			<span>{{ $ts.description }}</span>
+			<template #label>{{ $ts.description }}</template>
 		</FormTextarea>
 
 		<FormGroup>
-			<div v-for="file in files" :key="file.id" class="_debobigegoItem _debobigegoPanel wqugxsfx" :style="{ backgroundImage: file ? `url(${ file.thumbnailUrl })` : null }">
+			<div v-for="file in files" :key="file.id" class="_formGroup wqugxsfx" :style="{ backgroundImage: file ? `url(${ file.thumbnailUrl })` : null }">
 				<div class="name">{{ file.name }}</div>
-				<button class="remove _button" @click="remove(file)" v-tooltip="$ts.remove"><i class="fas fa-times"></i></button>
+				<button v-tooltip="$ts.remove" class="remove _button" @click="remove(file)"><i class="fas fa-times"></i></button>
 			</div>
-			<FormButton @click="selectFile" primary><i class="fas fa-plus"></i> {{ $ts.attachFile }}</FormButton>
+			<FormButton primary @click="selectFile"><i class="fas fa-plus"></i> {{ $ts.attachFile }}</FormButton>
 		</FormGroup>
 
 		<FormSwitch v-model="isSensitive">{{ $ts.markAsSensitive }}</FormSwitch>
 
-		<FormButton v-if="postId" @click="save" primary><i class="fas fa-save"></i> {{ $ts.save }}</FormButton>
-		<FormButton v-else @click="save" primary><i class="fas fa-save"></i> {{ $ts.publish }}</FormButton>
+		<FormButton v-if="postId" primary @click="save"><i class="fas fa-save"></i> {{ $ts.save }}</FormButton>
+		<FormButton v-else primary @click="save"><i class="fas fa-save"></i> {{ $ts.publish }}</FormButton>
 
-		<FormButton v-if="postId" @click="del" danger><i class="fas fa-trash-alt"></i> {{ $ts.delete }}</FormButton>
+		<FormButton v-if="postId" danger @click="del"><i class="fas fa-trash-alt"></i> {{ $ts.delete }}</FormButton>
 	</FormSuspense>
-</FormBase>
+</div>
 </template>
 
 <script lang="ts">
 import { computed, defineComponent } from 'vue';
-import FormButton from '@/components/debobigego/button.vue';
-import FormInput from '@/components/debobigego/input.vue';
-import FormTextarea from '@/components/debobigego/textarea.vue';
-import FormSwitch from '@/components/debobigego/switch.vue';
-import FormTuple from '@/components/debobigego/tuple.vue';
-import FormBase from '@/components/debobigego/base.vue';
-import FormGroup from '@/components/debobigego/group.vue';
-import FormSuspense from '@/components/debobigego/suspense.vue';
-import { selectFile } from '@/scripts/select-file';
+import FormButton from '@/components/ui/button.vue';
+import FormInput from '@/components/form/input.vue';
+import FormTextarea from '@/components/form/textarea.vue';
+import FormSwitch from '@/components/form/switch.vue';
+import FormGroup from '@/components/form/group.vue';
+import FormSuspense from '@/components/form/suspense.vue';
+import { selectFiles } from '@/scripts/select-file';
 import * as os from '@/os';
 import * as symbols from '@/symbols';
 
@@ -47,7 +45,6 @@ export default defineComponent({
 		FormInput,
 		FormTextarea,
 		FormSwitch,
-		FormBase,
 		FormGroup,
 		FormSuspense,
 	},
@@ -95,7 +92,7 @@ export default defineComponent({
 
 	methods: {
 		selectFile(e) {
-			selectFile(e.currentTarget || e.target, null, true).then(files => {
+			selectFiles(e.currentTarget || e.target, null).then(files => {
 				this.files = this.files.concat(files);
 			});
 		},
@@ -126,10 +123,9 @@ export default defineComponent({
 		},
 
 		async del() {
-			const { canceled } = await os.dialog({
+			const { canceled } = await os.confirm({
 				type: 'warning',
 				text: this.$ts.deleteConfirm,
-				showCancelButton: true
 			});
 			if (canceled) return;
 			await os.apiWithDialog('gallery/posts/delete', {

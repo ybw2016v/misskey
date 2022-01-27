@@ -4,7 +4,7 @@ import define from '../../../define';
 import { DriveFiles } from '@/models/index';
 
 export const meta = {
-	requireCredential: true as const,
+	requireCredential: true,
 
 	tags: ['drive'],
 
@@ -12,7 +12,7 @@ export const meta = {
 
 	params: {
 		name: {
-			validator: $.str
+			validator: $.str,
 		},
 
 		folderId: {
@@ -22,21 +22,22 @@ export const meta = {
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
+			type: 'object',
+			optional: false, nullable: false,
 			ref: 'DriveFile',
-		}
+		},
 	},
-};
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const files = await DriveFiles.find({
 		name: ps.name,
 		userId: user.id,
-		folderId: ps.folderId
+		folderId: ps.folderId,
 	});
 
 	return await Promise.all(files.map(file => DriveFiles.pack(file, { self: true })));

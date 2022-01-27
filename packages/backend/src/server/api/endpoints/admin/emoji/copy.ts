@@ -6,18 +6,18 @@ import { getConnection } from 'typeorm';
 import { ApiError } from '../../../error';
 import { DriveFile } from '@/models/entities/drive-file';
 import { ID } from '@/misc/cafy-id';
-import uploadFromUrl from '@/services/drive/upload-from-url';
+import { uploadFromUrl } from '@/services/drive/upload-from-url';
 import { publishBroadcastStream } from '@/services/stream';
 
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireModerator: true,
 
 	params: {
 		emojiId: {
-			validator: $.type(ID)
+			validator: $.type(ID),
 		},
 	},
 
@@ -25,23 +25,24 @@ export const meta = {
 		noSuchEmoji: {
 			message: 'No such emoji.',
 			code: 'NO_SUCH_EMOJI',
-			id: 'e2785b66-dca3-4087-9cac-b93c541cc425'
-		}
+			id: 'e2785b66-dca3-4087-9cac-b93c541cc425',
+		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		properties: {
 			id: {
-				type: 'string' as const,
-				optional: false as const, nullable: false as const,
+				type: 'string',
+				optional: false, nullable: false,
 				format: 'id',
-			}
-		}
-	}
-};
+			},
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	const emoji = await Emojis.findOne(ps.emojiId);
 
@@ -53,7 +54,7 @@ export default define(meta, async (ps, me) => {
 
 	try {
 		// Create file
-		driveFile = await uploadFromUrl(emoji.url, null, null, null, false, true);
+		driveFile = await uploadFromUrl({ url: emoji.originalUrl, user: null, force: true });
 	} catch (e) {
 		throw new ApiError();
 	}
@@ -64,18 +65,18 @@ export default define(meta, async (ps, me) => {
 		name: emoji.name,
 		host: null,
 		aliases: [],
-		url: driveFile.url,
-		type: driveFile.type,
-		fileId: driveFile.id,
+		originalUrl: driveFile.url,
+		publicUrl: driveFile.webpublicUrl ?? driveFile.url,
+		type: driveFile.webpublicType ?? driveFile.type,
 	}).then(x => Emojis.findOneOrFail(x.identifiers[0]));
 
 	await getConnection().queryResultCache!.remove(['meta_emojis']);
 
 	publishBroadcastStream('emojiAdded', {
-		emoji: await Emojis.pack(copied.id)
+		emoji: await Emojis.pack(copied.id),
 	});
 
 	return {
-		id: copied.id
+		id: copied.id,
 	};
 });

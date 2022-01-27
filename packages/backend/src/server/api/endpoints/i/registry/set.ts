@@ -5,26 +5,27 @@ import { RegistryItems } from '@/models/index';
 import { genId } from '@/misc/gen-id';
 
 export const meta = {
-	requireCredential: true as const,
+	requireCredential: true,
 
 	secure: true,
 
 	params: {
 		key: {
-			validator: $.str.min(1)
+			validator: $.str.min(1),
 		},
 
 		value: {
-			validator: $.nullable.any
+			validator: $.nullable.any,
 		},
 
 		scope: {
 			validator: $.optional.arr($.str.match(/^[a-zA-Z0-9_]+$/)),
 			default: [],
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const query = RegistryItems.createQueryBuilder('item')
 		.where('item.domain IS NULL')
@@ -37,7 +38,7 @@ export default define(meta, async (ps, user) => {
 	if (existingItem) {
 		await RegistryItems.update(existingItem.id, {
 			updatedAt: new Date(),
-			value: ps.value
+			value: ps.value,
 		});
 	} else {
 		await RegistryItems.insert({
@@ -48,7 +49,7 @@ export default define(meta, async (ps, user) => {
 			domain: null,
 			scope: ps.scope,
 			key: ps.key,
-			value: ps.value
+			value: ps.value,
 		});
 	}
 
@@ -56,6 +57,6 @@ export default define(meta, async (ps, user) => {
 	publishMainStream(user.id, 'registryUpdated', {
 		scope: ps.scope,
 		key: ps.key,
-		value: ps.value
+		value: ps.value,
 	});
 });

@@ -4,7 +4,7 @@ import { Users } from '@/models/index';
 import { normalizeForSearch } from '@/misc/normalize-for-search';
 
 export const meta = {
-	requireCredential: false as const,
+	requireCredential: false,
 
 	tags: ['hashtags', 'users'],
 
@@ -15,7 +15,7 @@ export const meta = {
 
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 
 		sort: {
@@ -32,9 +32,9 @@ export const meta = {
 		state: {
 			validator: $.optional.str.or([
 				'all',
-				'alive'
+				'alive',
 			]),
-			default: 'all'
+			default: 'all',
 		},
 
 		origin: {
@@ -43,21 +43,22 @@ export const meta = {
 				'local',
 				'remote',
 			]),
-			default: 'local'
-		}
+			default: 'local',
+		},
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
-			ref: 'User',
-		}
+			type: 'object',
+			optional: false, nullable: false,
+			ref: 'UserDetailed',
+		},
 	},
-};
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	const query = Users.createQueryBuilder('user')
 		.where(':tag = ANY(user.tags)', { tag: normalizeForSearch(ps.tag) });

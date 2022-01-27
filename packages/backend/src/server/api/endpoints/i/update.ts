@@ -19,7 +19,7 @@ import { normalizeForSearch } from '@/misc/normalize-for-search';
 export const meta = {
 	tags: ['account'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:account',
 
@@ -113,15 +113,19 @@ export const meta = {
 		},
 
 		mutedWords: {
-			validator: $.optional.arr($.arr($.str))
+			validator: $.optional.arr($.arr($.str)),
+		},
+
+		mutedInstances: {
+			validator: $.optional.arr($.str),
 		},
 
 		mutingNotificationTypes: {
-			validator: $.optional.arr($.str.or(notificationTypes as unknown as string[]))
+			validator: $.optional.arr($.str.or(notificationTypes as unknown as string[])),
 		},
 
 		emailNotificationTypes: {
-			validator: $.optional.arr($.str)
+			validator: $.optional.arr($.str),
 		},
 	},
 
@@ -129,41 +133,42 @@ export const meta = {
 		noSuchAvatar: {
 			message: 'No such avatar file.',
 			code: 'NO_SUCH_AVATAR',
-			id: '539f3a45-f215-4f81-a9a8-31293640207f'
+			id: '539f3a45-f215-4f81-a9a8-31293640207f',
 		},
 
 		noSuchBanner: {
 			message: 'No such banner file.',
 			code: 'NO_SUCH_BANNER',
-			id: '0d8f5629-f210-41c2-9433-735831a58595'
+			id: '0d8f5629-f210-41c2-9433-735831a58595',
 		},
 
 		avatarNotAnImage: {
 			message: 'The file specified as an avatar is not an image.',
 			code: 'AVATAR_NOT_AN_IMAGE',
-			id: 'f419f9f8-2f4d-46b1-9fb4-49d3a2fd7191'
+			id: 'f419f9f8-2f4d-46b1-9fb4-49d3a2fd7191',
 		},
 
 		bannerNotAnImage: {
 			message: 'The file specified as a banner is not an image.',
 			code: 'BANNER_NOT_AN_IMAGE',
-			id: '75aedb19-2afd-4e6d-87fc-67941256fa60'
+			id: '75aedb19-2afd-4e6d-87fc-67941256fa60',
 		},
 
 		noSuchPage: {
 			message: 'No such page.',
 			code: 'NO_SUCH_PAGE',
-			id: '8e01b590-7eb9-431b-a239-860e086c408e'
+			id: '8e01b590-7eb9-431b-a239-860e086c408e',
 		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
-		ref: 'User'
-	}
-};
+		type: 'object',
+		optional: false, nullable: false,
+		ref: 'MeDetailed',
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, _user, token) => {
 	const user = await Users.findOneOrFail(_user.id);
 	const isSecure = token == null;
@@ -185,6 +190,7 @@ export default define(meta, async (ps, _user, token) => {
 		profileUpdates.mutedWords = ps.mutedWords;
 		profileUpdates.enableWordMute = ps.mutedWords.length > 0;
 	}
+	if (ps.mutedInstances !== undefined) profileUpdates.mutedInstances = ps.mutedInstances;
 	if (ps.mutingNotificationTypes !== undefined) profileUpdates.mutingNotificationTypes = ps.mutingNotificationTypes as typeof notificationTypes[number][];
 	if (typeof ps.isLocked === 'boolean') updates.isLocked = ps.isLocked;
 	if (typeof ps.isExplorable === 'boolean') updates.isExplorable = ps.isExplorable;
@@ -273,9 +279,9 @@ export default define(meta, async (ps, _user, token) => {
 	if (Object.keys(updates).length > 0) await Users.update(user.id, updates);
 	if (Object.keys(profileUpdates).length > 0) await UserProfiles.update(user.id, profileUpdates);
 
-	const iObj = await Users.pack(user.id, user, {
+	const iObj = await Users.pack<true, true>(user.id, user, {
 		detail: true,
-		includeSecrets: isSecure
+		includeSecrets: isSecure,
 	});
 
 	// Publish meUpdated event

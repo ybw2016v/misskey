@@ -6,16 +6,17 @@ import { Users } from '@/models/index';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireAdmin: true,
 
 	params: {
 		userId: {
 			validator: $.type(ID),
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps) => {
 	const user = await Users.findOne(ps.userId as string);
 
@@ -24,6 +25,6 @@ export default define(meta, async (ps) => {
 	}
 
 	await Users.update(user.id, {
-		isModerator: false
+		isModerator: false,
 	});
 });

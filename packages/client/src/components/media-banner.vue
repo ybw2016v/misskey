@@ -1,20 +1,20 @@
 <template>
 <div class="mk-media-banner">
-	<div class="sensitive" v-if="media.isSensitive && hide" @click="hide = false">
+	<div v-if="media.isSensitive && hide" class="sensitive" @click="hide = false">
 		<span class="icon"><i class="fas fa-exclamation-triangle"></i></span>
 		<b>{{ $ts.sensitive }}</b>
 		<span>{{ $ts.clickToShow }}</span>
 	</div>
-	<div class="audio" v-else-if="media.type.startsWith('audio') && media.type !== 'audio/midi'">
-		<audio class="audio"
+	<div v-else-if="media.type.startsWith('audio') && media.type !== 'audio/midi'" class="audio">
+		<audio ref="audioEl"
+			class="audio"
 			:src="media.url"
 			:title="media.name"
 			controls
-			ref="audio"
-			@volumechange="volumechange"
-			preload="metadata" />
+			preload="metadata"
+			@volumechange="volumechange" />
 	</div>
-	<a class="download" v-else
+	<a v-else class="download"
 		:href="media.url"
 		:title="media.name"
 		:download="media.name"
@@ -25,34 +25,26 @@
 </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import * as os from '@/os';
+<script lang="ts" setup>
+import { onMounted } from 'vue';
+import * as misskey from 'misskey-js';
 import { ColdDeviceStorage } from '@/store';
 
-export default defineComponent({
-	props: {
-		media: {
-			type: Object,
-			required: true
-		}
-	},
-	data() {
-		return {
-			hide: true,
-		};
-	},
-	mounted() {
-		const audioTag = this.$refs.audio as HTMLAudioElement;
-		if (audioTag) audioTag.volume = ColdDeviceStorage.get('mediaVolume');
-	},
-	methods: {
-		volumechange() {
-			const audioTag = this.$refs.audio as HTMLAudioElement;
-			ColdDeviceStorage.set('mediaVolume', audioTag.volume);
-		},
-	},
-})
+const props = withDefaults(defineProps<{
+	media: misskey.entities.DriveFile;
+}>(), {
+});
+
+const audioEl = $ref<HTMLAudioElement | null>();
+let hide = $ref(true);
+
+function volumechange() {
+	if (audioEl) ColdDeviceStorage.set('mediaVolume', audioEl.volume);
+}
+
+onMounted(() => {
+	if (audioEl) audioEl.volume = ColdDeviceStorage.get('mediaVolume');
+});
 </script>
 
 <style lang="scss" scoped>

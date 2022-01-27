@@ -14,7 +14,7 @@ export default function(ctx: Koa.Context, user: ILocalUser, redirect = false) {
 			// SEE: https://github.com/koajs/koa/issues/974
 			// When using a SSL proxy it should be configured to add the "X-Forwarded-Proto: https" header
 			secure: config.url.startsWith('https'),
-			httpOnly: false
+			httpOnly: false,
 		});
 		//#endregion
 
@@ -22,21 +22,21 @@ export default function(ctx: Koa.Context, user: ILocalUser, redirect = false) {
 	} else {
 		ctx.body = {
 			id: user.id,
-			i: user.token
+			i: user.token,
 		};
 		ctx.status = 200;
 	}
 
 	(async () => {
 		// Append signin history
-		const record = await Signins.save({
+		const record = await Signins.insert({
 			id: genId(),
 			createdAt: new Date(),
 			userId: user.id,
 			ip: ctx.ip,
 			headers: ctx.headers,
-			success: true
-		});
+			success: true,
+		}).then(x => Signins.findOneOrFail(x.identifiers[0]));
 
 		// Publish signin event
 		publishMainStream(user.id, 'signin', await Signins.pack(record));

@@ -7,7 +7,7 @@ import { Clips } from '@/models/index';
 export const meta = {
 	tags: ['clips'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:account',
 
@@ -21,34 +21,35 @@ export const meta = {
 		},
 
 		isPublic: {
-			validator: $.optional.bool
+			validator: $.optional.bool,
 		},
 
 		description: {
-			validator: $.optional.nullable.str.range(1, 2048)
-		}
+			validator: $.optional.nullable.str.range(1, 2048),
+		},
 	},
 
 	errors: {
 		noSuchClip: {
 			message: 'No such clip.',
 			code: 'NO_SUCH_CLIP',
-			id: 'b4d92d70-b216-46fa-9a3f-a8c811699257'
+			id: 'b4d92d70-b216-46fa-9a3f-a8c811699257',
 		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
-		ref: 'Clip'
-	}
-};
+		type: 'object',
+		optional: false, nullable: false,
+		ref: 'Clip',
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	// Fetch the clip
 	const clip = await Clips.findOne({
 		id: ps.clipId,
-		userId: user.id
+		userId: user.id,
 	});
 
 	if (clip == null) {

@@ -30,23 +30,23 @@
 				<template #prefix>@</template>
 				<template #label>{{ $ts.username }}</template>
 			</MkInput>
-			<MkInput v-model="searchHost" style="flex: 1;" type="text" spellcheck="false" @update:modelValue="$refs.users.reload()" :disabled="pagination.params().origin === 'local'">
+			<MkInput v-model="searchHost" style="flex: 1;" type="text" spellcheck="false" :disabled="pagination.params.origin === 'local'" @update:modelValue="$refs.users.reload()">
 				<template #prefix>@</template>
 				<template #label>{{ $ts.host }}</template>
 			</MkInput>
 		</div>
 
-		<MkPagination :pagination="pagination" #default="{items}" class="users" ref="users">
-			<button class="user _panel _button _gap" v-for="user in items" :key="user.id" @click="show(user)">
+		<MkPagination v-slot="{items}" ref="users" :pagination="pagination" class="users">
+			<button v-for="user in items" :key="user.id" class="user _panel _button _gap" @click="show(user)">
 				<MkAvatar class="avatar" :user="user" :disable-link="true" :show-indicator="true"/>
 				<div class="body">
 					<header>
 						<MkUserName class="name" :user="user"/>
 						<span class="acct">@{{ acct(user) }}</span>
-						<span class="staff" v-if="user.isAdmin"><i class="fas fa-bookmark"></i></span>
-						<span class="staff" v-if="user.isModerator"><i class="far fa-bookmark"></i></span>
-						<span class="punished" v-if="user.isSilenced"><i class="fas fa-microphone-slash"></i></span>
-						<span class="punished" v-if="user.isSuspended"><i class="fas fa-snowflake"></i></span>
+						<span v-if="user.isAdmin" class="staff"><i class="fas fa-bookmark"></i></span>
+						<span v-if="user.isModerator" class="staff"><i class="far fa-bookmark"></i></span>
+						<span v-if="user.isSilenced" class="punished"><i class="fas fa-microphone-slash"></i></span>
+						<span v-if="user.isSuspended" class="punished"><i class="fas fa-snowflake"></i></span>
 					</header>
 					<div>
 						<span>{{ $ts.lastUsed }}: <MkTime v-if="user.updatedAt" :time="user.updatedAt" mode="detail"/></span>
@@ -62,7 +62,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { computed, defineComponent } from 'vue';
 import MkButton from '@/components/ui/button.vue';
 import MkInput from '@/components/form/input.vue';
 import MkSelect from '@/components/form/select.vue';
@@ -110,34 +110,18 @@ export default defineComponent({
 			searchUsername: '',
 			searchHost: '',
 			pagination: {
-				endpoint: 'admin/show-users',
+				endpoint: 'admin/show-users' as const,
 				limit: 10,
-				params: () => ({
+				params: computed(() => ({
 					sort: this.sort,
 					state: this.state,
 					origin: this.origin,
 					username: this.searchUsername,
 					hostname: this.searchHost,
-				}),
+				})),
 				offsetMode: true
 			},
 		}
-	},
-
-	watch: {
-		sort() {
-			this.$refs.users.reload();
-		},
-		state() {
-			this.$refs.users.reload();
-		},
-		origin() {
-			this.$refs.users.reload();
-		},
-	},
-
-	async mounted() {
-		this.$emit('info', this[symbols.PAGE_INFO]);
 	},
 
 	methods: {
@@ -150,15 +134,14 @@ export default defineComponent({
 		},
 
 		async addUser() {
-			const { canceled: canceled1, result: username } = await os.dialog({
+			const { canceled: canceled1, result: username } = await os.inputText({
 				title: this.$ts.username,
-				input: true
 			});
 			if (canceled1) return;
 
-			const { canceled: canceled2, result: password } = await os.dialog({
+			const { canceled: canceled2, result: password } = await os.inputText({
 				title: this.$ts.password,
-				input: { type: 'password' }
+				type: 'password'
 			});
 			if (canceled2) return;
 

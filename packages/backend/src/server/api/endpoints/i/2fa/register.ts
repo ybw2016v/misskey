@@ -7,17 +7,18 @@ import define from '../../../define';
 import { UserProfiles } from '@/models/index';
 
 export const meta = {
-	requireCredential: true as const,
+	requireCredential: true,
 
 	secure: true,
 
 	params: {
 		password: {
-			validator: $.str
-		}
-	}
-};
+			validator: $.str,
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const profile = await UserProfiles.findOneOrFail(user.id);
 
@@ -30,11 +31,11 @@ export default define(meta, async (ps, user) => {
 
 	// Generate user's secret key
 	const secret = speakeasy.generateSecret({
-		length: 32
+		length: 32,
 	});
 
 	await UserProfiles.update(user.id, {
-		twoFactorTempSecret: secret.base32
+		twoFactorTempSecret: secret.base32,
 	});
 
 	// Get the data URL of the authenticator URL
@@ -42,13 +43,13 @@ export default define(meta, async (ps, user) => {
 		secret: secret.base32,
 		encoding: 'base32',
 		label: user.username,
-		issuer: config.host
+		issuer: config.host,
 	}));
 
 	return {
 		qr: dataUrl,
 		secret: secret.base32,
 		label: user.username,
-		issuer: config.host
+		issuer: config.host,
 	};
 });

@@ -11,16 +11,17 @@ import { publishUserEvent } from '@/services/stream';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireModerator: true,
 
 	params: {
 		userId: {
 			validator: $.type(ID),
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	const user = await Users.findOne(ps.userId as string);
 
@@ -37,7 +38,7 @@ export default define(meta, async (ps, me) => {
 	}
 
 	await Users.update(user.id, {
-		isSuspended: true
+		isSuspended: true,
 	});
 
 	insertModerationLog(me, 'suspend', {
@@ -58,12 +59,12 @@ export default define(meta, async (ps, me) => {
 
 async function unFollowAll(follower: User) {
 	const followings = await Followings.find({
-		followerId: follower.id
+		followerId: follower.id,
 	});
 
 	for (const following of followings) {
 		const followee = await Users.findOne({
-			id: following.followeeId
+			id: following.followeeId,
 		});
 
 		if (followee == null) {
@@ -79,6 +80,6 @@ async function readAllNotify(notifier: User) {
 		notifierId: notifier.id,
 		isRead: false,
 	}, {
-		isRead: true
+		isRead: true,
 	});
 }

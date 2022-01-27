@@ -3,10 +3,10 @@ const types = require('pg').types;
 types.setTypeParser(20, Number);
 
 import { createConnection, Logger, getConnection } from 'typeorm';
-import config from '@/config/index';
-import { entities as charts } from '@/services/chart/entities';
-import { dbLogger } from './logger';
 import * as highlight from 'cli-highlight';
+import config from '@/config/index';
+
+import { dbLogger } from './logger';
 
 import { User } from '@/models/entities/user';
 import { DriveFile } from '@/models/entities/drive-file';
@@ -40,8 +40,6 @@ import { Signin } from '@/models/entities/signin';
 import { AuthSession } from '@/models/entities/auth-session';
 import { FollowRequest } from '@/models/entities/follow-request';
 import { Emoji } from '@/models/entities/emoji';
-import { ReversiGame } from '@/models/entities/games/reversi/game';
-import { ReversiMatching } from '@/models/entities/games/reversi/matching';
 import { UserNotePining } from '@/models/entities/user-note-pining';
 import { Poll } from '@/models/entities/poll';
 import { UserKeypair } from '@/models/entities/user-keypair';
@@ -73,6 +71,8 @@ import { RegistryItem } from '@/models/entities/registry-item';
 import { Ad } from '@/models/entities/ad';
 import { PasswordResetRequest } from '@/models/entities/password-reset-request';
 import { UserPending } from '@/models/entities/user-pending';
+
+import { entities as charts } from '@/services/chart/entities';
 
 const sqlLogger = dbLogger.createSubLogger('sql', 'white', false);
 
@@ -164,8 +164,6 @@ export const entities = [
 	AntennaNote,
 	PromoNote,
 	PromoRead,
-	ReversiGame,
-	ReversiMatching,
 	Relay,
 	MutedNote,
 	Channel,
@@ -175,7 +173,7 @@ export const entities = [
 	Ad,
 	PasswordResetRequest,
 	UserPending,
-	...charts as any
+	...charts,
 ];
 
 export function initDb(justBorrow = false, sync = false, forceRecreate = false) {
@@ -205,12 +203,12 @@ export function initDb(justBorrow = false, sync = false, forceRecreate = false) 
 				port: config.redis.port,
 				password: config.redis.pass,
 				prefix: `${config.redis.prefix}:query:`,
-				db: config.redis.db || 0
-			}
+				db: config.redis.db || 0,
+			},
 		} : false,
 		logging: log,
 		logger: log ? new MyCustomLogger() : undefined,
-		entities: entities
+		entities: entities,
 	});
 }
 
@@ -222,7 +220,9 @@ export async function resetDb() {
 		WHERE nspname NOT IN ('pg_catalog', 'information_schema')
 			AND C.relkind = 'r'
 			AND nspname !~ '^pg_toast';`);
-		await Promise.all(tables.map(t => t.table).map(x => conn.query(`DELETE FROM "${x}" CASCADE`)));
+		for (const table of tables) {
+			await conn.query(`DELETE FROM "${table.table}" CASCADE`);
+		}
 	};
 
 	for (let i = 1; i <= 3; i++) {

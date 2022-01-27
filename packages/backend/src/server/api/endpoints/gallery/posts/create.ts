@@ -11,13 +11,13 @@ import { DriveFile } from '@/models/entities/drive-file';
 export const meta = {
 	tags: ['gallery'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:gallery',
 
 	limit: {
 		duration: ms('1hour'),
-		max: 300
+		max: 300,
 	},
 
 	params: {
@@ -40,21 +40,22 @@ export const meta = {
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		ref: 'GalleryPost',
 	},
 
 	errors: {
 
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const files = (await Promise.all(ps.fileIds.map(fileId =>
 		DriveFiles.findOne({
 			id: fileId,
-			userId: user.id
+			userId: user.id,
 		})
 	))).filter((file): file is DriveFile => file != null);
 
@@ -70,7 +71,7 @@ export default define(meta, async (ps, user) => {
 		description: ps.description,
 		userId: user.id,
 		isSensitive: ps.isSensitive,
-		fileIds: files.map(file => file.id)
+		fileIds: files.map(file => file.id),
 	})).then(x => GalleryPosts.findOneOrFail(x.identifiers[0]));
 
 	return await GalleryPosts.pack(post, user);

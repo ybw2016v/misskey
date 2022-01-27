@@ -6,48 +6,49 @@ import { AuthSessions } from '@/models/index';
 export const meta = {
 	tags: ['auth'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 
 	params: {
 		token: {
 			validator: $.str,
-		}
+		},
 	},
 
 	errors: {
 		noSuchSession: {
 			message: 'No such session.',
 			code: 'NO_SUCH_SESSION',
-			id: 'bd72c97d-eba7-4adb-a467-f171b8847250'
-		}
+			id: 'bd72c97d-eba7-4adb-a467-f171b8847250',
+		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		properties: {
 			id: {
-				type: 'string' as const,
-				optional: false as const, nullable: false as const,
-				format: 'id'
+				type: 'string',
+				optional: false, nullable: false,
+				format: 'id',
 			},
 			app: {
-				type: 'object' as const,
-				optional: false as const, nullable: false as const,
-				ref: 'App'
+				type: 'object',
+				optional: false, nullable: false,
+				ref: 'App',
 			},
 			token: {
-				type: 'string' as const,
-				optional: false as const, nullable: false as const
-			}
-		}
-	}
-};
+				type: 'string',
+				optional: false, nullable: false,
+			},
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	// Lookup session
 	const session = await AuthSessions.findOne({
-		token: ps.token
+		token: ps.token,
 	});
 
 	if (session == null) {

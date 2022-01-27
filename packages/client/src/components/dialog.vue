@@ -1,10 +1,10 @@
 <template>
-<MkModal ref="modal" @click="done(true)" @closed="$emit('closed')">
+<MkModal ref="modal" :prefer-type="'dialog'" :z-priority="'high'" @click="done(true)" @closed="emit('closed')">
 	<div class="mk-dialog">
-		<div class="icon" v-if="icon">
+		<div v-if="icon" class="icon">
 			<i :class="icon"></i>
 		</div>
-		<div class="icon" v-else-if="!input && !select" :class="type">
+		<div v-else-if="!input && !select" class="icon" :class="type">
 			<i v-if="type === 'success'" class="fas fa-check"></i>
 			<i v-else-if="type === 'error'" class="fas fa-times-circle"></i>
 			<i v-else-if="type === 'warning'" class="fas fa-exclamation-triangle"></i>
@@ -13,8 +13,10 @@
 			<i v-else-if="type === 'waiting'" class="fas fa-spinner fa-pulse"></i>
 		</div>
 		<header v-if="title"><Mfm :text="title"/></header>
-		<div class="body" v-if="text"><Mfm :text="text"/></div>
-		<MkInput v-if="input" v-model="inputValue" autofocus :type="input.type || 'text'" :placeholder="input.placeholder" @keydown="onInputKeydown"></MkInput>
+		<div v-if="text" class="body"><Mfm :text="text"/></div>
+		<MkInput v-if="input" v-model="inputValue" autofocus :type="input.type || 'text'" :placeholder="input.placeholder || undefined" @keydown="onInputKeydown">
+			<template v-if="input.type === 'password'" #prefix><i class="fas fa-lock"></i></template>
+		</MkInput>
 		<MkSelect v-if="select" v-model="selectedValue" autofocus>
 			<template v-if="select.items">
 				<option v-for="item in select.items" :value="item.value">{{ item.text }}</option>
@@ -25,129 +27,119 @@
 				</optgroup>
 			</template>
 		</MkSelect>
-		<div class="buttons" v-if="(showOkButton || showCancelButton) && !actions">
-			<MkButton inline @click="ok" v-if="showOkButton" primary :autofocus="!input && !select">{{ (showCancelButton || input || select) ? $ts.ok : $ts.gotIt }}</MkButton>
-			<MkButton inline @click="cancel" v-if="showCancelButton || input || select">{{ $ts.cancel }}</MkButton>
+		<div v-if="(showOkButton || showCancelButton) && !actions" class="buttons">
+			<MkButton v-if="showOkButton" inline primary :autofocus="!input && !select" @click="ok">{{ (showCancelButton || input || select) ? i18n.locale.ok : i18n.locale.gotIt }}</MkButton>
+			<MkButton v-if="showCancelButton || input || select" inline @click="cancel">{{ i18n.locale.cancel }}</MkButton>
 		</div>
-		<div class="buttons" v-if="actions">
-			<MkButton v-for="action in actions" inline @click="() => { action.callback(); close(); }" :primary="action.primary" :key="action.text">{{ action.text }}</MkButton>
+		<div v-if="actions" class="buttons">
+			<MkButton v-for="action in actions" :key="action.text" inline :primary="action.primary" @click="() => { action.callback(); close(); }">{{ action.text }}</MkButton>
 		</div>
 	</div>
 </MkModal>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 import MkModal from '@/components/ui/modal.vue';
 import MkButton from '@/components/ui/button.vue';
 import MkInput from '@/components/form/input.vue';
 import MkSelect from '@/components/form/select.vue';
+import { i18n } from '@/i18n';
 
-export default defineComponent({
-	components: {
-		MkModal,
-		MkButton,
-		MkInput,
-		MkSelect,
-	},
+type Input = {
+	type: HTMLInputElement['type'];
+	placeholder?: string | null;
+	default: any | null;
+};
 
-	props: {
-		type: {
-			type: String,
-			required: false,
-			default: 'info'
-		},
-		title: {
-			type: String,
-			required: false
-		},
-		text: {
-			type: String,
-			required: false
-		},
-		input: {
-			required: false
-		},
-		select: {
-			required: false
-		},
-		icon: {
-			required: false
-		},
-		actions: {
-			required: false
-		},
-		showOkButton: {
-			type: Boolean,
-			default: true
-		},
-		showCancelButton: {
-			type: Boolean,
-			default: false
-		},
-		cancelableByBgClick: {
-			type: Boolean,
-			default: true
-		},
-	},
+type Select = {
+	items: {
+		value: string;
+		text: string;
+	}[];
+	groupedItems: {
+		label: string;
+		items: {
+			value: string;
+			text: string;
+		}[];
+	}[];
+	default: string | null;
+};
 
-	emits: ['done', 'closed'],
+const props = withDefaults(defineProps<{
+	type?: 'success' | 'error' | 'warning' | 'info' | 'question' | 'waiting';
+	title: string;
+	text?: string;
+	input?: Input;
+	select?: Select;
+	icon?: string;
+	actions?: {
+		text: string;
+		primary?: boolean,
+		callback: (...args: any[]) => void;
+	}[];
+	showOkButton?: boolean;
+	showCancelButton?: boolean;
+	cancelableByBgClick?: boolean;
+}>(), {
+	type: 'info',
+	showOkButton: true,
+	showCancelButton: false,
+	cancelableByBgClick: true,
+});
 
-	data() {
-		return {
-			inputValue: this.input && this.input.default ? this.input.default : null,
-			selectedValue: this.select ? this.select.default ? this.select.default : this.select.items ? this.select.items[0].value : this.select.groupedItems[0].items[0].value : null,
-		};
-	},
+const emit = defineEmits<{
+	(e: 'done', v: { canceled: boolean; result: any }): void;
+	(e: 'closed'): void;
+}>();
 
-	mounted() {
-		document.addEventListener('keydown', this.onKeydown);
-	},
+const modal = ref<InstanceType<typeof MkModal>>();
 
-	beforeUnmount() {
-		document.removeEventListener('keydown', this.onKeydown);
-	},
+const inputValue = ref(props.input?.default || null);
+const selectedValue = ref(props.select?.default || null);
 
-	methods: {
-		done(canceled, result?) {
-			this.$emit('done', { canceled, result });
-			this.$refs.modal.close();
-		},
+function done(canceled: boolean, result?) {
+	emit('done', { canceled, result });
+	modal.value?.close();
+}
 
-		async ok() {
-			if (!this.showOkButton) return;
+async function ok() {
+	if (!props.showOkButton) return;
 
-			const result =
-				this.input ? this.inputValue :
-				this.select ? this.selectedValue :
-				true;
-			this.done(false, result);
-		},
+	const result =
+		props.input ? inputValue.value :
+		props.select ? selectedValue.value :
+		true;
+	done(false, result);
+}
 
-		cancel() {
-			this.done(true);
-		},
+function cancel() {
+	done(true);
+}
+/*
+function onBgClick() {
+	if (props.cancelableByBgClick) cancel();
+}
+*/
+function onKeydown(e: KeyboardEvent) {
+	if (e.key === 'Escape') cancel();
+}
 
-		onBgClick() {
-			if (this.cancelableByBgClick) {
-				this.cancel();
-			}
-		},
-
-		onKeydown(e) {
-			if (e.which === 27) { // ESC
-				this.cancel();
-			}
-		},
-
-		onInputKeydown(e) {
-			if (e.which === 13) { // Enter
-				e.preventDefault();
-				e.stopPropagation();
-				this.ok();
-			}
-		}
+function onInputKeydown(e: KeyboardEvent) {
+	if (e.key === 'Enter') {
+		e.preventDefault();
+		e.stopPropagation();
+		ok();
 	}
+}
+
+onMounted(() => {
+	document.addEventListener('keydown', onKeydown);
+});
+
+onBeforeUnmount(() => {
+	document.removeEventListener('keydown', onKeydown);
 });
 </script>
 
@@ -164,6 +156,10 @@ export default defineComponent({
 
 	> .icon {
 		font-size: 32px;
+
+		&.info {
+			color: #55c4dd;
+		}
 
 		&.success {
 			color: var(--success);

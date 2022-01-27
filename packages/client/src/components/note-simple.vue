@@ -1,48 +1,34 @@
 <template>
-<div class="yohlumlk" v-size="{ min: [350, 500] }">
+<div v-size="{ min: [350, 500] }" class="yohlumlk">
 	<MkAvatar class="avatar" :user="note.user"/>
 	<div class="main">
 		<XNoteHeader class="header" :note="note" :mini="true"/>
 		<div class="body">
 			<p v-if="note.cw != null" class="cw">
-				<span class="text" v-if="note.cw != ''">{{ note.cw }}</span>
+				<span v-if="note.cw != ''" class="text">{{ note.cw }}</span>
 				<XCwButton v-model="showContent" :note="note"/>
 			</p>
-			<div class="content" v-show="note.cw == null || showContent">
-				<XSubNote-content class="text" :note="note"/>
+			<div v-show="note.cw == null || showContent" class="content">
+				<MkNoteSubNoteContent class="text" :note="note"/>
 			</div>
 		</div>
 	</div>
 </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import { } from 'vue';
+import * as misskey from 'misskey-js';
 import XNoteHeader from './note-header.vue';
-import XSubNoteContent from './sub-note-content.vue';
+import MkNoteSubNoteContent from './sub-note-content.vue';
 import XCwButton from './cw-button.vue';
-import * as os from '@/os';
 
-export default defineComponent({
-	components: {
-		XNoteHeader,
-		XSubNoteContent,
-		XCwButton,
-	},
+const props = defineProps<{
+	note: misskey.entities.Note;
+	pinned?: boolean;
+}>();
 
-	props: {
-		note: {
-			type: Object,
-			required: true
-		}
-	},
-
-	data() {
-		return {
-			showContent: false
-		};
-	}
-});
+const showContent = $ref(false);
 </script>
 
 <style lang="scss" scoped>

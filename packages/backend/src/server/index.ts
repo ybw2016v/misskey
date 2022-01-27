@@ -23,7 +23,7 @@ import Logger from '@/services/logger';
 import { envOption } from '../env';
 import { UserProfiles, Users } from '@/models/index';
 import { networkChart } from '@/services/chart/index';
-import { genAvatar } from '@/misc/gen-avatar';
+import { genIdenticon } from '@/misc/gen-identicon';
 import { createTemp } from '@/misc/create-temp';
 import { publishMainStream } from '@/services/stream';
 import * as Acct from 'misskey-js/built/acct';
@@ -43,7 +43,7 @@ if (!['production', 'test'].includes(process.env.NODE_ENV || '')) {
 	// Delay
 	if (envOption.slow) {
 		app.use(slow({
-			delay: 3000
+			delay: 3000,
 		}));
 	}
 }
@@ -74,7 +74,7 @@ router.get('/avatar/@:acct', async ctx => {
 	const user = await Users.findOne({
 		usernameLower: username.toLowerCase(),
 		host: host === config.host ? null : host,
-		isSuspended: false
+		isSuspended: false,
 	});
 
 	if (user) {
@@ -84,16 +84,16 @@ router.get('/avatar/@:acct', async ctx => {
 	}
 });
 
-router.get('/random-avatar/:x', async ctx => {
+router.get('/identicon/:x', async ctx => {
 	const [temp] = await createTemp();
-	await genAvatar(ctx.params.x, fs.createWriteStream(temp));
+	await genIdenticon(ctx.params.x, fs.createWriteStream(temp));
 	ctx.set('Content-Type', 'image/png');
 	ctx.body = fs.createReadStream(temp);
 });
 
 router.get('/verify-email/:code', async ctx => {
 	const profile = await UserProfiles.findOne({
-		emailVerifyCode: ctx.params.code
+		emailVerifyCode: ctx.params.code,
 	});
 
 	if (profile != null) {
@@ -102,12 +102,12 @@ router.get('/verify-email/:code', async ctx => {
 
 		await UserProfiles.update({ userId: profile.userId }, {
 			emailVerified: true,
-			emailVerifyCode: null
+			emailVerifyCode: null,
 		});
 
 		publishMainStream(profile.userId, 'meUpdated', await Users.pack(profile.userId, { id: profile.userId }, {
 			detail: true,
-			includeSecrets: true
+			includeSecrets: true,
 		}));
 	} else {
 		ctx.status = 404;

@@ -1,16 +1,16 @@
 <template>
-<div class="skeikyzd" v-show="files.length != 0">
-	<XDraggable class="files" v-model="_files" item-key="id" animation="150" delay="100" delay-on-touch-only="true">
+<div v-show="files.length != 0" class="skeikyzd">
+	<XDraggable v-model="_files" class="files" item-key="id" animation="150" delay="100" delay-on-touch-only="true">
 		<template #item="{element}">
 			<div @click="showFileMenu(element, $event)" @contextmenu.prevent="showFileMenu(element, $event)">
 				<MkDriveFileThumbnail :data-id="element.id" class="thumbnail" :file="element" fit="cover"/>
-				<div class="sensitive" v-if="element.isSensitive">
+				<div v-if="element.isSensitive" class="sensitive">
 					<i class="fas fa-exclamation-triangle icon"></i>
 				</div>
 			</div>
 		</template>
 	</XDraggable>
-	<p class="remain">{{ 4 - files.length }}/4</p>
+	<p class="remain">{{ 16 - files.length }}/16</p>
 </div>
 </template>
 
@@ -41,7 +41,6 @@ export default defineComponent({
 	data() {
 		return {
 			menu: null as Promise<null> | null,
-
 		};
 	},
 
@@ -73,11 +72,9 @@ export default defineComponent({
 			});
 		},
 		async rename(file) {
-			const { canceled, result } = await os.dialog({
+			const { canceled, result } = await os.inputText({
 				title: this.$ts.enterFileName,
-				input: {
-					default: file.name
-				},
+				default: file.name,
 				allowEmpty: false
 			});
 			if (canceled) return;
@@ -101,10 +98,12 @@ export default defineComponent({
 			}, {
 				done: result => {
 					if (!result || result.canceled) return;
-					let comment = result.result;
+					let comment = result.result.length == 0 ? null : result.result;
 					os.api('drive/files/update', {
 						fileId: file.id,
-						comment: comment.length == 0 ? null : comment
+						comment: comment,
+					}).then(() => {
+						file.comment = comment;
 					});
 				}
 			}, 'closed');

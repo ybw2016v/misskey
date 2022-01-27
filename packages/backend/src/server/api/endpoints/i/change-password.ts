@@ -4,21 +4,22 @@ import define from '../../define';
 import { UserProfiles } from '@/models/index';
 
 export const meta = {
-	requireCredential: true as const,
+	requireCredential: true,
 
 	secure: true,
 
 	params: {
 		currentPassword: {
-			validator: $.str
+			validator: $.str,
 		},
 
 		newPassword: {
-			validator: $.str
-		}
-	}
-};
+			validator: $.str,
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const profile = await UserProfiles.findOneOrFail(user.id);
 
@@ -34,6 +35,6 @@ export default define(meta, async (ps, user) => {
 	const hash = await bcrypt.hash(ps.newPassword, salt);
 
 	await UserProfiles.update(user.id, {
-		password: hash
+		password: hash,
 	});
 });

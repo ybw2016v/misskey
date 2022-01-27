@@ -24,12 +24,13 @@ export const meta = {
 
 		userId: {
 			validator: $.type(ID),
-		}
+		},
 	},
 
 	res: convertLog(perUserNotesChart.schema),
-};
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps) => {
 	return await perUserNotesChart.getChart(ps.span as any, ps.limit!, ps.offset ? new Date(ps.offset) : null, ps.userId);
 });

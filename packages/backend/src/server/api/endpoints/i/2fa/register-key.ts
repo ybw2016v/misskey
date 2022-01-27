@@ -10,17 +10,18 @@ import { hash } from '../../../2fa';
 const randomBytes = promisify(crypto.randomBytes);
 
 export const meta = {
-	requireCredential: true as const,
+	requireCredential: true,
 
 	secure: true,
 
 	params: {
 		password: {
-			validator: $.str
-		}
-	}
-};
+			validator: $.str,
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const profile = await UserProfiles.findOneOrFail(user.id);
 
@@ -44,16 +45,16 @@ export default define(meta, async (ps, user) => {
 
 	const challengeId = genId();
 
-	await AttestationChallenges.save({
+	await AttestationChallenges.insert({
 		userId: user.id,
 		id: challengeId,
 		challenge: hash(Buffer.from(challenge, 'utf-8')).toString('hex'),
 		createdAt: new Date(),
-		registrationChallenge: true
+		registrationChallenge: true,
 	});
 
 	return {
 		challengeId,
-		challenge
+		challenge,
 	};
 });

@@ -5,7 +5,7 @@ import define from '../../../define';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireModerator: true,
 
 	params: {
@@ -19,43 +19,44 @@ export const meta = {
 
 		limit: {
 			validator: $.optional.num,
-			default: 50
+			default: 50,
 		},
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
+			type: 'object',
+			optional: false, nullable: false,
 			properties: {
 				id: {
-					type: 'string' as const,
-					optional: false as const, nullable: false as const,
-					format: 'id'
+					type: 'string',
+					optional: false, nullable: false,
+					format: 'id',
 				},
 				data: {
-					type: 'object' as const,
-					optional: false as const, nullable: false as const
+					type: 'object',
+					optional: false, nullable: false,
 				},
 				attempts: {
-					type: 'number' as const,
-					optional: false as const, nullable: false as const
+					type: 'number',
+					optional: false, nullable: false,
 				},
 				maxAttempts: {
-					type: 'number' as const,
-					optional: false as const, nullable: false as const
+					type: 'number',
+					optional: false, nullable: false,
 				},
 				timestamp: {
-					type: 'number' as const,
-					optional: false as const, nullable: false as const
-				}
-			}
-		}
-	}
-};
+					type: 'number',
+					optional: false, nullable: false,
+				},
+			},
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps) => {
 	const queue =
 		ps.domain === 'deliver' ? deliverQueue :

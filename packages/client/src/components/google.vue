@@ -1,35 +1,22 @@
 <template>
 <div class="mk-google">
-	<input type="search" v-model="query" :placeholder="q">
+	<input v-model="query" type="search" :placeholder="q">
 	<button @click="search"><i class="fas fa-search"></i> {{ $ts.search }}</button>
 </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import * as os from '@/os';
+<script lang="ts" setup>
+import { ref } from 'vue';
 
-export default defineComponent({
-	props: {
-		q: {
-			type: String,
-			required: true,
-		}
-	},
-	data() {
-		return {
-			query: null,
-		};
-	},
-	mounted() {
-		this.query = this.q;
-	},
-	methods: {
-		search() {
-			window.open(`https://www.google.com/search?q=${this.query}`, '_blank');
-		}
-	}
-});
+const props = defineProps<{
+	q: string;
+}>();
+
+const query = ref(props.q);
+
+const search = () => {
+	window.open(`https://www.google.com/search?q=${query.value}`, '_blank');
+};
 </script>
 
 <style lang="scss" scoped>

@@ -21,7 +21,7 @@ export class PageRepository extends Repository<Page> {
 				if (x.type === 'image') {
 					attachedFiles.push(DriveFiles.findOne({
 						id: x.fileId,
-						userId: page.userId
+						userId: page.userId,
 					}));
 				}
 				if (x.children) {
@@ -53,7 +53,7 @@ export class PageRepository extends Repository<Page> {
 		migrate(page.content);
 		if (migrated) {
 			this.update(page.id, {
-				content: page.content
+				content: page.content,
 			});
 		}
 
@@ -87,56 +87,3 @@ export class PageRepository extends Repository<Page> {
 		return Promise.all(pages.map(x => this.pack(x, me)));
 	}
 }
-
-export const packedPageSchema = {
-	type: 'object' as const,
-	optional: false as const, nullable: false as const,
-	properties: {
-		id: {
-			type: 'string' as const,
-			optional: false as const, nullable: false as const,
-			format: 'id',
-			example: 'xxxxxxxxxx',
-		},
-		createdAt: {
-			type: 'string' as const,
-			optional: false as const, nullable: false as const,
-			format: 'date-time',
-		},
-		updatedAt: {
-			type: 'string' as const,
-			optional: false as const, nullable: false as const,
-			format: 'date-time',
-		},
-		title: {
-			type: 'string' as const,
-			optional: false as const, nullable: false as const,
-		},
-		name: {
-			type: 'string' as const,
-			optional: false as const, nullable: false as const,
-		},
-		summary: {
-			type: 'string' as const,
-			optional: false as const, nullable: true as const,
-		},
-		content: {
-			type: 'array' as const,
-			optional: false as const, nullable: false as const,
-		},
-		variables: {
-			type: 'array' as const,
-			optional: false as const, nullable: false as const,
-		},
-		userId: {
-			type: 'string' as const,
-			optional: false as const, nullable: false as const,
-			format: 'id',
-		},
-		user: {
-			type: 'object' as const,
-			ref: 'User' as const,
-			optional: false as const, nullable: false as const,
-		},
-	}
-};

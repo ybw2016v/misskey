@@ -1,32 +1,27 @@
 <template>
-<FormBase class="relaycxt">
-	<FormButton @click="addRelay" primary><i class="fas fa-plus"></i> {{ $ts.addRelay }}</FormButton>
-
-	<div class="_debobigegoItem" v-for="relay in relays" :key="relay.inbox">
-		<div class="_debobigegoPanel" style="padding: 16px;">
-			<div>{{ relay.inbox }}</div>
-			<div>{{ $t(`_relayStatus.${relay.status}`) }}</div>
-			<MkButton class="button" inline danger @click="remove(relay.inbox)"><i class="fas fa-trash-alt"></i> {{ $ts.remove }}</MkButton>
+<MkSpacer :content-max="800">
+	<div v-for="relay in relays" :key="relay.inbox" class="relaycxt _panel _block" style="padding: 16px;">
+		<div>{{ relay.inbox }}</div>
+		<div class="status">
+			<i v-if="relay.status === 'accepted'" class="fas fa-check icon accepted"></i>
+			<i v-else-if="relay.status === 'rejected'" class="fas fa-ban icon rejected"></i>
+			<i v-else class="fas fa-clock icon requesting"></i>
+			<span>{{ $t(`_relayStatus.${relay.status}`) }}</span>
 		</div>
+		<MkButton class="button" inline danger @click="remove(relay.inbox)"><i class="fas fa-trash-alt"></i> {{ $ts.remove }}</MkButton>
 	</div>
-</FormBase>
+</MkSpacer>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import MkButton from '@/components/ui/button.vue';
-import MkInput from '@/components/form/input.vue';
-import FormBase from '@/components/debobigego/base.vue';
-import FormButton from '@/components/debobigego/button.vue';
 import * as os from '@/os';
 import * as symbols from '@/symbols';
 
 export default defineComponent({
 	components: {
-		FormBase,
-		FormButton,
 		MkButton,
-		MkInput,
 	},
 
 	emits: ['info'],
@@ -37,6 +32,12 @@ export default defineComponent({
 				title: this.$ts.relays,
 				icon: 'fas fa-globe',
 				bg: 'var(--bg)',
+				actions: [{
+					asFullButton: true,
+					icon: 'fas fa-plus',
+					text: this.$ts.addRelay,
+					handler: this.addRelay,
+				}],
 			},
 			relays: [],
 			inbox: '',
@@ -47,17 +48,12 @@ export default defineComponent({
 		this.refresh();
 	},
 
-	mounted() {
-		this.$emit('info', this[symbols.PAGE_INFO]);
-	},
-
 	methods: {
 		async addRelay() {
-			const { canceled, result: inbox } = await os.dialog({
+			const { canceled, result: inbox } = await os.inputText({
 				title: this.$ts.addRelay,
-				input: {
-					placeholder: this.$ts.inboxUrl
-				}
+				type: 'url',
+				placeholder: this.$ts.inboxUrl
 			});
 			if (canceled) return;
 			os.api('admin/relays/add', {
@@ -65,7 +61,7 @@ export default defineComponent({
 			}).then((relay: any) => {
 				this.refresh();
 			}).catch((e: any) => {
-				os.dialog({
+				os.alert({
 					type: 'error',
 					text: e.message || e
 				});
@@ -78,7 +74,7 @@ export default defineComponent({
 			}).then(() => {
 				this.refresh();
 			}).catch((e: any) => {
-				os.dialog({
+				os.alert({
 					type: 'error',
 					text: e.message || e
 				});
@@ -95,5 +91,22 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.relaycxt {
+	> .status {
+		margin: 8px 0;
 
+		> .icon {
+			width: 1em;
+			margin-right: 0.75em;
+
+			&.accepted {
+				color: var(--success);
+			}
+
+			&.rejected {
+				color: var(--error);
+			}
+		}
+	}
+}
 </style>

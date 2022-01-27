@@ -13,11 +13,11 @@ import { generateBlockedUserQuery } from '../../common/generate-block-query';
 export const meta = {
 	tags: ['notes'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 
 	params: {
 		query: {
-			validator: $.str
+			validator: $.str,
 		},
 
 		sinceId: {
@@ -30,39 +30,40 @@ export const meta = {
 
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 
 		host: {
 			validator: $.optional.nullable.str,
-			default: undefined
+			default: undefined,
 		},
 
 		userId: {
 			validator: $.optional.nullable.type(ID),
-			default: null
+			default: null,
 		},
 
 		channelId: {
 			validator: $.optional.nullable.type(ID),
-			default: null
+			default: null,
 		},
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
+			type: 'object',
+			optional: false, nullable: false,
 			ref: 'Note',
-		}
+		},
 	},
 
 	errors: {
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	if (es == null) {
 		const query = makePaginationQuery(Notes.createQueryBuilder('note'), ps.sinceId, ps.untilId);
@@ -91,8 +92,8 @@ export default define(meta, async (ps, me) => {
 	} else {
 		const userQuery = ps.userId != null ? [{
 			term: {
-				userId: ps.userId
-			}
+				userId: ps.userId,
+			},
 		}] : [];
 
 		const hostQuery = ps.userId == null ?
@@ -100,14 +101,14 @@ export default define(meta, async (ps, me) => {
 				bool: {
 					must_not: {
 						exists: {
-							field: 'userHost'
-						}
-					}
-				}
+							field: 'userHost',
+						},
+					},
+				},
 			}] : ps.host !== undefined ? [{
 				term: {
-					userHost: ps.host
-				}
+					userHost: ps.host,
+				},
 			}] : []
 		: [];
 
@@ -122,15 +123,15 @@ export default define(meta, async (ps, me) => {
 							simple_query_string: {
 								fields: ['text'],
 								query: ps.query.toLowerCase(),
-								default_operator: 'and'
+								default_operator: 'and',
 							},
-						}, ...hostQuery, ...userQuery]
-					}
+						}, ...hostQuery, ...userQuery],
+					},
 				},
 				sort: [{
-					_doc: 'desc'
-				}]
-			}
+					_doc: 'desc',
+				}],
+			},
 		});
 
 		const hits = result.body.hits.hits.map((hit: any) => hit._id);
@@ -140,11 +141,11 @@ export default define(meta, async (ps, me) => {
 		// Fetch found notes
 		const notes = await Notes.find({
 			where: {
-				id: In(hits)
+				id: In(hits),
 			},
 			order: {
-				id: -1
-			}
+				id: -1,
+			},
 		});
 
 		return await Notes.packMany(notes, me);

@@ -23,36 +23,37 @@ const max = 5;
 export const meta = {
 	tags: ['hashtags'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
+			type: 'object',
+			optional: false, nullable: false,
 			properties: {
 				tag: {
-					type: 'string' as const,
-					optional: false as const, nullable: false as const,
+					type: 'string',
+					optional: false, nullable: false,
 				},
 				chart: {
-					type: 'array' as const,
-					optional: false as const, nullable: false as const,
+					type: 'array',
+					optional: false, nullable: false,
 					items: {
-						type: 'number' as const,
-						optional: false as const, nullable: false as const,
-					}
+						type: 'number',
+						optional: false, nullable: false,
+					},
 				},
 				usersCount: {
-					type: 'number' as const,
-					optional: false as const, nullable: false as const,
-				}
-			}
-		}
-	}
-};
+					type: 'number',
+					optional: false, nullable: false,
+				},
+			},
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async () => {
 	const instance = await fetchMeta(true);
 	const hiddenTags = instance.hiddenTags.map(t => normalizeForSearch(t));
@@ -92,7 +93,7 @@ export default define(meta, async () => {
 			} else {
 				tags.push({
 					name: tag,
-					users: [note.userId]
+					users: [note.userId],
 				});
 			}
 		}
@@ -139,7 +140,7 @@ export default define(meta, async () => {
 	const stats = hots.map((tag, i) => ({
 		tag,
 		chart: countsLog.map(counts => counts[i]),
-		usersCount: totalCounts[i]
+		usersCount: totalCounts[i],
 	}));
 
 	return stats;

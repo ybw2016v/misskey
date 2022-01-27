@@ -7,7 +7,7 @@
 		<p class="username"><MkAcct :user="user"/></p>
 	</div>
 	<div class="description">
-		<div class="mfm" v-if="user.description">
+		<div v-if="user.description" class="mfm">
 			<Mfm :text="user.description" :author="user" :i="$i" :custom-emojis="user.emojis"/>
 		</div>
 		<span v-else style="opacity: 0.7;">{{ $ts.noAccountDescription }}</span>
@@ -23,36 +23,18 @@
 			<p>{{ $ts.followers }}</p><span>{{ user.followersCount }}</span>
 		</div>
 	</div>
-	<MkFollowButton class="koudoku-button" v-if="$i && user.id != $i.id" :user="user" mini/>
+	<MkFollowButton v-if="$i && user.id != $i.id" class="koudoku-button" :user="user" mini/>
 </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script lang="ts" setup>
+import * as misskey from 'misskey-js';
 import MkFollowButton from './follow-button.vue';
 import { userPage } from '@/filters/user';
 
-export default defineComponent({
-	components: {
-		MkFollowButton
-	},
-
-	props: {
-		user: {
-			type: Object,
-			required: true
-		},
-	},
-
-	data() {
-		return {
-		};
-	},
-
-	methods: {
-		userPage,
-	}
-});
+defineProps<{
+	user: misskey.entities.UserDetailed;
+}>();
 </script>
 
 <style lang="scss" scoped>

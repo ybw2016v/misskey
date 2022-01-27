@@ -6,31 +6,32 @@ import { Brackets, In } from 'typeorm';
 export const meta = {
 	tags: ['notes'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	params: {
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 
 		offset: {
 			validator: $.optional.num.min(0),
-			default: 0
-		}
+			default: 0,
+		},
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
-			ref: 'Note'
-		}
-	}
-};
+			type: 'object',
+			optional: false, nullable: false,
+			ref: 'Note',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const query = Polls.createQueryBuilder('poll')
 		.where('poll.userHost IS NULL')
@@ -68,10 +69,10 @@ export default define(meta, async (ps, user) => {
 	if (polls.length === 0) return [];
 
 	const notes = await Notes.find({
-		id: In(polls.map(poll => poll.noteId))
+		id: In(polls.map(poll => poll.noteId)),
 	});
 
 	return await Notes.packMany(notes, user, {
-		detail: true
+		detail: true,
 	});
 });

@@ -1,11 +1,11 @@
 <template>
-<div class="icozogqfvdetwohsdglrbswgrejoxbdj" v-if="hide" @click="hide = false">
+<div v-if="hide" class="icozogqfvdetwohsdglrbswgrejoxbdj" @click="hide = false">
 	<div>
 		<b><i class="fas fa-exclamation-triangle"></i> {{ $ts.sensitive }}</b>
 		<span>{{ $ts.clickToShow }}</span>
 	</div>
 </div>
-<div class="kkjnbbplepmiyuadieoenjgutgcmtsvu" v-else>
+<div v-else class="kkjnbbplepmiyuadieoenjgutgcmtsvu">
 	<video
 		:poster="video.thumbnailUrl"
 		:title="video.name"
@@ -22,26 +22,16 @@
 </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import * as os from '@/os';
+<script lang="ts" setup>
+import { ref } from 'vue';
+import * as misskey from 'misskey-js';
+import { defaultStore } from '@/store';
 
-export default defineComponent({
-	props: {
-		video: {
-			type: Object,
-			required: true
-		}
-	},
-	data() {
-		return {
-			hide: true,
-		};
-	},
-	created() {
-		this.hide = (this.$store.state.nsfw === 'force') ? true : this.video.isSensitive && (this.$store.state.nsfw !== 'ignore');
-	},
-});
+const props = defineProps<{
+	video: misskey.entities.DriveFile;
+}>();
+
+const hide = ref((defaultStore.state.nsfw === 'force') ? true : props.video.isSensitive && (defaultStore.state.nsfw !== 'ignore'));
 </script>
 
 <style lang="scss" scoped>

@@ -3,7 +3,7 @@ import define from '../../../define';
 import { RegistryItems } from '@/models/index';
 
 export const meta = {
-	requireCredential: true as const,
+	requireCredential: true,
 
 	secure: true,
 
@@ -12,9 +12,10 @@ export const meta = {
 			validator: $.optional.arr($.str.match(/^[a-zA-Z0-9_]+$/)),
 			default: [],
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const query = RegistryItems.createQueryBuilder('item')
 		.select('item.key')

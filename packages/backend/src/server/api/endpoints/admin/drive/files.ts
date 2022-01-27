@@ -7,13 +7,13 @@ import { ID } from '@/misc/cafy-id';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 	requireModerator: true,
 
 	params: {
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 
 		sinceId: {
@@ -25,7 +25,7 @@ export const meta = {
 		},
 
 		type: {
-			validator: $.optional.nullable.str.match(/^[a-zA-Z0-9\/\-*]+$/)
+			validator: $.optional.nullable.str.match(/^[a-zA-Z0-9\/\-*]+$/),
 		},
 
 		origin: {
@@ -34,26 +34,27 @@ export const meta = {
 				'local',
 				'remote',
 			]),
-			default: 'local'
+			default: 'local',
 		},
 
 		hostname: {
 			validator: $.optional.nullable.str,
-			default: null
+			default: null,
 		},
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
-			ref: 'DriveFile'
-		}
-	}
-};
+			type: 'object',
+			optional: false, nullable: false,
+			ref: 'DriveFile',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	const query = makePaginationQuery(DriveFiles.createQueryBuilder('file'), ps.sinceId, ps.untilId);
 

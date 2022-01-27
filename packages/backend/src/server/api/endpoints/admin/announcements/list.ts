@@ -7,13 +7,13 @@ import { makePaginationQuery } from '../../../common/make-pagination-query';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireModerator: true,
 
 	params: {
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 
 		sinceId: {
@@ -26,49 +26,50 @@ export const meta = {
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
+			type: 'object',
+			optional: false, nullable: false,
 			properties: {
 				id: {
-					type: 'string' as const,
-					optional: false as const, nullable: false as const,
+					type: 'string',
+					optional: false, nullable: false,
 					format: 'id',
 					example: 'xxxxxxxxxx',
 				},
 				createdAt: {
-					type: 'string' as const,
-					optional: false as const, nullable: false as const,
+					type: 'string',
+					optional: false, nullable: false,
 					format: 'date-time',
 				},
 				updatedAt: {
-					type: 'string' as const,
-					optional: false as const, nullable: true as const,
+					type: 'string',
+					optional: false, nullable: true,
 					format: 'date-time',
 				},
 				text: {
-					type: 'string' as const,
-					optional: false as const, nullable: false as const,
+					type: 'string',
+					optional: false, nullable: false,
 				},
 				title: {
-					type: 'string' as const,
-					optional: false as const, nullable: false as const,
+					type: 'string',
+					optional: false, nullable: false,
 				},
 				imageUrl: {
-					type: 'string' as const,
-					optional: false as const, nullable: true as const,
+					type: 'string',
+					optional: false, nullable: true,
 				},
 				reads: {
-					type: 'number' as const,
-					optional: false as const, nullable: false as const,
-				}
-			}
-		}
-	}
-};
+					type: 'number',
+					optional: false, nullable: false,
+				},
+			},
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps) => {
 	const query = makePaginationQuery(Announcements.createQueryBuilder('announcement'), ps.sinceId, ps.untilId);
 
@@ -76,7 +77,7 @@ export default define(meta, async (ps) => {
 
 	for (const announcement of announcements) {
 		(announcement as any).reads = await AnnouncementReads.count({
-			announcementId: announcement.id
+			announcementId: announcement.id,
 		});
 	}
 

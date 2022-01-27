@@ -1,12 +1,12 @@
 <template>
-<div class="qiivuoyo" v-if="ad">
-	<div class="main" :class="ad.place" v-if="!showMenu">
+<div v-if="ad" class="qiivuoyo">
+	<div v-if="!showMenu" class="main" :class="ad.place">
 		<a :href="ad.url" target="_blank">
 			<img :src="ad.imageUrl">
 			<button class="_button menu" @click.prevent.stop="toggleMenu"><span class="fas fa-info-circle"></span></button>
 		</a>
 	</div>
-	<div class="menu" v-else>
+	<div v-else class="menu">
 		<div class="body">
 			<div>Ads by {{ host }}</div>
 			<!--<MkButton class="button" primary>{{ $ts._ad.like }}</MkButton>-->
@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
-import { Instance, instance } from '@/instance';
+import { instance } from '@/instance';
 import { host } from '@/config';
 import MkButton from '@/components/ui/button.vue';
 import { defaultStore } from '@/store';
@@ -48,9 +48,9 @@ export default defineComponent({
 			showMenu.value = !showMenu.value;
 		};
 
-		const choseAd = (): Instance['ads'][number] | null => {
+		const choseAd = (): (typeof instance)['ads'][number] | null => {
 			if (props.specify) {
-				return props.specify as Instance['ads'][number];
+				return props.specify as (typeof instance)['ads'][number];
 			}
 
 			const allAds = instance.ads.map(ad => defaultStore.state.mutedAds.includes(ad.id) ? {

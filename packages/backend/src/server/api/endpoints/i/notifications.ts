@@ -3,6 +3,7 @@ import { ID } from '@/misc/cafy-id';
 import { readNotification } from '../../common/read-notification';
 import define from '../../define';
 import { makePaginationQuery } from '../../common/make-pagination-query';
+import { generateMutedInstanceNotificationQuery } from '../../common/generate-muted-instance-query';
 import { Notifications, Followings, Mutings, Users } from '@/models/index';
 import { notificationTypes } from '@/types';
 import read from '@/services/note/read';
@@ -11,14 +12,14 @@ import { Brackets } from 'typeorm';
 export const meta = {
 	tags: ['account', 'notifications'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'read:notifications',
 
 	params: {
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 
 		sinceId: {
@@ -31,17 +32,17 @@ export const meta = {
 
 		following: {
 			validator: $.optional.bool,
-			default: false
+			default: false,
 		},
 
 		unreadOnly: {
 			validator: $.optional.bool,
-			default: false
+			default: false,
 		},
 
 		markAsRead: {
 			validator: $.optional.bool,
-			default: true
+			default: true,
 		},
 
 		includeTypes: {
@@ -50,20 +51,21 @@ export const meta = {
 
 		excludeTypes: {
 			validator: $.optional.arr($.str.or(notificationTypes as unknown as string[])),
-		}
+		},
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
+			type: 'object',
+			optional: false, nullable: false,
 			ref: 'Notification',
-		}
+		},
 	},
-};
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	// includeTypes が空の場合はクエリしない
 	if (ps.includeTypes && ps.includeTypes.length === 0) {
@@ -100,6 +102,8 @@ export default define(meta, async (ps, user) => {
 		.orWhere('notification.notifierId IS NULL');
 	}));
 	query.setParameters(mutingQuery.getParameters());
+
+	generateMutedInstanceNotificationQuery(query, user);
 
 	query.andWhere(new Brackets(qb => { qb
 		.where(`notification.notifierId NOT IN (${ suspendedQuery.getQuery() })`)

@@ -8,36 +8,37 @@ import { ApiError } from '../../../error';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireModerator: true,
 
 	params: {
 		id: {
-			validator: $.type(ID)
+			validator: $.type(ID),
 		},
 
 		name: {
-			validator: $.str
+			validator: $.str,
 		},
 
 		category: {
-			validator: $.optional.nullable.str
+			validator: $.optional.nullable.str,
 		},
 
 		aliases: {
-			validator: $.arr($.str)
-		}
+			validator: $.arr($.str),
+		},
 	},
 
 	errors: {
 		noSuchEmoji: {
 			message: 'No such emoji.',
 			code: 'NO_SUCH_EMOJI',
-			id: '684dec9d-a8c2-4364-9aa8-456c49cb1dc8'
-		}
-	}
-};
+			id: '684dec9d-a8c2-4364-9aa8-456c49cb1dc8',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps) => {
 	const emoji = await Emojis.findOne(ps.id);
 

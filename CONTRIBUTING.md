@@ -49,6 +49,11 @@ If your language is not listed in Crowdin, please open an issue.
 
 ![Crowdin](https://d322cqt584bo4o.cloudfront.net/misskey/localized.svg)
 
+## Development
+During development, it is useful to use the `npm run dev` command.
+This command monitors the server-side and client-side source files and automatically builds them if they are modified.
+In addition, it will also automatically start the Misskey server process.
+
 ## Testing
 - Test codes are located in [`/test`](/test).
 
@@ -80,21 +85,19 @@ TODO
 Misskey uses GitHub Actions for executing automated tests.
 Configuration files are located in [`/.github/workflows`](/.github/workflows).
 
-## Adding MisskeyRoom items
-* Use English for material, object and texture names.
-* Use meter for unit of length.
-* Your PR should include all source files (e.g. `.png`, `.blend`) of your models (for later editing).
-* Your PR must include the glTF binary files (`.glb`) of your models.
-* Add a locale key `room.furnitures.YOUR_ITEM` at [`/locales/ja-JP.yml`](/locales/ja-JP.yml).
-* Add a furniture definition at [`src/client/scripts/room/furnitures.json5`](src/client/scripts/room/furnitures.json5).
-
-If you have no experience on 3D modeling, we suggest to use the free 3DCG software [Blender](https://www.blender.org/).
-You can find information on glTF 2.0 at [glTF 2.0 — Blender Manual]( https://docs.blender.org/manual/en/dev/addons/io_scene_gltf2.html).
+## Vue
+Misskey uses Vue(v3) as its front-end framework.
+- Use TypeScript.
+- **When creating a new component, please use the Composition API (with [setup sugar](https://v3.vuejs.org/api/sfc-script-setup.html) and [ref sugar](https://github.com/vuejs/rfcs/discussions/369)) instead of the Options API.**
+	- Some of the existing components are implemented in the Options API, but it is an old implementation. Refactors that migrate those components to the Composition API are also welcome.
 
 ## Notes
 ### How to resolve conflictions occurred at yarn.lock?
 
 Just execute `yarn` to fix it.
+
+### INSERTするときにはsaveではなくinsertを使用する
+#6441
 
 ### placeholder
 SQLをクエリビルダで組み立てる際、使用するプレースホルダは重複してはならない

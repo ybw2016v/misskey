@@ -7,24 +7,24 @@ import { DriveFiles, Notes } from '@/models/index';
 export const meta = {
 	tags: ['drive', 'notes'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'read:drive',
 
 	params: {
 		fileId: {
 			validator: $.type(ID),
-		}
+		},
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
+			type: 'object',
+			optional: false, nullable: false,
 			ref: 'Note',
-		}
+		},
 	},
 
 	errors: {
@@ -32,10 +32,11 @@ export const meta = {
 			message: 'No such file.',
 			code: 'NO_SUCH_FILE',
 			id: 'c118ece3-2e4b-4296-99d1-51756e32d232',
-		}
-	}
-};
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	// Fetch file
 	const file = await DriveFiles.findOne({
@@ -52,6 +53,6 @@ export default define(meta, async (ps, user) => {
 		.getMany();
 
 	return await Notes.packMany(notes, user, {
-		detail: true
+		detail: true,
 	});
 });

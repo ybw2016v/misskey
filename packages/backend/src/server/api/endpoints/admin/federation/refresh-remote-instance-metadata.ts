@@ -7,16 +7,17 @@ import { fetchInstanceMetadata } from '@/services/fetch-instance-metadata';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireModerator: true,
 
 	params: {
 		host: {
-			validator: $.str
+			validator: $.str,
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	const instance = await Instances.findOne({ host: toPuny(ps.host) });
 

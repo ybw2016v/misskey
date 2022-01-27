@@ -11,7 +11,7 @@ import { readUserMessagingMessage, readGroupMessagingMessage, deliverReadActivit
 export const meta = {
 	tags: ['messaging'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'read:messaging',
 
@@ -26,7 +26,7 @@ export const meta = {
 
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 
 		sinceId: {
@@ -39,41 +39,42 @@ export const meta = {
 
 		markAsRead: {
 			validator: $.optional.bool,
-			default: true
-		}
+			default: true,
+		},
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
+			type: 'object',
+			optional: false, nullable: false,
 			ref: 'MessagingMessage',
-		}
+		},
 	},
 
 	errors: {
 		noSuchUser: {
 			message: 'No such user.',
 			code: 'NO_SUCH_USER',
-			id: '11795c64-40ea-4198-b06e-3c873ed9039d'
+			id: '11795c64-40ea-4198-b06e-3c873ed9039d',
 		},
 
 		noSuchGroup: {
 			message: 'No such group.',
 			code: 'NO_SUCH_GROUP',
-			id: 'c4d9f88c-9270-4632-b032-6ed8cee36f7f'
+			id: 'c4d9f88c-9270-4632-b032-6ed8cee36f7f',
 		},
 
 		groupAccessDenied: {
 			message: 'You can not read messages of groups that you have not joined.',
 			code: 'GROUP_ACCESS_DENIED',
-			id: 'a053a8dd-a491-4718-8f87-50775aad9284'
+			id: 'a053a8dd-a491-4718-8f87-50775aad9284',
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	if (ps.userId != null) {
 		// Fetch recipient (user)
@@ -109,7 +110,7 @@ export default define(meta, async (ps, user) => {
 		}
 
 		return await Promise.all(messages.map(message => MessagingMessages.pack(message, user, {
-			populateRecipient: false
+			populateRecipient: false,
 		})));
 	} else if (ps.groupId != null) {
 		// Fetch recipient (group)
@@ -122,7 +123,7 @@ export default define(meta, async (ps, user) => {
 		// check joined
 		const joining = await UserGroupJoinings.findOne({
 			userId: user.id,
-			userGroupId: recipientGroup.id
+			userGroupId: recipientGroup.id,
 		});
 
 		if (joining == null) {
@@ -140,7 +141,7 @@ export default define(meta, async (ps, user) => {
 		}
 
 		return await Promise.all(messages.map(message => MessagingMessages.pack(message, user, {
-			populateGroup: false
+			populateGroup: false,
 		})));
 	} else {
 		throw new Error();

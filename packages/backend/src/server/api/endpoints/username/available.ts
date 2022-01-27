@@ -5,36 +5,37 @@ import { Users, UsedUsernames } from '@/models/index';
 export const meta = {
 	tags: ['users'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 
 	params: {
 		username: {
-			validator: $.use(Users.validateLocalUsername)
-		}
+			validator: $.use(Users.validateLocalUsername),
+		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		properties: {
 			available: {
-				type: 'boolean' as const,
-				optional: false as const, nullable: false as const,
-			}
-		}
-	}
-};
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps) => {
 	// Get exist
 	const exist = await Users.count({
 		host: null,
-		usernameLower: ps.username.toLowerCase()
+		usernameLower: ps.username.toLowerCase(),
 	});
 
 	const exist2 = await UsedUsernames.count({ username: ps.username.toLowerCase() });
 
 	return {
-		available: exist === 0 && exist2 === 0
+		available: exist === 0 && exist2 === 0,
 	};
 });

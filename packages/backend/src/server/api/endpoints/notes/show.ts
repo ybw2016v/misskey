@@ -8,17 +8,17 @@ import { Notes } from '@/models/index';
 export const meta = {
 	tags: ['notes'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 
 	params: {
 		noteId: {
 			validator: $.type(ID),
-		}
+		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		ref: 'Note',
 	},
 
@@ -26,11 +26,12 @@ export const meta = {
 		noSuchNote: {
 			message: 'No such note.',
 			code: 'NO_SUCH_NOTE',
-			id: '24fcbfc6-2e37-42b6-8388-c29b3861a08d'
-		}
-	}
-};
+			id: '24fcbfc6-2e37-42b6-8388-c29b3861a08d',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const note = await getNote(ps.noteId).catch(e => {
 		if (e.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);
@@ -38,6 +39,6 @@ export default define(meta, async (ps, user) => {
 	});
 
 	return await Notes.pack(note, user, {
-		detail: true
+		detail: true,
 	});
 });

@@ -8,7 +8,7 @@ import { PromoNotes } from '@/models/index';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireModerator: true,
 
 	params: {
@@ -17,7 +17,7 @@ export const meta = {
 		},
 
 		expiresAt: {
-			validator: $.num.int()
+			validator: $.num.int(),
 		},
 	},
 
@@ -25,17 +25,18 @@ export const meta = {
 		noSuchNote: {
 			message: 'No such note.',
 			code: 'NO_SUCH_NOTE',
-			id: 'ee449fbe-af2a-453b-9cae-cf2fe7c895fc'
+			id: 'ee449fbe-af2a-453b-9cae-cf2fe7c895fc',
 		},
 
 		alreadyPromoted: {
 			message: 'The note has already promoted.',
 			code: 'ALREADY_PROMOTED',
-			id: 'ae427aa2-7a41-484f-a18c-2c1104051604'
+			id: 'ae427aa2-7a41-484f-a18c-2c1104051604',
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const note = await getNote(ps.noteId).catch(e => {
 		if (e.id === '9725d0ce-ba28-4dde-95a7-2cbb2c15de24') throw new ApiError(meta.errors.noSuchNote);

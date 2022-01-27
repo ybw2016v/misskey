@@ -7,13 +7,13 @@ import { makePaginationQuery } from '../../../common/make-pagination-query';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireModerator: true,
 
 	params: {
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 
 		sinceId: {
@@ -24,8 +24,9 @@ export const meta = {
 			validator: $.optional.type(ID),
 		},
 	},
-};
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps) => {
 	const query = makePaginationQuery(Ads.createQueryBuilder('ad'), ps.sinceId, ps.untilId)
 		.andWhere('ad.expiresAt > :now', { now: new Date() });

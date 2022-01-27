@@ -12,22 +12,23 @@ export const meta = {
 
 		password: {
 			validator: Users.validatePassword,
-		}
+		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		ref: 'User',
 		properties: {
 			token: {
-				type: 'string' as const,
-				optional: false as const, nullable: false as const,
-			}
-		}
-	}
-};
+				type: 'string',
+				optional: false, nullable: false,
+			},
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, _me) => {
 	const me = _me ? await Users.findOneOrFail(_me.id) : null;
 	const noUsers = (await Users.count({
@@ -42,7 +43,7 @@ export default define(meta, async (ps, _me) => {
 
 	const res = await Users.pack(account, account, {
 		detail: true,
-		includeSecrets: true
+		includeSecrets: true,
 	});
 
 	(res as any).token = secret;

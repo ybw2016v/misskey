@@ -1,30 +1,28 @@
 <template>
-<FormBase>
-	<FormLink @click="configure">{{ $ts.notificationSetting }}</FormLink>
-	<FormGroup>
-		<FormButton @click="readAllNotifications">{{ $ts.markAsReadAllNotifications }}</FormButton>
-		<FormButton @click="readAllUnreadNotes">{{ $ts.markAsReadAllUnreadNotes }}</FormButton>
-		<FormButton @click="readAllMessagingMessages">{{ $ts.markAsReadAllTalkMessages }}</FormButton>
-	</FormGroup>
-</FormBase>
+<div class="_formRoot">
+	<FormLink class="_formBlock" @click="configure"><template #icon><i class="fas fa-cog"></i></template>{{ $ts.notificationSetting }}</FormLink>
+	<FormSection>
+		<FormLink class="_formBlock" @click="readAllNotifications">{{ $ts.markAsReadAllNotifications }}</FormLink>
+		<FormLink class="_formBlock" @click="readAllUnreadNotes">{{ $ts.markAsReadAllUnreadNotes }}</FormLink>
+		<FormLink class="_formBlock" @click="readAllMessagingMessages">{{ $ts.markAsReadAllTalkMessages }}</FormLink>
+	</FormSection>
+</div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
-import FormButton from '@/components/debobigego/button.vue';
-import FormLink from '@/components/debobigego/link.vue';
-import FormBase from '@/components/debobigego/base.vue';
-import FormGroup from '@/components/debobigego/group.vue';
+import FormButton from '@/components/ui/button.vue';
+import FormLink from '@/components/form/link.vue';
+import FormSection from '@/components/form/section.vue';
 import { notificationTypes } from 'misskey-js';
 import * as os from '@/os';
 import * as symbols from '@/symbols';
 
 export default defineComponent({
 	components: {
-		FormBase,
 		FormLink,
 		FormButton,
-		FormGroup,
+		FormSection,
 	},
 
 	emits: ['info'],
@@ -37,10 +35,6 @@ export default defineComponent({
 				bg: 'var(--bg)',
 			},
 		}
-	},
-
-	mounted() {
-		this.$emit('info', this[symbols.PAGE_INFO]);
 	},
 
 	methods: {

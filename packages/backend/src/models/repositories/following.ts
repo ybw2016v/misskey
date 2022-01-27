@@ -65,10 +65,10 @@ export class FollowingRepository extends Repository<Following> {
 			followeeId: following.followeeId,
 			followerId: following.followerId,
 			followee: opts.populateFollowee ? Users.pack(following.followee || following.followeeId, me, {
-				detail: true
+				detail: true,
 			}) : undefined,
 			follower: opts.populateFollower ? Users.pack(following.follower || following.followerId, me, {
-				detail: true
+				detail: true,
 			}) : undefined,
 		});
 	}
@@ -84,41 +84,3 @@ export class FollowingRepository extends Repository<Following> {
 		return Promise.all(followings.map(x => this.pack(x, me, opts)));
 	}
 }
-
-export const packedFollowingSchema = {
-	type: 'object' as const,
-	optional: false as const, nullable: false as const,
-	properties: {
-		id: {
-			type: 'string' as const,
-			optional: false as const, nullable: false as const,
-			format: 'id',
-			example: 'xxxxxxxxxx',
-		},
-		createdAt: {
-			type: 'string' as const,
-			optional: false as const, nullable: false as const,
-			format: 'date-time',
-		},
-		followeeId: {
-			type: 'string' as const,
-			optional: false as const, nullable: false as const,
-			format: 'id',
-		},
-		followee: {
-			type: 'object' as const,
-			optional: true as const, nullable: false as const,
-			ref: 'User' as const,
-		},
-		followerId: {
-			type: 'string' as const,
-			optional: false as const, nullable: false as const,
-			format: 'id',
-		},
-		follower: {
-			type: 'object' as const,
-			optional: true as const, nullable: false as const,
-			ref: 'User' as const,
-		},
-	}
-};

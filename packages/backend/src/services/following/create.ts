@@ -14,6 +14,7 @@ import { instanceChart, perUserFollowingChart } from '@/services/chart/index';
 import { genId } from '@/misc/gen-id';
 import { createNotification } from '../create-notification';
 import { isDuplicateKeyValueError } from '@/misc/is-duplicate-key-value-error';
+import { Packed } from '@/misc/schema';
 
 const logger = new Logger('following/create');
 
@@ -34,7 +35,7 @@ export async function insertFollowingDoc(followee: { id: User['id']; host: User[
 		followerSharedInbox: Users.isRemoteUser(follower) ? follower.sharedInbox : null,
 		followeeHost: followee.host,
 		followeeInbox: Users.isRemoteUser(followee) ? followee.inbox : null,
-		followeeSharedInbox: Users.isRemoteUser(followee) ? followee.sharedInbox : null
+		followeeSharedInbox: Users.isRemoteUser(followee) ? followee.sharedInbox : null,
 	}).catch(e => {
 		if (isDuplicateKeyValueError(e) && Users.isRemoteUser(follower) && Users.isLocalUser(followee)) {
 			logger.info(`Insert duplicated ignore. ${follower.id} => ${followee.id}`);
@@ -46,13 +47,13 @@ export async function insertFollowingDoc(followee: { id: User['id']; host: User[
 
 	const req = await FollowRequests.findOne({
 		followeeId: followee.id,
-		followerId: follower.id
+		followerId: follower.id,
 	});
 
 	if (req) {
 		await FollowRequests.delete({
 			followeeId: followee.id,
-			followerId: follower.id
+			followerId: follower.id,
 		});
 
 		// 通知を作成
@@ -87,10 +88,10 @@ export async function insertFollowingDoc(followee: { id: User['id']; host: User[
 	// Publish follow event
 	if (Users.isLocalUser(follower)) {
 		Users.pack(followee.id, follower, {
-			detail: true
+			detail: true,
 		}).then(packed => {
-			publishUserEvent(follower.id, 'follow', packed);
-			publishMainStream(follower.id, 'follow', packed);
+			publishUserEvent(follower.id, 'follow', packed as Packed<"UserDetailedNotMe">);
+			publishMainStream(follower.id, 'follow', packed as Packed<"UserDetailedNotMe">);
 		});
 	}
 
@@ -100,7 +101,7 @@ export async function insertFollowingDoc(followee: { id: User['id']; host: User[
 
 		// 通知を作成
 		createNotification(followee.id, 'follow', {
-			notifierId: follower.id
+			notifierId: follower.id,
 		});
 	}
 }
@@ -108,7 +109,7 @@ export async function insertFollowingDoc(followee: { id: User['id']; host: User[
 export default async function(_follower: { id: User['id'] }, _followee: { id: User['id'] }, requestId?: string) {
 	const [follower, followee] = await Promise.all([
 		Users.findOneOrFail(_follower.id),
-		Users.findOneOrFail(_followee.id)
+		Users.findOneOrFail(_followee.id),
 	]);
 
 	// check blocking
@@ -120,7 +121,7 @@ export default async function(_follower: { id: User['id'] }, _followee: { id: Us
 		Blockings.findOne({
 			blockerId: followee.id,
 			blockeeId: follower.id,
-		})
+		}),
 	]);
 
 	if (Users.isRemoteUser(follower) && Users.isLocalUser(followee) && blocked) {
@@ -159,7 +160,7 @@ export default async function(_follower: { id: User['id'] }, _followee: { id: Us
 		if (!autoAccept && (Users.isLocalUser(followee) && followeeProfile.autoAcceptFollowed)) {
 			const followed = await Followings.findOne({
 				followerId: followee.id,
-				followeeId: follower.id
+				followeeId: follower.id,
 			});
 
 			if (followed) autoAccept = true;

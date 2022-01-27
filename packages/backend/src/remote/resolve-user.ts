@@ -37,7 +37,7 @@ export async function resolveUser(username: string, host: string | null, option?
 		});
 	}
 
-	const user = await Users.findOne({ usernameLower, host }, option) as IRemoteUser;
+	const user = await Users.findOne({ usernameLower, host }, option) as IRemoteUser | null;
 
 	const acctLower = `${usernameLower}@${host}`;
 
@@ -71,9 +71,9 @@ export async function resolveUser(username: string, host: string | null, option?
 
 			await Users.update({
 				usernameLower,
-				host: host
+				host: host,
 			}, {
-				uri: self.href
+				uri: self.href,
 			});
 		} else {
 			logger.info(`uri is fine: ${acctLower}`);

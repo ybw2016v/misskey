@@ -54,7 +54,7 @@ export async function populateEmoji(emojiName: string, noteUserHost: string | nu
 
 	const queryOrNull = async () => (await Emojis.findOne({
 		name,
-		host
+		host,
 	})) || null;
 
 	const emoji = await cache.fetch(`${name} ${host}`, queryOrNull);
@@ -62,7 +62,8 @@ export async function populateEmoji(emojiName: string, noteUserHost: string | nu
 	if (emoji == null) return null;
 
 	const isLocal = emoji.host == null;
-	const url = isLocal ? emoji.url : `${config.url}/proxy/image.png?${query({url: emoji.url})}`;
+	const emojiUrl = emoji.publicUrl || emoji.originalUrl; // || emoji.originalUrl してるのは後方互換性のため
+	const url = isLocal ? emojiUrl : `${config.url}/proxy/image.png?${query({ url: emojiUrl })}`;
 
 	return {
 		name: emojiName,
@@ -111,12 +112,12 @@ export async function prefetchEmojis(emojis: { name: string; host: string | null
 	for (const host of hosts) {
 		emojisQuery.push({
 			name: In(notCachedEmojis.filter(e => e.host === host).map(e => e.name)),
-			host: host
+			host: host,
 		});
 	}
 	const _emojis = emojisQuery.length > 0 ? await Emojis.find({
 		where: emojisQuery,
-		select: ['name', 'host', 'url']
+		select: ['name', 'host', 'originalUrl', 'publicUrl'],
 	}) : [];
 	for (const emoji of _emojis) {
 		cache.set(`${emoji.name} ${emoji.host}`, emoji);

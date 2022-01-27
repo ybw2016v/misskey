@@ -1,9 +1,8 @@
 import * as Router from '@koa/router';
 import config from '@/config/index';
 import { fetchMeta } from '@/misc/fetch-meta';
-import { Users } from '@/models/index';
-// import User from '../models/user';
-// import Note from '../models/note';
+import { Users, Notes } from '@/models/index';
+import { Not, IsNull, MoreThan } from 'typeorm';
 
 const router = new Router();
 
@@ -15,24 +14,25 @@ export const links = [/* (awaiting release) {
 	href: config.url + nodeinfo2_1path
 }, */{
 	rel: 'http://nodeinfo.diaspora.software/ns/schema/2.0',
-	href: config.url + nodeinfo2_0path
+	href: config.url + nodeinfo2_0path,
 }];
 
 const nodeinfo2 = async () => {
+	const now = Date.now();
 	const [
 		meta,
-		// total,
-		// activeHalfyear,
-		// activeMonth,
-		// localPosts,
-		// localComments
+		total,
+		activeHalfyear,
+		activeMonth,
+		localPosts,
+		localComments,
 	] = await Promise.all([
 		fetchMeta(true),
-		// User.count({ host: null }),
-		// User.count({ host: null, updatedAt: { $gt: new Date(Date.now() - 15552000000) } }),
-		// User.count({ host: null, updatedAt: { $gt: new Date(Date.now() - 2592000000) } }),
-		// Note.count({ '_user.host': null, replyId: null }),
-		// Note.count({ '_user.host': null, replyId: { $ne: null } })
+		Users.count({ where: { host: null } }),
+		Users.count({ where: { host: null, updatedAt: MoreThan(new Date(now - 15552000000)) } }),
+		Users.count({ where: { host: null, updatedAt: MoreThan(new Date(now - 2592000000)) } }),
+		Notes.count({ where: { userHost: null, replyId: null } }),
+		Notes.count({ where: { userHost: null, replyId: Not(IsNull()) } }),
 	]);
 
 	const proxyAccount = meta.proxyAccountId ? await Users.pack(meta.proxyAccountId).catch(() => null) : null;
@@ -46,20 +46,20 @@ const nodeinfo2 = async () => {
 		protocols: ['activitypub'],
 		services: {
 			inbound: [] as string[],
-			outbound: ['atom1.0', 'rss2.0']
+			outbound: ['atom1.0', 'rss2.0'],
 		},
 		openRegistrations: !meta.disableRegistration,
 		usage: {
-			users: {} // { total, activeHalfyear, activeMonth },
-			// localPosts,
-			// localComments
+			users: { total, activeHalfyear, activeMonth },
+			localPosts,
+			localComments,
 		},
 		metadata: {
 			nodeName: meta.name,
 			nodeDescription: meta.description,
 			maintainer: {
 				name: meta.maintainerName,
-				email: meta.maintainerEmail
+				email: meta.maintainerEmail,
 			},
 			langs: meta.langs,
 			tosUrl: meta.ToSUrl,
@@ -78,7 +78,7 @@ const nodeinfo2 = async () => {
 			enableEmail: meta.enableEmail,
 			enableServiceWorker: meta.enableServiceWorker,
 			proxyAccountName: proxyAccount ? proxyAccount.username : null,
-		}
+		},
 	};
 };
 

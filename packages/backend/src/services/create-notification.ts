@@ -20,15 +20,16 @@ export async function createNotification(
 	const isMuted = profile?.mutingNotificationTypes.includes(type);
 
 	// Create notification
-	const notification = await Notifications.save({
+	const notification = await Notifications.insert({
 		id: genId(),
 		createdAt: new Date(),
 		notifieeId: notifieeId,
 		type: type,
 		// 相手がこの通知をミュートしているようなら、既読を予めつけておく
 		isRead: isMuted,
-		...data
-	} as Partial<Notification>);
+		...data,
+	} as Partial<Notification>)
+		.then(x => Notifications.findOneOrFail(x.identifiers[0]));
 
 	const packed = await Notifications.pack(notification, {});
 
@@ -43,7 +44,7 @@ export async function createNotification(
 
 		//#region ただしミュートしているユーザーからの通知なら無視
 		const mutings = await Mutings.find({
-			muterId: notifieeId
+			muterId: notifieeId,
 		});
 		if (data.notifierId && mutings.map(m => m.muteeId).includes(data.notifierId)) {
 			return;

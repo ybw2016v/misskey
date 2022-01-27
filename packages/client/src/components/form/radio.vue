@@ -1,5 +1,6 @@
 <template>
 <div
+	v-adaptive-border
 	class="novjtctn"
 	:class="{ disabled, checked }"
 	:aria-checked="checked"
@@ -50,9 +51,13 @@ export default defineComponent({
 .novjtctn {
 	position: relative;
 	display: inline-block;
-	margin: 8px 20px 0 0;
 	text-align: left;
 	cursor: pointer;
+	padding: 10px 12px;
+	background-color: var(--panel);
+	background-clip: padding-box !important;
+	border: solid 1px var(--panel);
+	border-radius: 6px;
 	transition: all 0.3s;
 
 	> * {
@@ -67,7 +72,19 @@ export default defineComponent({
 		}
 	}
 
+	&:hover {
+		border-color: var(--inputBorderHover) !important;
+	}
+
 	&.checked {
+		background-color: var(--accentedBg) !important;
+		border-color: var(--accentedBg) !important;
+		color: var(--accent);
+
+		&, * {
+			cursor: default !important;
+		}
+
 		> .button {
 			border-color: var(--accent);
 
@@ -89,8 +106,8 @@ export default defineComponent({
 
 	> .button {
 		position: absolute;
-		width: 20px;
-		height: 20px;
+		width: 14px;
+		height: 14px;
 		background: none;
 		border: solid 2px var(--inputBorder);
 		border-radius: 100%;
@@ -114,7 +131,6 @@ export default defineComponent({
 	> .label {
 		margin-left: 28px;
 		display: block;
-		font-size: 16px;
 		line-height: 20px;
 		cursor: pointer;
 	}

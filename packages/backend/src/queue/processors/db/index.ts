@@ -1,6 +1,7 @@
 import * as Bull from 'bull';
 import { DbJobData } from '@/queue/types';
 import { deleteDriveFiles } from './delete-drive-files';
+import { exportCustomEmojis } from './export-custom-emojis';
 import { exportNotes } from './export-notes';
 import { exportFollowing } from './export-following';
 import { exportMute } from './export-mute';
@@ -11,9 +12,11 @@ import { importUserLists } from './import-user-lists';
 import { deleteAccount } from './delete-account';
 import { importMuting } from './import-muting';
 import { importBlocking } from './import-blocking';
+import { importCustomEmojis } from './import-custom-emojis';
 
 const jobs = {
 	deleteDriveFiles,
+	exportCustomEmojis,
 	exportNotes,
 	exportFollowing,
 	exportMute,
@@ -23,6 +26,7 @@ const jobs = {
 	importMuting,
 	importBlocking,
 	importUserLists,
+	importCustomEmojis,
 	deleteAccount,
 } as Record<string, Bull.ProcessCallbackFunction<DbJobData> | Bull.ProcessPromiseFunction<DbJobData>>;
 

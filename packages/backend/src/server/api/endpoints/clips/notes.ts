@@ -11,7 +11,7 @@ import { generateBlockedUserQuery } from '../../common/generate-block-query';
 export const meta = {
 	tags: ['account', 'notes', 'clips'],
 
-	requireCredential: false as const,
+	requireCredential: false,
 
 	kind: 'read:account',
 
@@ -22,7 +22,7 @@ export const meta = {
 
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 
 		sinceId: {
@@ -38,21 +38,22 @@ export const meta = {
 		noSuchClip: {
 			message: 'No such clip.',
 			code: 'NO_SUCH_CLIP',
-			id: '1d7645e6-2b6d-4635-b0fe-fe22b0e72e00'
-		}
+			id: '1d7645e6-2b6d-4635-b0fe-fe22b0e72e00',
+		},
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
-			ref: 'Note'
-		}
-	}
-};
+			type: 'object',
+			optional: false, nullable: false,
+			ref: 'Note',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const clip = await Clips.findOne({
 		id: ps.clipId,

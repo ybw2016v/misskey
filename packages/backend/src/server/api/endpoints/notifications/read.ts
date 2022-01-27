@@ -9,7 +9,7 @@ import { ApiError } from '../../error';
 export const meta = {
 	tags: ['notifications', 'account'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:notifications',
 
@@ -23,11 +23,12 @@ export const meta = {
 		noSuchNotification: {
 			message: 'No such notification.',
 			code: 'NO_SUCH_NOTIFICATION',
-			id: 'efa929d5-05b5-47d1-beec-e6a4dbed011e'
+			id: 'efa929d5-05b5-47d1-beec-e6a4dbed011e',
 		},
 	},
-};
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const notification = await Notifications.findOne({
 		notifieeId: user.id,

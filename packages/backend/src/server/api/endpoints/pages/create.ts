@@ -10,13 +10,13 @@ import { ApiError } from '../../error';
 export const meta = {
 	tags: ['pages'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:pages',
 
 	limit: {
 		duration: ms('1hour'),
-		max: 300
+		max: 300,
 	},
 
 	params: {
@@ -33,11 +33,11 @@ export const meta = {
 		},
 
 		content: {
-			validator: $.arr($.obj())
+			validator: $.arr($.obj()),
 		},
 
 		variables: {
-			validator: $.arr($.obj())
+			validator: $.arr($.obj()),
 		},
 
 		script: {
@@ -50,23 +50,23 @@ export const meta = {
 
 		font: {
 			validator: $.optional.str.or(['serif', 'sans-serif']),
-			default: 'sans-serif'
+			default: 'sans-serif',
 		},
 
 		alignCenter: {
 			validator: $.optional.bool,
-			default: false
+			default: false,
 		},
 
 		hideTitleWhenPinned: {
 			validator: $.optional.bool,
-			default: false
+			default: false,
 		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		ref: 'Page',
 	},
 
@@ -74,22 +74,23 @@ export const meta = {
 		noSuchFile: {
 			message: 'No such file.',
 			code: 'NO_SUCH_FILE',
-			id: 'b7b97489-0f66-4b12-a5ff-b21bd63f6e1c'
+			id: 'b7b97489-0f66-4b12-a5ff-b21bd63f6e1c',
 		},
 		nameAlreadyExists: {
 			message: 'Specified name already exists.',
 			code: 'NAME_ALREADY_EXISTS',
-			id: '4650348e-301c-499a-83c9-6aa988c66bc1'
-		}
-	}
-};
+			id: '4650348e-301c-499a-83c9-6aa988c66bc1',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	let eyeCatchingImage = null;
 	if (ps.eyeCatchingImageId != null) {
 		eyeCatchingImage = await DriveFiles.findOne({
 			id: ps.eyeCatchingImageId,
-			userId: user.id
+			userId: user.id,
 		});
 
 		if (eyeCatchingImage == null) {
@@ -99,14 +100,14 @@ export default define(meta, async (ps, user) => {
 
 	await Pages.find({
 		userId: user.id,
-		name: ps.name
+		name: ps.name,
 	}).then(result => {
 		if (result.length > 0) {
 			throw new ApiError(meta.errors.nameAlreadyExists);
 		}
 	});
 
-	const page = await Pages.save(new Page({
+	const page = await Pages.insert(new Page({
 		id: genId(),
 		createdAt: new Date(),
 		updatedAt: new Date(),
@@ -121,8 +122,8 @@ export default define(meta, async (ps, user) => {
 		visibility: 'public',
 		alignCenter: ps.alignCenter,
 		hideTitleWhenPinned: ps.hideTitleWhenPinned,
-		font: ps.font
-	}));
+		font: ps.font,
+	})).then(x => Pages.findOneOrFail(x.identifiers[0]));
 
 	return await Pages.pack(page);
 });

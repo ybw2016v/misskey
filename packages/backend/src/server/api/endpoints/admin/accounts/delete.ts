@@ -9,16 +9,17 @@ import { ID } from '@/misc/cafy-id';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireModerator: true,
 
 	params: {
 		userId: {
 			validator: $.type(ID),
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	const user = await Users.findOne(ps.userId);
 
@@ -39,11 +40,11 @@ export default define(meta, async (ps, me) => {
 		await doPostSuspend(user).catch(e => {});
 
 		createDeleteAccountJob(user, {
-			soft: false
+			soft: false,
 		});
 	} else {
 		createDeleteAccountJob(user, {
-			soft: true // リモートユーザーの削除は、完全にDBから物理削除してしまうと再度連合してきてアカウントが復活する可能性があるため、soft指定する
+			soft: true, // リモートユーザーの削除は、完全にDBから物理削除してしまうと再度連合してきてアカウントが復活する可能性があるため、soft指定する
 		});
 	}
 

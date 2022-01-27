@@ -1,6 +1,6 @@
-import { refs, Schema } from '@/misc/schema';
+import { refs, MinimumSchema } from '@/misc/schema';
 
-export function convertSchemaToOpenApiSchema(schema: Schema) {
+export function convertSchemaToOpenApiSchema(schema: MinimumSchema) {
 	const res: any = schema;
 
 	if (schema.type === 'object' && schema.properties) {
@@ -14,6 +14,10 @@ export function convertSchemaToOpenApiSchema(schema: Schema) {
 	if (schema.type === 'array' && schema.items) {
 		res.items = convertSchemaToOpenApiSchema(schema.items);
 	}
+
+	if (schema.anyOf) res.anyOf = schema.anyOf.map(convertSchemaToOpenApiSchema);
+	if (schema.oneOf) res.oneOf = schema.oneOf.map(convertSchemaToOpenApiSchema);
+	if (schema.allOf) res.allOf = schema.allOf.map(convertSchemaToOpenApiSchema);
 
 	if (schema.ref) {
 		res.$ref = `#/components/schemas/${schema.ref}`;
@@ -42,12 +46,12 @@ export const schemas = {
 						type: 'string',
 						format: 'uuid',
 						description: 'An error ID. This ID is static.',
-					}
+					},
 				},
-				required: ['code', 'id', 'message']
+				required: ['code', 'id', 'message'],
 			},
 		},
-		required: ['error']
+		required: ['error'],
 	},
 
 	...Object.fromEntries(

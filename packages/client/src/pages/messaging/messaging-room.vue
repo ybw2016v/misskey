@@ -6,17 +6,17 @@
 	<div class="_content mk-messaging-room">
 		<div class="body">
 			<MkLoading v-if="fetching"/>
-			<p class="empty" v-if="!fetching && messages.length == 0"><i class="fas fa-info-circle"></i>{{ $ts.noMessagesYet }}</p>
-			<p class="no-history" v-if="!fetching && messages.length > 0 && !existMoreMessages"><i class="fas fa-flag"></i>{{ $ts.noMoreHistory }}</p>
-			<button class="more _button" ref="loadMore" :class="{ fetching: fetchingMoreMessages }" v-show="existMoreMessages" @click="fetchMoreMessages" :disabled="fetchingMoreMessages">
+			<p v-if="!fetching && messages.length == 0" class="empty"><i class="fas fa-info-circle"></i>{{ $ts.noMessagesYet }}</p>
+			<p v-if="!fetching && messages.length > 0 && !existMoreMessages" class="no-history"><i class="fas fa-flag"></i>{{ $ts.noMoreHistory }}</p>
+			<button v-show="existMoreMessages" ref="loadMore" class="more _button" :class="{ fetching: fetchingMoreMessages }" :disabled="fetchingMoreMessages" @click="fetchMoreMessages">
 				<template v-if="fetchingMoreMessages"><i class="fas fa-spinner fa-pulse fa-fw"></i></template>{{ fetchingMoreMessages ? $ts.loading : $ts.loadMore }}
 			</button>
-			<XList class="messages" :items="messages" v-slot="{ item: message }" direction="up" reversed>
-				<XMessage :message="message" :is-group="group != null" :key="message.id"/>
+			<XList v-slot="{ item: message }" class="messages" :items="messages" direction="up" reversed>
+				<XMessage :key="message.id" :message="message" :is-group="group != null"/>
 			</XList>
 		</div>
 		<footer>
-			<div class="typers" v-if="typers.length > 0">
+			<div v-if="typers.length > 0" class="typers">
 				<I18n :src="$ts.typingUsers" text-tag="span" class="users">
 					<template #users>
 						<b v-for="user in typers" :key="user.id" class="user">{{ user.username }}</b>
@@ -24,12 +24,12 @@
 				</I18n>
 				<MkEllipsis/>
 			</div>
-			<transition name="fade">
-				<div class="new-message" v-show="showIndicator">
+			<transition :name="$store.state.animation ? 'fade' : ''">
+				<div v-show="showIndicator" class="new-message">
 					<button class="_buttonPrimary" @click="onIndicatorClick"><i class="fas fa-arrow-circle-down"></i>{{ $ts.newMessageExists }}</button>
 				</div>
 			</transition>
-			<XForm v-if="!fetching" :user="user" :group="group" ref="form" class="form"/>
+			<XForm v-if="!fetching" ref="form" :user="user" :group="group" class="form"/>
 		</footer>
 	</div>
 </div>
@@ -43,6 +43,7 @@ import XForm from './messaging-room.form.vue';
 import * as Acct from 'misskey-js/built/acct';
 import { isBottom, onScrollBottom, scroll } from '@/scripts/scroll';
 import * as os from '@/os';
+import { stream } from '@/stream';
 import { popout } from '@/scripts/popout';
 import * as sound from '@/scripts/sound';
 import * as symbols from '@/symbols';
@@ -141,7 +142,7 @@ const Component = defineComponent({
 				this.group = group;
 			}
 
-			this.connection = markRaw(os.stream.useChannel('messaging', {
+			this.connection = markRaw(stream.useChannel('messaging', {
 				otherparty: this.user ? this.user.id : undefined,
 				group: this.group ? this.group.id : undefined,
 			}));
@@ -161,7 +162,7 @@ const Component = defineComponent({
 				// もっと見るの交差検知を発火させないためにfetchは
 				// スクロールが終わるまでfalseにしておく
 				// scrollendのようなイベントはないのでsetTimeoutで
-				setTimeout(() => this.fetching = false, 300);
+				window.setTimeout(() => this.fetching = false, 300);
 			});
 		},
 
@@ -182,7 +183,7 @@ const Component = defineComponent({
 				this.form.upload(e.dataTransfer.files[0]);
 				return;
 			} else if (e.dataTransfer.files.length > 1) {
-				os.dialog({
+				os.alert({
 					type: 'error',
 					text: this.$ts.onlyOneFileCanBeAttached
 				});
@@ -299,9 +300,9 @@ const Component = defineComponent({
 				this.showIndicator = false;
 			});
 
-			if (this.timer) clearTimeout(this.timer);
+			if (this.timer) window.clearTimeout(this.timer);
 
-			this.timer = setTimeout(() => {
+			this.timer = window.setTimeout(() => {
 				this.showIndicator = false;
 			}, 4000);
 		},

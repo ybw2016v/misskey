@@ -12,46 +12,47 @@ export const meta = {
 
 	limit: {
 		duration: ms('1hour'),
-		max: 100
+		max: 100,
 	},
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:blocks',
 
 	params: {
 		userId: {
 			validator: $.type(ID),
-		}
+		},
 	},
 
 	errors: {
 		noSuchUser: {
 			message: 'No such user.',
 			code: 'NO_SUCH_USER',
-			id: '7cc4f851-e2f1-4621-9633-ec9e1d00c01e'
+			id: '7cc4f851-e2f1-4621-9633-ec9e1d00c01e',
 		},
 
 		blockeeIsYourself: {
 			message: 'Blockee is yourself.',
 			code: 'BLOCKEE_IS_YOURSELF',
-			id: '88b19138-f28d-42c0-8499-6a31bbd0fdc6'
+			id: '88b19138-f28d-42c0-8499-6a31bbd0fdc6',
 		},
 
 		alreadyBlocking: {
 			message: 'You are already blocking that user.',
 			code: 'ALREADY_BLOCKING',
-			id: '787fed64-acb9-464a-82eb-afbd745b9614'
+			id: '787fed64-acb9-464a-82eb-afbd745b9614',
 		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
-		ref: 'User'
-	}
-};
+		type: 'object',
+		optional: false, nullable: false,
+		ref: 'UserDetailedNotMe',
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const blocker = await Users.findOneOrFail(user.id);
 
@@ -69,7 +70,7 @@ export default define(meta, async (ps, user) => {
 	// Check if already blocking
 	const exist = await Blockings.findOne({
 		blockerId: blocker.id,
-		blockeeId: blockee.id
+		blockeeId: blockee.id,
 	});
 
 	if (exist != null) {
@@ -80,10 +81,10 @@ export default define(meta, async (ps, user) => {
 
 	NoteWatchings.delete({
 		userId: blocker.id,
-		noteUserId: blockee.id
+		noteUserId: blockee.id,
 	});
 
 	return await Users.pack(blockee.id, blocker, {
-		detail: true
+		detail: true,
 	});
 });

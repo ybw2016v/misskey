@@ -7,7 +7,7 @@ import { UserGroups } from '@/models/index';
 export const meta = {
 	tags: ['groups'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'write:user-groups',
 
@@ -18,12 +18,12 @@ export const meta = {
 
 		name: {
 			validator: $.str.range(1, 100),
-		}
+		},
 	},
 
 	res: {
-		type: 'object' as const,
-		optional: false as const, nullable: false as const,
+		type: 'object',
+		optional: false, nullable: false,
 		ref: 'UserGroup',
 	},
 
@@ -31,16 +31,17 @@ export const meta = {
 		noSuchGroup: {
 			message: 'No such group.',
 			code: 'NO_SUCH_GROUP',
-			id: '9081cda3-7a9e-4fac-a6ce-908d70f282f6'
+			id: '9081cda3-7a9e-4fac-a6ce-908d70f282f6',
 		},
-	}
-};
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	// Fetch the group
 	const userGroup = await UserGroups.findOne({
 		id: ps.groupId,
-		userId: me.id
+		userId: me.id,
 	});
 
 	if (userGroup == null) {
@@ -48,7 +49,7 @@ export default define(meta, async (ps, me) => {
 	}
 
 	await UserGroups.update(userGroup.id, {
-		name: ps.name
+		name: ps.name,
 	});
 
 	return await UserGroups.pack(userGroup.id);

@@ -1,28 +1,23 @@
 <template>
-<FormBase>
-	<FormInfo warn>{{ $ts._accountDelete.mayTakeTime }}</FormInfo>
-	<FormInfo>{{ $ts._accountDelete.sendEmail }}</FormInfo>
-	<FormButton @click="deleteAccount" danger v-if="!$i.isDeleted">{{ $ts._accountDelete.requestAccountDelete }}</FormButton>
-	<FormButton disabled v-else>{{ $ts._accountDelete.inProgress }}</FormButton>
-</FormBase>
+<div class="_formRoot">
+	<FormInfo warn class="_formBlock">{{ $ts._accountDelete.mayTakeTime }}</FormInfo>
+	<FormInfo class="_formBlock">{{ $ts._accountDelete.sendEmail }}</FormInfo>
+	<FormButton v-if="!$i.isDeleted" danger class="_formBlock" @click="deleteAccount">{{ $ts._accountDelete.requestAccountDelete }}</FormButton>
+	<FormButton v-else disabled>{{ $ts._accountDelete.inProgress }}</FormButton>
+</div>
 </template>
 
 <script lang="ts">
 import { defineAsyncComponent, defineComponent } from 'vue';
-import FormInfo from '@/components/debobigego/info.vue';
-import FormBase from '@/components/debobigego/base.vue';
-import FormGroup from '@/components/debobigego/group.vue';
-import FormButton from '@/components/debobigego/button.vue';
+import FormInfo from '@/components/ui/info.vue';
+import FormButton from '@/components/ui/button.vue';
 import * as os from '@/os';
-import { debug } from '@/config';
 import { signout } from '@/account';
 import * as symbols from '@/symbols';
 
 export default defineComponent({
 	components: {
-		FormBase,
 		FormButton,
-		FormGroup,
 		FormInfo,
 	},
 
@@ -35,21 +30,22 @@ export default defineComponent({
 				icon: 'fas fa-exclamation-triangle',
 				bg: 'var(--bg)',
 			},
-			debug,
 		}
-	},
-
-	mounted() {
-		this.$emit('info', this[symbols.PAGE_INFO]);
 	},
 
 	methods: {
 		async deleteAccount() {
-			const { canceled, result: password } = await os.dialog({
+			{
+				const { canceled } = await os.confirm({
+					type: 'warning',
+					text: this.$ts.deleteAccountConfirm,
+				});
+				if (canceled) return;
+			}
+
+			const { canceled, result: password } = await os.inputText({
 				title: this.$ts.password,
-				input: {
-					type: 'password'
-				}
+				type: 'password'
 			});
 			if (canceled) return;
 
@@ -57,7 +53,7 @@ export default defineComponent({
 				password: password
 			});
 
-			await os.dialog({
+			await os.alert({
 				title: this.$ts._accountDelete.started,
 			});
 

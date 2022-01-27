@@ -5,18 +5,18 @@ import { Users } from '@/models/index';
 export const meta = {
 	tags: ['admin'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 	requireModerator: true,
 
 	params: {
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 
 		offset: {
 			validator: $.optional.num.min(0),
-			default: 0
+			default: 0,
 		},
 
 		sort: {
@@ -40,7 +40,7 @@ export const meta = {
 				'silenced',
 				'suspended',
 			]),
-			default: 'all'
+			default: 'all',
 		},
 
 		origin: {
@@ -49,31 +49,32 @@ export const meta = {
 				'local',
 				'remote',
 			]),
-			default: 'local'
+			default: 'local',
 		},
 
 		username: {
 			validator: $.optional.str,
-			default: null
+			default: null,
 		},
 
 		hostname: {
 			validator: $.optional.str,
-			default: null
-		}
+			default: null,
+		},
 	},
 
 	res: {
-		type: 'array' as const,
-		nullable: false as const, optional: false as const,
+		type: 'array',
+		nullable: false, optional: false,
 		items: {
-			type: 'object' as const,
-			nullable: false as const, optional: false as const,
-			ref: 'User'
-		}
-	}
-};
+			type: 'object',
+			nullable: false, optional: false,
+			ref: 'UserDetailed',
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, me) => {
 	const query = Users.createQueryBuilder('user');
 

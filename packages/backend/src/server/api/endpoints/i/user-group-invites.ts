@@ -7,14 +7,14 @@ import { makePaginationQuery } from '../../common/make-pagination-query';
 export const meta = {
 	tags: ['account', 'groups'],
 
-	requireCredential: true as const,
+	requireCredential: true,
 
 	kind: 'read:user-groups',
 
 	params: {
 		limit: {
 			validator: $.optional.num.range(1, 100),
-			default: 10
+			default: 10,
 		},
 
 		sinceId: {
@@ -27,27 +27,28 @@ export const meta = {
 	},
 
 	res: {
-		type: 'array' as const,
-		optional: false as const, nullable: false as const,
+		type: 'array',
+		optional: false, nullable: false,
 		items: {
-			type: 'object' as const,
-			optional: false as const, nullable: false as const,
+			type: 'object',
+			optional: false, nullable: false,
 			properties: {
 				id: {
-					type: 'string' as const,
-					optional: false as const, nullable: false as const,
-					format: 'id'
+					type: 'string',
+					optional: false, nullable: false,
+					format: 'id',
 				},
 				group: {
-					type: 'object' as const,
-					optional: false as const, nullable: false as const,
-					ref: 'UserGroup'
-				}
-			}
-		}
-	}
-};
+					type: 'object',
+					optional: false, nullable: false,
+					ref: 'UserGroup',
+				},
+			},
+		},
+	},
+} as const;
 
+// eslint-disable-next-line import/no-default-export
 export default define(meta, async (ps, user) => {
 	const query = makePaginationQuery(UserGroupInvitations.createQueryBuilder('invitation'), ps.sinceId, ps.untilId)
 		.andWhere(`invitation.userId = :meId`, { meId: user.id })
