@@ -10,6 +10,22 @@
 You should also include the user name that made the change.
 -->
 
+## 12.110.0 (2022/04/11)
+
+### Improvements
+- Improve webhook @syuilo
+- Client: Show loading icon on splash screen @syuilo
+
+### Bugfixes
+- API: parameter validation of users/show was wrong
+- Federation: リモートインスタンスへのダイレクト投稿が届かない問題を修正 @syuilo
+
+## 12.109.2 (2022/04/03)
+
+### Bugfixes
+- API: admin/update-meta was not working @syuilo
+- Client: テーマを切り替えたり読み込んだりするとmeta[name="theme-color"]のcontentがundefinedになる問題を修正 @tamaina
+
 ## 12.109.1 (2022/04/02)
 
 ### Bugfixes
