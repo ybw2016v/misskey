@@ -9,7 +9,7 @@ import { User } from '@/models/entities/user.js';
 export const meta = {
 	tags: ['users'],
 
-	requireCredential: false,
+	requireCredential: true,
 
 	description: 'Show the properties of a user.',
 

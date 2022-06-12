@@ -6,7 +6,7 @@ import { generateBlockQueryForUsers } from '../common/generate-block-query.js';
 export const meta = {
 	tags: ['users'],
 
-	requireCredential: false,
+	requireCredential: true,
 
 	res: {
 		type: 'array',
