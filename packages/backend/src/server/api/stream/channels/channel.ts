@@ -30,6 +30,7 @@ export default class extends Channel {
 
 	private async onNote(note: Packed<'Note'>) {
 		if (note.channelId !== this.channelId) return;
+		note = await Notes.pack(note.id, this.user);
 
 		// リプライなら再pack
 		if (note.replyId != null) {

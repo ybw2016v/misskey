@@ -22,6 +22,11 @@ export default class extends Channel {
 	}
 
 	private async onNote(note: Packed<'Note'>) {
+
+		note = await Notes.pack(note.id, this.user!, {
+			detail: true,
+		});
+
 		if (note.channelId) {
 			if (!this.followingChannels.has(note.channelId)) return;
 		} else {
@@ -32,28 +37,25 @@ export default class extends Channel {
 		// Ignore notes from instances the user has muted
 		if (isInstanceMuted(note, new Set<string>(this.userProfile?.mutedInstances ?? []))) return;
 
-		if (['followers', 'specified'].includes(note.visibility)) {
-			note = await Notes.pack(note.id, this.user!, {
+
+
+		if (note.isHidden) {
+			return;
+		}
+		
+			// リプライなら再pack
+		if (note.replyId != null) {
+			note.reply = await Notes.pack(note.replyId, this.user!, {
 				detail: true,
 			});
-
-			if (note.isHidden) {
-				return;
-			}
-		} else {
-			// リプライなら再pack
-			if (note.replyId != null) {
-				note.reply = await Notes.pack(note.replyId, this.user!, {
-					detail: true,
-				});
-			}
-			// Renoteなら再pack
-			if (note.renoteId != null) {
-				note.renote = await Notes.pack(note.renoteId, this.user!, {
-					detail: true,
-				});
-			}
 		}
+		// Renoteなら再pack
+		// if (note.renoteId != null) {
+		// 	note.renote = await Notes.pack(note.renoteId, this.user!, {
+		// 		detail: true,
+		// 	});
+		// }
+	
 
 		// 関係ない返信は除外
 		if (note.reply && !this.user!.showTimelineReplies) {

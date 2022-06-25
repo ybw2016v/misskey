@@ -29,7 +29,7 @@ export default class extends Channel {
 		const noteTags = note.tags ? note.tags.map((t: string) => t.toLowerCase()) : [];
 		const matched = this.q.some(tags => tags.every(tag => noteTags.includes(normalizeForSearch(tag))));
 		if (!matched) return;
-
+		note = await Notes.pack(note.id, this.user);
 		// Renoteなら再pack
 		if (note.renoteId != null) {
 			note.renote = await Notes.pack(note.renoteId, this.user, {

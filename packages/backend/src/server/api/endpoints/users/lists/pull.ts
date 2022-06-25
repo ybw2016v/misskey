@@ -58,5 +58,5 @@ export default define(meta, paramDef, async (ps, me) => {
 	// Pull the user
 	await UserListJoinings.delete({ userListId: userList.id, userId: user.id });
 
-	publishUserListStream(userList.id, 'userRemoved', await Users.pack(user));
+	publishUserListStream(userList.id, 'userRemoved', await Users.pack(user,me));
 });

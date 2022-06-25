@@ -52,7 +52,7 @@ export default class extends Channel {
 	private async onNote(note: Packed<'Note'>) {
 		if (!this.listUsers.includes(note.userId)) return;
 
-		if (['followers', 'specified'].includes(note.visibility)) {
+		// if (['followers', 'specified'].includes(note.visibility)) {
 			note = await Notes.pack(note.id, this.user, {
 				detail: true,
 			});
@@ -60,7 +60,7 @@ export default class extends Channel {
 			if (note.isHidden) {
 				return;
 			}
-		} else {
+		// } else {
 			// リプライなら再pack
 			if (note.replyId != null) {
 				note.reply = await Notes.pack(note.replyId, this.user, {
@@ -68,12 +68,12 @@ export default class extends Channel {
 				});
 			}
 			// Renoteなら再pack
-			if (note.renoteId != null) {
-				note.renote = await Notes.pack(note.renoteId, this.user, {
-					detail: true,
-				});
-			}
-		}
+			// if (note.renoteId != null) {
+			// 	note.renote = await Notes.pack(note.renoteId, this.user, {
+			// 		detail: true,
+			// 	});
+			// }
+		// }
 
 		// 流れてきたNoteがミュートしているユーザーが関わるものだったら無視する
 		if (isMutedUserRelated(note, this.muting)) return;

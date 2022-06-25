@@ -6,7 +6,7 @@ import { Notes } from '@/models/index.js';
 export const meta = {
 	tags: ['notes'],
 
-	requireCredential: true,
+	requireCredential: false,
 
 	res: {
 		type: 'object',

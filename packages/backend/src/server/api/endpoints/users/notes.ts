@@ -13,7 +13,6 @@ export const meta = {
 	tags: ['users', 'notes'],
 
 	description: 'Show all notes that this user created.',
-	requireCredential: true,
 	res: {
 		type: 'array',
 		optional: false, nullable: false,
