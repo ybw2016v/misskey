@@ -118,7 +118,11 @@
    			<path d="M12 9v2m0 4v.01"></path>
    			<path d="M5 19h14a2 2 0 0 0 1.84 -2.75l-7.1 -12.25a2 2 0 0 0 -3.5 0l-7.1 12.25a2 2 0 0 0 1.75 2.75"></path>
 			</svg>
-			<h1>⚠发生了一些事情</h1>
+
+						<h1>⚠发生了一些事情</h1>
+						<p>这个页面通常会出现在版本更新后，浏览器缓存的旧的前端文件与新的后端不匹配，通常刷新后恢复正常。如反复刷新后仍然看到这样页面，说明可能出了一些不好的事情，可以通知Email: neko@neko.red来处理。</p>
+			<h1>An error has occurred!</h1>
+
 			<button class="button-big" onclick="location.reload(true);">
 				<span class="button-label-big">Refresh</span>
 			</button>
@@ -133,7 +137,9 @@
 			<br>
       <a href="/cli">
         <button class="button-small">
-          <span class="button-label-small">启动简易界面</span>
+
+          <span class="button-label-small">开启简易模式</span>
+
         </button>
       </a>
 			<br>
