@@ -292,10 +292,10 @@ export const UserRepository = db.getRepository(User).extend({
 
 		const packed = {
 			id: user.id,
-			name: user.name,
+			name:(!user.host || me) ? user.name : null,
 			username: user.username,
 			host: user.host,
-			avatarUrl: this.getAvatarUrlSync(user),
+			avatarUrl: (!user.host || me) ? this.getAvatarUrlSync(user) : this.getIdenticonUrl(user.id),
 			avatarBlurhash: user.avatar?.blurhash || null,
 			avatarColor: null, // 後方互換性のため
 			isAdmin: user.isAdmin || falsy,
@@ -329,11 +329,11 @@ export const UserRepository = db.getRepository(User).extend({
 				isLocked: user.isLocked,
 				isSilenced: user.isSilenced || falsy,
 				isSuspended: user.isSuspended || falsy,
-				description: profile!.description,
+				description: (!user.host || me) ? profile!.description : null,
 				location: profile!.location,
 				birthday: profile!.birthday,
 				lang: profile!.lang,
-				fields: profile!.fields,
+				fields: (!user.host || me) ? profile!.fields : [],
 				followersCount: followersCount || 0,
 				followingCount: followingCount || 0,
 				notesCount: user.notesCount,

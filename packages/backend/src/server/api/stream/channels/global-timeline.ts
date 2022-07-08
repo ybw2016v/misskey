@@ -29,7 +29,7 @@ export default class extends Channel {
 	private async onNote(note: Packed<'Note'>) {
 		if (note.visibility !== 'public') return;
 		if (note.channelId != null) return;
-
+		note = await Notes.pack(note.id, this.user);
 		// リプライなら再pack
 		if (note.replyId != null) {
 			note.reply = await Notes.pack(note.replyId, this.user, {
