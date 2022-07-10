@@ -36,7 +36,6 @@ const modal = $ref<InstanceType<typeof MkModal>>();
 	display: flex;
 	flex-direction: column;
 	height: 100%;
-
 	> header,
 	> footer {
 		align-self: center;
@@ -47,12 +46,10 @@ const modal = $ref<InstanceType<typeof MkModal>>();
 		border-radius: 6px;
 		color: #fff;
 	}
-
 	> header {
 		margin-bottom: 8px;
 		opacity: 0.9;
 	}
-
 	> img {
 		display: block;
 		flex: 1;
@@ -62,11 +59,9 @@ const modal = $ref<InstanceType<typeof MkModal>>();
 		cursor: zoom-out;
 		image-orientation: from-image;
 	}
-
 	> footer {
 		margin-top: 8px;
 		opacity: 0.8;
-
 		> span + span {
 			margin-left: 0.5em;
 			padding-left: 0.5em;

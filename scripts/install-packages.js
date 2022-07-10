@@ -3,7 +3,7 @@ const execa = require('execa');
 (async () => {
 	console.log('installing dependencies of packages/backend ...');
 
-	await execa('yarn', ['--force', 'install'], {
+	await execa('yarn', ['install'], {
 		cwd: __dirname + '/../packages/backend',
 		stdout: process.stdout,
 		stderr: process.stderr,
