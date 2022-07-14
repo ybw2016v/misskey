@@ -70,11 +70,13 @@ onMounted(() => {
 });
 
 useTooltip(buttonRef, async (showing) => {
-	const reactions = await os.apiGet('notes/reactions', {
+	// 由于对非登录用户提供差异化返回内容，此处应当带有登录状态，临时性改回原来的POST方法
+	// const reactions = await os.apiGet('notes/reactions', {
+	const reactions = await os.api('notes/reactions', {
 		noteId: props.note.id,
 		type: props.reaction,
 		limit: 11,
-		_cacheKey_: props.count,
+		// _cacheKey_: props.count,
 	});
 
 	const users = reactions.map(x => x.user);
