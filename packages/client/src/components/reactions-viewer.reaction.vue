@@ -78,6 +78,14 @@ useTooltip(buttonRef, async (showing) => {
 		limit: 11,
 		// _cacheKey_: props.count,
 	});
+	// 或者是在Get时附加一个登录凭据
+	// const reactions = await os.apiGet('notes/reactions', {
+	// 	noteId: props.note.id,
+	// 	type: props.reaction,
+	// 	limit: 11,
+	// 	_cacheKey_: props.count,
+	// 	i: $i,
+	// });
 
 	const users = reactions.map(x => x.user);
 
