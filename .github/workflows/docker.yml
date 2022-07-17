@@ -13,11 +13,17 @@ jobs:
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2
+      - name: Replace the github url
+        run: |
+          sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' package.json
+          sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/client/package.json
+          sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/backend/package.json
+          sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/sw/package.json
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: misskey/misskey
+          images: dogcraft/misskey
       - name: Log in to Docker Hub
         uses: docker/login-action@v1
         with:
