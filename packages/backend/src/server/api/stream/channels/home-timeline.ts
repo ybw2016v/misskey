@@ -21,7 +21,6 @@ export default class extends Channel {
 	}
 
 	private async onNote(note: Packed<'Note'>) {
-
 		note = await Notes.pack(note.id, this.user!, {
 			detail: true,
 		});
@@ -35,8 +34,6 @@ export default class extends Channel {
 
 		// Ignore notes from instances the user has muted
 		if (isInstanceMuted(note, new Set<string>(this.userProfile?.mutedInstances ?? []))) return;
-
-
 
 		if (note.isHidden) {
 			return;
@@ -54,8 +51,6 @@ export default class extends Channel {
 		// 		detail: true,
 		// 	});
 		// }
-
-
 		// 関係ない返信は除外
 		if (note.reply && !this.user!.showTimelineReplies) {
 			const reply = note.reply;
