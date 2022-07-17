@@ -41,8 +41,8 @@ export default class extends Channel {
 		if (note.isHidden) {
 			return;
 		}
-		
-			// リプライなら再pack
+
+		// リプライなら再pack
 		if (note.replyId != null) {
 			note.reply = await Notes.pack(note.replyId, this.user!, {
 				detail: true,
@@ -54,7 +54,7 @@ export default class extends Channel {
 		// 		detail: true,
 		// 	});
 		// }
-	
+
 
 		// 関係ない返信は除外
 		if (note.reply && !this.user!.showTimelineReplies) {

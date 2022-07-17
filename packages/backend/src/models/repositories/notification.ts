@@ -28,7 +28,7 @@ export const NotificationRepository = db.getRepository(Notification).extend({
 			type: notification.type,
 			isRead: notification.isRead,
 			userId: notification.notifierId,
-			user: notification.notifierId ? Users.pack(notification.notifier || notification.notifierId, {id:notification.notifieeId}) : null,
+			user: notification.notifierId ? Users.pack(notification.notifier || notification.notifierId, { id: notification.notifieeId }) : null,
 			...(notification.type === 'mention' ? {
 				note: Notes.pack(notification.note || notification.noteId!, { id: notification.notifieeId }, {
 					detail: true,
