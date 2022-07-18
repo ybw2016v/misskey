@@ -1,3 +1,21 @@
+### 一点点微小的改动
+
+* 将`package.json`中的github的https协议替换为ssh协议，安排好ssh公钥后即可在不稳定的网络情况下顺利安装。
+
+* 将主题色由绿色改为蓝色。
+
+* 对登录用户与非登录用户提供差异化内容，精准服务各类人群。
+
+### Docker镜像
+
+目前用action自动构建docker镜像
+
+```bash
+docker pull dogcraft/misskey
+```
+
+********************************************************************************
+
 <div align="center">
 <a href="https://misskey-hub.net">
 	<img src="./assets/title_float.svg" alt="Misskey logo" style="border-radius:50%" width="400"/>
