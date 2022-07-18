@@ -16,10 +16,10 @@ const userInstanceCache = new Cache<Instance | null>(1000 * 60 * 60 * 3);
 
 type IsUserDetailed<Detailed extends boolean> = Detailed extends true ? Packed<'UserDetailed'> : Packed<'UserLite'>;
 type IsMeAndIsUserDetailed<ExpectsMe extends boolean | null, Detailed extends boolean> =
-	Detailed extends true ? 
-		ExpectsMe extends true ? Packed<'MeDetailed'> :
-		ExpectsMe extends false ? Packed<'UserDetailedNotMe'> :
-		Packed<'UserDetailed'> :
+	Detailed extends true ?
+	ExpectsMe extends true ? Packed<'MeDetailed'> :
+	ExpectsMe extends false ? Packed<'UserDetailedNotMe'> :
+	Packed<'UserDetailed'> :
 	Packed<'UserLite'>;
 
 const ajv = new Ajv();
@@ -210,8 +210,8 @@ export const UserRepository = db.getRepository(User).extend({
 		const elapsed = Date.now() - user.lastActiveDate.getTime();
 		return (
 			elapsed < USER_ONLINE_THRESHOLD ? 'online' :
-			elapsed < USER_ACTIVE_THRESHOLD ? 'active' :
-			'offline'
+				elapsed < USER_ACTIVE_THRESHOLD ? 'active' :
+					'offline'
 		);
 	},
 
@@ -280,19 +280,19 @@ export const UserRepository = db.getRepository(User).extend({
 
 		const followingCount = profile == null ? null :
 			(profile.ffVisibility === 'public') || isMe ? user.followingCount :
-			(profile.ffVisibility === 'followers') && (relation && relation.isFollowing) ? user.followingCount :
-			null;
+				(profile.ffVisibility === 'followers') && (relation && relation.isFollowing) ? user.followingCount :
+					null;
 
 		const followersCount = profile == null ? null :
 			(profile.ffVisibility === 'public') || isMe ? user.followersCount :
-			(profile.ffVisibility === 'followers') && (relation && relation.isFollowing) ? user.followersCount :
-			null;
+				(profile.ffVisibility === 'followers') && (relation && relation.isFollowing) ? user.followersCount :
+					null;
 
 		const falsy = opts.detail ? false : undefined;
 
 		const packed = {
 			id: user.id,
-			name:(!user.host || me) ? user.name : null,
+			name: (!user.host || me) ? user.name : null,
 			username: user.username,
 			host: user.host,
 			avatarUrl: (!user.host || me) ? this.getAvatarUrlSync(user) : this.getIdenticonUrl(user.id),
