@@ -1,6 +1,6 @@
 <template>
 <div class="hpaizdrt" :style="bg">
-	<img v-if="instance.faviconUrl" class="icon" :src="instance.faviconUrl"/>
+	<img v-if="instance.faviconUrl" class="icon" :src="instance.faviconUrl" @error="onError"/>
 	<span class="name">{{ instance.name }}</span>
 </div>
 </template>
@@ -30,6 +30,12 @@ const themeColor = instance.themeColor ?? '#777777';
 const bg = {
 	background: `linear-gradient(90deg, ${themeColor}, ${themeColor}00)`
 };
+
+function onError(ev: Event) {
+	let img = ev.target as HTMLImageElement;
+	img.src = "/static-assets/user-unknown.png";
+	img.onerror = null;
+}
 </script>
 
 <style lang="scss" scoped>
