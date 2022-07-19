@@ -10,6 +10,7 @@ jobs:
   push_to_registry:
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.commits.*.message, '[skip ci]') && !contains(github.event.commits.*.message, '[ci skip]') }}
 
     steps:
       - name: Check out the repo
@@ -41,7 +42,7 @@ jobs:
           push: true
           tags: |
             dogcraft/misskey:neko
-            dogcraft/misskey:neko-{{steps.dogs.outputs.sha_short}}
+            dogcraft/misskey:neko-${{steps.dogs.outputs.sha_short}}
           labels: neko
       - name: Update Docker Hub Description
         uses: peter-evans/dockerhub-description@v3
