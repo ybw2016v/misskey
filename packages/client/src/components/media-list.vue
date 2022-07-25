@@ -92,6 +92,7 @@ onMounted(() => {
 	});
 	lightbox.addFilter('contentErrorElement',()=>{
 		const el = document.createElement('div');
+		el.style.cssText = 'display: flex; justify-content: center; align-items: center; width: 100%; height: 100%;';
 		el.innerHTML='<img style = "margin:auto;" src="/static-assets/404.png"/>';
 		return el;
 	})
