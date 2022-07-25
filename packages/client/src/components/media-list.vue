@@ -90,7 +90,7 @@ onMounted(() => {
 		itemData.msrc = file.thumbnailUrl;
 		itemData.thumbCropped = true;
 	});
-	lightbox.addfilter('contentErrorElement',()=>{
+	lightbox.addFilter('contentErrorElement',()=>{
 		const el = document.createElement('div');
 		el.innerHTML='<img style = "margin:auto;" src="/static-assets/404.png"/>';
 		return el;
