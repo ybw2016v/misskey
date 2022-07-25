@@ -71,7 +71,7 @@
 		wallpaperOverlay: 'rgba(255, 255, 255, 0.5)',
 		badge: '#31b1ce',
 		messageBg: '@bg',
-		success: '#86b300',
+		success: '#77bff9',
 		error: '#ec4137',
 		warn: '#ecb637',
 		codeString: '#b98710',
