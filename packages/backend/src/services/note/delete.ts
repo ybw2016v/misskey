@@ -84,7 +84,7 @@ export default async function(user: { id: User['id']; uri: User['uri']; host: Us
 	});
 }
 
-async function findCascadingNotes(note: Note) {
+export async function findCascadingNotes(note: Note) {
 	const cascadingNotes: Note[] = [];
 
 	const recursive = async (noteId: string) => {
