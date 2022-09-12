@@ -1,7 +1,7 @@
 <template>
 <div class="xubzgfgb" :class="{ cover }" :title="title">
 	<canvas v-if="!loaded" ref="canvas" :width="size" :height="size" :title="title"/>
-	<img v-if="src" :src="src" :title="title" :alt="alt" @load="onLoad"/>
+	<img v-if="src" :src="src" :title="title" :alt="alt" @load="onLoad"  @error="onError"/>
 </div>
 </template>
 
@@ -43,6 +43,12 @@ function onLoad() {
 onMounted(() => {
 	draw();
 });
+
+function onError(ev: Event) {
+	let img = ev.target as HTMLImageElement;
+	img.src = "/static-assets/404.png";
+	img.onerror = null;
+}
 </script>
 
 <style lang="scss" scoped>

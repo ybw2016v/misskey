@@ -11,6 +11,7 @@ on:
 jobs:
   mocha:
     runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.commits.*.message, '[skip ci]') && !contains(github.event.commits.*.message, '[ci skip]') }}
 
     strategy:
       matrix:
@@ -59,6 +60,7 @@ jobs:
 
   e2e:
     runs-on: ubuntu-latest
+    if: ${{ !contains(github.event.commits.*.message, '[skip ci]') && !contains(github.event.commits.*.message, '[ci skip]') }}
 
     strategy:
       fail-fast: false

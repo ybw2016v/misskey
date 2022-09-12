@@ -1,5 +1,5 @@
 import { CacheableRemoteUser } from '@/models/entities/user.js';
-import deleteNode from '@/services/note/delete.js';
+import deleteNode , { findCascadingNotes } from '@/services/note/delete.js';
 import { apLogger } from '../../logger.js';
 import DbResolver from '../../db-resolver.js';
 import { getApLock } from '@/misc/app-lock.js';
@@ -32,7 +32,10 @@ export default async function(actor: CacheableRemoteUser, uri: string): Promise<
 		if (note.userId !== actor.id) {
 			return '投稿を削除しようとしているユーザーは投稿の作成者ではありません';
 		}
-
+		const cascadingNotes = await findCascadingNotes(note);
+		if (cascadingNotes.length > 0) {
+			return 'no: cascading notes found';
+		}
 		await deleteNode(actor, note);
 		return 'ok: note deleted';
 	} finally {

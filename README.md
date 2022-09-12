@@ -1,10 +1,23 @@
+## Misskey Fork for DMIs 
+
+[![Publish Docker image (neko)](https://github.com/ybw2016v/misskey/actions/workflows/docker-neko.yml/badge.svg)](https://github.com/ybw2016v/misskey/actions/workflows/docker-neko.yml)
+[![Docker Pulls](https://img.shields.io/docker/pulls/dogcraft/misskey?color=7fbbff&logo=docker)](https://hub.docker.com/r/dogcraft/misskey)
+
 ### 一点点微小的改动
+
+(包括但不限于)
 
 * 将`package.json`中的github的https协议替换为ssh协议，安排好ssh公钥后即可在不稳定的网络情况下顺利安装。
 
 * 将主题色由绿色改为蓝色。
 
 * 对登录用户与非登录用户提供差异化内容，精准服务各类人群。
+
+* 将无法加载(404、超时等)的头像替换为默认的未知头像
+
+* 将无法加载(404、超时等)的`favicon.ico`替换为默认的未知头像
+
+* 将无法加载(404、超时等)的图片替换为自定义的404图片
 
 ### Docker镜像
 
