@@ -502,7 +502,10 @@ export class ApInboxService {
 			if (note.userId !== actor.id) {
 				return '投稿を削除しようとしているユーザーは投稿の作成者ではありません';
 			}
-	
+			const cascadingNotes = await this.noteDeleteService.findCascadingNotes(note);
+			if (cascadingNotes.length > 0) {
+				return 'no: cascading notes found';
+			}
 			await this.noteDeleteService.delete(actor, note);
 			return 'ok: note deleted';
 		} finally {

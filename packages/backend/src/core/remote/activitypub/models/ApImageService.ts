@@ -62,7 +62,7 @@ export class ApImageService {
 		if (file.isLink) {
 			// URLが異なっている場合、同じ画像が以前に異なるURLで登録されていたということなので、
 			// URLを更新する
-			if (file.url !== image.url) {
+			if (file.url !== image.url || file.uri !== image.url) {
 				await this.driveFilesRepository.update({ id: file.id }, {
 					url: image.url,
 					uri: image.url,

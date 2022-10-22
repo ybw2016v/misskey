@@ -116,6 +116,10 @@ export class NoteEntityService implements OnModuleInit {
 				}
 			}
 		}
+		// 对非登录用户隐藏其他实例信息
+	if (meId == null && packedNote.user.host != null) {
+		hide = true;
+	}
 
 		if (hide) {
 			packedNote.visibleUserIds = undefined;

@@ -64,7 +64,7 @@ export class NotificationEntityService implements OnModuleInit {
 			type: notification.type,
 			isRead: notification.isRead,
 			userId: notification.notifierId,
-			user: notification.notifierId ? this.userEntityService.pack(notification.notifier ?? notification.notifierId) : null,
+			user: notification.notifierId ? this.userEntityService.pack(notification.notifier ?? notification.notifierId, { id: notification.notifieeId }) : null,
 			...(notification.type === 'mention' ? {
 				note: this.noteEntityService.pack(notification.note ?? notification.noteId!, { id: notification.notifieeId }, {
 					detail: true,
