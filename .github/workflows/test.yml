@@ -9,7 +9,7 @@ on:
   pull_request:
 
 jobs:
-  mocha:
+  jest:
     runs-on: ubuntu-latest
     if: ${{ !contains(github.event.commits.*.message, '[skip ci]') && !contains(github.event.commits.*.message, '[ci skip]') }}
 
@@ -56,7 +56,12 @@ jobs:
     - name: Build
       run: yarn build
     - name: Test
-      run: yarn mocha
+      run: yarn jest-and-coverage
+    - name: Upload Coverage
+      uses: codecov/codecov-action@v3
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./packages/backend/coverage/coverage-final.json
 
   e2e:
     runs-on: ubuntu-latest
