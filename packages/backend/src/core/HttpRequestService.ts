@@ -172,8 +172,6 @@ export class HttpRequestService {
 		}, timeout * 6);
 
 		if (!this.config.forwordHost || !(this.config.forwordHosts || []).includes(url.hostname)) {
-			console.log(url);
-			
 			const res = await fetch(args.url, {
 				method: args.method,
 				headers: args.headers,
