@@ -671,6 +671,11 @@ export class ApInboxService {
 
 		if (!note) return 'skip: no such Announce';
 
+		const cascadingNotes = await this.noteDeleteService.findCascadingNotes(note);
+		if (cascadingNotes.length > 0) {
+			return 'no: cascading notes found';
+		}
+
 		await this.noteDeleteService.delete(actor, note);
 		return 'ok: deleted';
 	}

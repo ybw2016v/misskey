@@ -114,7 +114,7 @@ export class NoteDeleteService {
 	}
 
 	@bindThis
-	private async findCascadingNotes(note: Note) {
+	async findCascadingNotes(note: Note) {
 		const cascadingNotes: Note[] = [];
 
 		const recursive = async (noteId: string) => {

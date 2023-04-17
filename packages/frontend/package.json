@@ -19,7 +19,7 @@
 		"autosize": "5.0.2",
 		"blurhash": "2.0.4",
 		"broadcast-channel": "4.20.1",
-		"browser-image-resizer": "git+https://github.com/misskey-dev/browser-image-resizer#v2.2.1-misskey.3",
+		"browser-image-resizer": "git+ssh://git@github.com:misskey-dev/browser-image-resizer#v2.2.1-misskey.3",
 		"canvas-confetti": "^1.6.0",
 		"chart.js": "4.1.2",
 		"chartjs-adapter-date-fns": "3.0.0",

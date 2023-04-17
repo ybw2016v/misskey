@@ -1,10 +1,10 @@
 <template>
 <span v-if="!link" v-user-preview="preview ? user.id : undefined" :class="[$style.root, { [$style.cat]: user.isCat, [$style.square]: $store.state.squareAvatars }]" class="_noSelect" :style="{ color }" :title="acct(user)" @click="onClick">
-	<img :class="$style.inner" :src="url" decoding="async"/>
+	<img :class="$style.inner" :src="url" decoding="async" @error="onError"/>
 	<MkUserOnlineIndicator v-if="indicator" :class="$style.indicator" :user="user"/>
 </span>
 <MkA v-else v-user-preview="preview ? user.id : undefined" class="_noSelect" :class="[$style.root, { [$style.cat]: user.isCat, [$style.square]: $store.state.squareAvatars }]" :style="{ color }" :to="userPage(user)" :title="acct(user)" :target="target">
-	<img :class="$style.inner" :src="url" decoding="async"/>
+	<img :class="$style.inner" :src="url" decoding="async" @error="onError"/>
 	<MkUserOnlineIndicator v-if="indicator" :class="$style.indicator" :user="user"/>
 </MkA>
 </template>
@@ -50,6 +50,12 @@ watch(() => props.user.avatarBlurhash, () => {
 }, {
 	immediate: true,
 });
+
+function onError(ev: Event) {
+	let img = ev.target as HTMLImageElement;
+	img.src = "/static-assets/user-unknown.png";
+	img.onerror = null;
+}
 </script>
 
 <style lang="scss" module>
