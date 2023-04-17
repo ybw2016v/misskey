@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - name: Check out the repo
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3.3.0
       - name: Replace the github url
         run: |
           sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' package.json
