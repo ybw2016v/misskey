@@ -20,7 +20,7 @@ class UserListChannel extends Channel {
 		private userListsRepository: UserListsRepository,
 		private userListJoiningsRepository: UserListJoiningsRepository,
 		private noteEntityService: NoteEntityService,
-		
+
 		id: string,
 		connection: Channel['connection'],
 	) {
@@ -66,26 +66,25 @@ class UserListChannel extends Channel {
 		if (!this.listUsers.includes(note.userId)) return;
 
 		// if (['followers', 'specified'].includes(note.visibility)) {
-			note = await this.noteEntityService.pack(note.id, this.user, {
+		note = await this.noteEntityService.pack(note.id, this.user, {
+			detail: true,
+		});
+
+		if (note.isHidden) {
+			return;
+		}
+		// } else {
+		// リプライなら再pack
+		if (note.replyId != null) {
+			note.reply = await this.noteEntityService.pack(note.replyId, this.user, {
 				detail: true,
 			});
-
-			if (note.isHidden) {
-				return;
-			}
-		// } else {
-			// リプライなら再pack
-			if (note.replyId != null) {
-				note.reply = await this.noteEntityService.pack(note.replyId, this.user, {
-					detail: true,
-				});
-			}
-			// Renoteなら再pack 之前注释掉了但想不起来为什么注释掉了
-			if (note.renoteId != null) {
-				note.renote = await this.noteEntityService.pack(note.renoteId, this.user, {
-					detail: true,
-				});
-			}
+		}
+		// Renoteなら再pack 之前注释掉了但想不起来为什么注释掉了
+		if (note.renoteId != null) {
+			note.renote = await this.noteEntityService.pack(note.renoteId, this.user, {
+				detail: true,
+			});
 		}
 
 		// 流れてきたNoteがミュートしているユーザーが関わるものだったら無視する
