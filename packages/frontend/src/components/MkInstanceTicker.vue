@@ -1,6 +1,6 @@
 <template>
 <div :class="$style.root" :style="bg">
-	<img v-if="faviconUrl" :class="$style.icon" :src="faviconUrl"/>
+	<img v-if="faviconUrl" :class="$style.icon" :src="faviconUrl" @error="onError"/>
 	<div :class="$style.name">{{ instance.name }}</div>
 </div>
 </template>
@@ -32,6 +32,12 @@ const themeColor = instance.themeColor ?? '#777777';
 const bg = {
 	background: `linear-gradient(90deg, ${themeColor}, ${themeColor}00)`,
 };
+
+function onError(ev: Event) {
+	let img = ev.target as HTMLImageElement;
+	img.src = "/static-assets/user-unknown.png";
+	img.onerror = null;
+}
 </script>
 
 <style lang="scss" module>
