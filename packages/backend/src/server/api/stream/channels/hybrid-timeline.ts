@@ -71,7 +71,7 @@ class HybridTimelineChannel extends Channel {
 					detail: true,
 				});
 			}
-		}
+		
 
 		// Ignore notes from instances the user has muted
 		if (isInstanceMuted(note, new Set<string>(this.userProfile?.mutedInstances ?? []))) return;
@@ -98,7 +98,7 @@ class HybridTimelineChannel extends Channel {
 		this.connection.cacheNote(note);
 
 		this.send('note', note);
-	}
+	}}
 
 	@bindThis
 	public dispose(): void {
