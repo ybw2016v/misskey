@@ -1,27 +1,37 @@
-import Channel from '../channel.js';
-import { Notes } from '@/models/index.js';
+import { Inject, Injectable } from '@nestjs/common';
+import type { NotesRepository } from '@/models/index.js';
 import { checkWordMute } from '@/misc/check-word-mute.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
 import { isInstanceMuted } from '@/misc/is-instance-muted.js';
-import { Packed } from '@/misc/schema.js';
+import type { Packed } from '@/misc/schema.js';
+import { NoteEntityService } from '@/core/entities/NoteEntityService.js';
+import { bindThis } from '@/decorators.js';
+import Channel from '../channel.js';
 
-export default class extends Channel {
+class HomeTimelineChannel extends Channel {
 	public readonly chName = 'homeTimeline';
 	public static shouldShare = true;
 	public static requireCredential = true;
 
-	constructor(id: string, connection: Channel['connection']) {
+	constructor(
+		private noteEntityService: NoteEntityService,
+
+		id: string,
+		connection: Channel['connection'],
+	) {
 		super(id, connection);
-		this.onNote = this.onNote.bind(this);
+		//this.onNote = this.onNote.bind(this);
 	}
 
+	@bindThis
 	public async init(params: any) {
 		// Subscribe events
 		this.subscriber.on('notesStream', this.onNote);
 	}
 
+	@bindThis
 	private async onNote(note: Packed<'Note'>) {
-		note = await Notes.pack(note.id, this.user!, {
+		note = await this.noteEntityService.pack(note.id, this.user!, {
 			detail: true,
 		});
 
@@ -41,16 +51,16 @@ export default class extends Channel {
 
 		// リプライなら再pack
 		if (note.replyId != null) {
-			note.reply = await Notes.pack(note.replyId, this.user!, {
+			note.reply = await this.noteEntityService.pack(note.replyId, this.user!, {
 				detail: true,
 			});
 		}
-		// Renoteなら再pack
-		// if (note.renoteId != null) {
-		// 	note.renote = await Notes.pack(note.renoteId, this.user!, {
-		// 		detail: true,
-		// 	});
-		// }
+		//Renoteなら再pack 之前注释掉的已经忘了是为什么了……
+		if (note.renoteId != null) {
+			note.renote = await this.noteEntityService.pack(note.renoteId, this.user!, {
+				detail: true,
+			});
+		}
 		// 関係ない返信は除外
 		if (note.reply && !this.user!.showTimelineReplies) {
 			const reply = note.reply;
@@ -75,8 +85,29 @@ export default class extends Channel {
 		this.send('note', note);
 	}
 
+	@bindThis
 	public dispose() {
 		// Unsubscribe events
 		this.subscriber.off('notesStream', this.onNote);
+	}
+}
+
+@Injectable()
+export class HomeTimelineChannelService {
+	public readonly shouldShare = HomeTimelineChannel.shouldShare;
+	public readonly requireCredential = HomeTimelineChannel.requireCredential;
+
+	constructor(
+		private noteEntityService: NoteEntityService,
+	) {
+	}
+
+	@bindThis
+	public create(id: string, connection: Channel['connection']): HomeTimelineChannel {
+		return new HomeTimelineChannel(
+			this.noteEntityService,
+			id,
+			connection,
+		);
 	}
 }
