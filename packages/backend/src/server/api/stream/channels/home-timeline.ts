@@ -48,8 +48,8 @@ class HomeTimelineChannel extends Channel {
 		if (note.isHidden) {
 			return;
 		}
-
-		// リプライなら再pack
+		
+			// リプライなら再pack
 		if (note.replyId != null) {
 			note.reply = await this.noteEntityService.pack(note.replyId, this.user!, {
 				detail: true,

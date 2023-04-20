@@ -237,7 +237,7 @@ export class QueryService {
 			q.andWhere(new Brackets(qb => { qb
 				.where('note.visibility = \'public\'')
 				.orWhere('note.visibility = \'home\'');
-			})).andWhere('note.userHost IS NULL');
+			})).andWhere('note.userHost IS NULL').andWhere('note.userHost IS NULL');//不对非登录用户提供非本地用户的公开内容;
 		} else {
 			const followingQuery = this.followingsRepository.createQueryBuilder('following')
 				.select('following.followeeId')

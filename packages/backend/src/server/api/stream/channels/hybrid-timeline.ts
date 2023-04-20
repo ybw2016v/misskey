@@ -49,6 +49,9 @@ class HybridTimelineChannel extends Channel {
 			(note.channelId == null && (note.user.host == null && note.visibility === 'public')) ||
 			(note.channelId != null && this.followingChannels.has(note.channelId))
 		)) return;
+		note = await this.noteEntityService.pack(note.id, this.user!, {
+			detail: true,
+		});
 
 		// if (['followers', 'specified'].includes(note.visibility)) {
 			note = await this.noteEntityService.pack(note.id, this.user!, {
