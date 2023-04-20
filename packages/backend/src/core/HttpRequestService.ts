@@ -171,7 +171,7 @@ export class HttpRequestService {
 	} = {
 		throwErrorWhenResponseNotOk: true,
 	}): Promise<Response> {
-		const url = new URL(args.url);
+		const urls = new URL(url);
 
 		const timeout = args.timeout ?? 5000;
 
@@ -180,14 +180,14 @@ export class HttpRequestService {
 			controller.abort();
 		}, timeout);
 
-		if (!this.config.forwordHost || !(this.config.forwordHosts || []).includes(url.hostname)) {
+		if (!this.config.forwordHost || !(this.config.forwordHosts || []).includes(urls.hostname)) {
 
-		const res = await fetch(url, {
+		const res = await fetch(urls, {
 			method: args.method ?? 'GET',
 			headers: args.headers,
 			body: args.body,
 			size: args.size ?? 10 * 1024 * 1024,
-			agent: (url) => this.getAgentByUrl(url),
+			agent: (urls) => this.getAgentByUrl(urls),
 			signal: controller.signal,
 		});
 
@@ -197,17 +197,17 @@ export class HttpRequestService {
 
 		return res;
 		} else {
-		const fwheader = { 'Thost': url.hostname, 'Tkey': this.config.forwordToken, 'host': this.config.forwordHost };
+		const fwheader = { 'Thost': urls.hostname, 'Tkey': this.config.forwordToken, 'host': this.config.forwordHost };
 		Object.assign(args.headers, fwheader);
 		// console.log(args.headers);
 		
-		url.host = this.config.forwordHost;
-		const res = await fetch(url, {
+		urls.host = this.config.forwordHost;
+		const res = await fetch(urls, {
 			method: args.method ?? 'GET',
 			headers: args.headers,
 			body: args.body,
 			size: args.size ?? 10 * 1024 * 1024,
-			agent: (url) => this.getAgentByUrl(url),
+			agent: (urls) => this.getAgentByUrl(urls),
 			signal: controller.signal,
 		});
 
