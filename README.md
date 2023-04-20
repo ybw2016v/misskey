@@ -55,6 +55,8 @@ docker pull dogcraft/misskey
 	
 ---
 
+[![codecov](https://codecov.io/gh/misskey-dev/misskey/branch/develop/graph/badge.svg?token=R6IQZ3QJOL)](https://codecov.io/gh/misskey-dev/misskey)
+
 </div>
 
 <div>
