@@ -21,10 +21,10 @@ jobs:
           echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
       - name: Replace the github url
         run: |
-          sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' package.json
-          sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/client/package.json
-          sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/backend/package.json
-          sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/sw/package.json
+          sed -i 's|ssh://git@github.com/|git+https://github.com/|g' package.json
+          sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/frontend/package.json
+          sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/backend/package.json
+          sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/sw/package.json
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v3
