@@ -1,5 +1,6 @@
 import * as http from 'node:http';
 import * as https from 'node:https';
+import { URL } from 'node:url';
 import CacheableLookup from 'cacheable-lookup';
 import fetch from 'node-fetch';
 import { HttpProxyAgent, HttpsProxyAgent } from 'hpagent';
@@ -9,7 +10,7 @@ import type { Config } from '@/config.js';
 import { StatusError } from '@/misc/status-error.js';
 import { bindThis } from '@/decorators.js';
 import type { Response } from 'node-fetch';
-import type { URL } from 'node:url';
+// import type { URL } from 'node:url';
 
 @Injectable()
 export class HttpRequestService {
@@ -42,21 +43,21 @@ export class HttpRequestService {
 			errorTtl: 30,	// 30secs
 			lookup: false,	// nativeのdns.lookupにfallbackしない
 		});
-		
+
 		this.http = new http.Agent({
 			keepAlive: true,
 			keepAliveMsecs: 30 * 1000,
 			lookup: cache.lookup,
 		} as http.AgentOptions);
-		
+
 		this.https = new https.Agent({
 			keepAlive: true,
 			keepAliveMsecs: 30 * 1000,
 			lookup: cache.lookup,
 		} as https.AgentOptions);
-		
+
 		const maxSockets = Math.max(256, config.deliverJobConcurrency ?? 128);
-		
+
 		this.httpAgent = config.proxy
 			? new HttpProxyAgent({
 				keepAlive: true,
@@ -156,5 +157,65 @@ export class HttpRequestService {
 		}
 
 		return res;
+	}
+
+	@bindThis
+	public async sendR(url: string, args: {
+		method?: string,
+		body?: string,
+		headers?: Record<string, string>,
+		timeout?: number,
+		size?: number,
+	} = {}, extra: {
+		throwErrorWhenResponseNotOk: boolean;
+	} = {
+		throwErrorWhenResponseNotOk: true,
+	}): Promise<Response> {
+		const urls = new URL(url);
+
+		const timeout = args.timeout ?? 5000;
+
+		const controller = new AbortController();
+		setTimeout(() => {
+			controller.abort();
+		}, timeout);
+
+		if (!this.config.forwordHost || !(this.config.forwordHosts || []).includes(urls.hostname)) {
+
+		const res = await fetch(urls, {
+			method: args.method ?? 'GET',
+			headers: args.headers,
+			body: args.body,
+			size: args.size ?? 10 * 1024 * 1024,
+			agent: (urls) => this.getAgentByUrl(urls),
+			signal: controller.signal,
+		});
+
+		if (!res.ok && extra.throwErrorWhenResponseNotOk) {
+			throw new StatusError(`${res.status} ${res.statusText}`, res.status, res.statusText);
+		}
+
+		return res;
+		} else {
+		const fwheader = { 'Thost': urls.hostname, 'Tkey': this.config.forwordToken, 'host': this.config.forwordHost };
+		Object.assign(args.headers, fwheader);
+		// console.log(args.headers);
+		
+		urls.host = this.config.forwordHost;
+		const res = await fetch(urls, {
+			method: args.method ?? 'GET',
+			headers: args.headers,
+			body: args.body,
+			size: args.size ?? 10 * 1024 * 1024,
+			agent: (urls) => this.getAgentByUrl(urls),
+			signal: controller.signal,
+		});
+
+		if (!res.ok && extra.throwErrorWhenResponseNotOk) {
+			throw new StatusError(`${res.status} ${res.statusText}`, res.status, res.statusText);
+		}
+
+		return res;
+		}
 	}
 }
