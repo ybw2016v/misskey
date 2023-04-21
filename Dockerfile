@@ -21,7 +21,7 @@ COPY ["packages/frontend/package.json", "./packages/frontend/"]
 COPY ["packages/sw/package.json", "./packages/sw/"]
 
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store,sharing=locked \
-	pnpm i --frozen-lockfile --aggregate-output
+	pnpm i --aggregate-output
 
 COPY . ./
 
