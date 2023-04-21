@@ -25,6 +25,7 @@ jobs:
           sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/frontend/package.json
           sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/backend/package.json
           sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/sw/package.json
+          sed -i 's|git@github.com:|https://github.com/|g' .gitmodules
       - name: Docker meta
         id: meta
         uses: docker/metadata-action@v3
