@@ -185,7 +185,10 @@ export class HttpRequestService {
 
 		const res = await fetch(urls, {
 			method: args.method ?? 'GET',
-			headers: args.headers,
+			headers: {
+				'User-Agent': this.config.userAgent,
+				...(args.headers ?? {})
+			},
 			body: args.body,
 			size: args.size ?? 10 * 1024 * 1024,
 			agent: (urls) => this.getAgentByUrl(urls),
@@ -205,7 +208,10 @@ export class HttpRequestService {
 		urls.host = this.config.forwordHost;
 		const res = await fetch(urls, {
 			method: args.method ?? 'GET',
-			headers: args.headers,
+			headers: {
+				'User-Agent': this.config.userAgent,
+				...(args.headers ?? {})
+			},
 			body: args.body,
 			size: args.size ?? 10 * 1024 * 1024,
 			agent: (urls) => this.getAgentByUrl(urls),
