@@ -15,6 +15,13 @@ jobs:
       DOCKER_CONTENT_TRUST: 1
     steps:
       - uses: actions/checkout@v3.2.0
+      - name: Replace the github url
+        run: |
+          sed -i 's|ssh://git@github.com/|git+https://github.com/|g' package.json
+          sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/frontend/package.json
+          sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/backend/package.json
+          sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/sw/package.json
+          sed -i 's|git@github.com:|https://github.com/|g' .gitmodules
       - run: |
           curl -L -o dockle.deb "https://github.com/goodwithtech/dockle/releases/download/v0.4.10/dockle_0.4.10_Linux-64bit.deb"
           sudo dpkg -i dockle.deb
