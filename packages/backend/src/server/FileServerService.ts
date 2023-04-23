@@ -183,6 +183,7 @@ export class FileServerService {
 						correctFilename(file.filename, image.ext)
 					)
 				);
+				reply.header('Cache-Control', 'max-age=691200, immutable');
 				return image.data;
 			}
 

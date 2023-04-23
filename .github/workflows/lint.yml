@@ -80,11 +80,12 @@ jobs:
         fetch-depth: 0
         submodules: true
     - name: Replace the github url
-      run: |
-        sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' package.json
-        sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/client/package.json
-        sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/backend/package.json
-        sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/sw/package.json
+        run: |
+          sed -i 's|ssh://git@github.com/|git+https://github.com/|g' package.json
+          sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/frontend/package.json
+          sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/backend/package.json
+          sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/sw/package.json
+          sed -i 's|git@github.com:|https://github.com/|g' .gitmodules
     - uses: pnpm/action-setup@v2
       with:
         version: 7
