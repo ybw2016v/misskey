@@ -120,16 +120,17 @@ export class DriveFileEntityService {
 
 			if (key && !key.match('/')) {	// 古いものはここにオブジェクトストレージキーが入ってるので除外
 				const url = `${this.config.url}/files/${key}`;
-				if (mode === 'avatar') return this.getProxiedUrl(file.uri, 'avatar');
+				// 移除关于头像的处理
+				// if (mode === 'avatar') return this.getProxiedUrl(file.uri, 'avatar');
 				return url;
 			}
 		}
 
 		const url = file.webpublicUrl ?? file.url;
-
-		if (mode === 'avatar') {
-			return this.getProxiedUrl(url, 'avatar');
-		}
+		// 移除关于头像的处理
+		// if (mode === 'avatar') {
+		// 	return this.getProxiedUrl(url, 'avatar');
+		// }
 		return url;
 	}
 
@@ -266,6 +267,7 @@ export class DriveFileEntityService {
 		fileIds: DriveFile['id'][],
 		options?: PackOptions,
 	): Promise<Map<Packed<'DriveFile'>['id'], Packed<'DriveFile'> | null>> {
+		if (fileIds.length === 0) return new Map();
 		const files = await this.driveFilesRepository.findBy({ id: In(fileIds) });
 		const packedFiles = await this.packMany(files, options);
 		const map = new Map<Packed<'DriveFile'>['id'], Packed<'DriveFile'> | null>(packedFiles.map(f => [f.id, f]));
@@ -280,6 +282,7 @@ export class DriveFileEntityService {
 		fileIds: DriveFile['id'][],
 		options?: PackOptions,
 	): Promise<Packed<'DriveFile'>[]> {
+		if (fileIds.length === 0) return [];
 		const filesMap = await this.packManyByIdsMap(fileIds, options);
 		return fileIds.map(id => filesMap.get(id)).filter(isNotNull);
 	}
