@@ -423,6 +423,11 @@ export class ClientServerService {
 					: [];
 
 				reply.header('Cache-Control', 'public, max-age=15');
+				if (!(host == null) || (host === this.config.host)){
+					user.name = username;
+					user.avatarUrl = this.userEntityService.getIdenticonUrl(user);
+					profile.description = '';
+				}
 				return await reply.view('user', {
 					user, profile, me,
 					avatarUrl: user.avatarUrl ?? this.userEntityService.getIdenticonUrl(user),
