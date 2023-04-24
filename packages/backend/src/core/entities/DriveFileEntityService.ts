@@ -99,7 +99,12 @@ export class DriveFileEntityService {
 			// リモートかつ期限切れはローカルプロキシを試みる
 			// 従来は/files/${thumbnailAccessKey}にアクセスしていたが、
 			// /filesはメディアプロキシにリダイレクトするようにしたため直接メディアプロキシを指定する
-			return this.getProxiedUrl(file.uri, 'static');
+			// return this.getProxiedUrl(file.uri, 'static');
+			// 更改为直接返回url
+			const key = file.thumbnailAccessKey;
+			if (key && !key.match('/')) {
+				return `${this.config.url}/files/${key}`;
+			}
 		}
 
 		const url = file.webpublicUrl ?? file.url;
