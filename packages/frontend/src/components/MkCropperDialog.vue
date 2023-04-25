@@ -36,7 +36,7 @@ import { $i } from '@/account';
 import { defaultStore } from '@/store';
 import { apiUrl } from '@/config';
 import { i18n } from '@/i18n';
-import { getProxiedImageUrl } from '@/scripts/media-proxy';
+// import { getProxiedImageUrl } from '@/scripts/media-proxy';
 
 const emit = defineEmits<{
 	(ev: 'ok', cropped: misskey.entities.DriveFile): void;
@@ -49,7 +49,8 @@ const props = defineProps<{
 	aspectRatio: number;
 }>();
 
-const imgUrl = getProxiedImageUrl(props.file.url, undefined, true);
+// const imgUrl = getProxiedImageUrl(props.file.url, undefined, true);
+const imgUrl = props.file.url;
 let dialogEl = $shallowRef<InstanceType<typeof MkModalWindow>>();
 let imgEl = $shallowRef<HTMLImageElement>();
 let cropper: Cropper | null = null;
