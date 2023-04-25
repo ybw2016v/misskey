@@ -2,8 +2,8 @@ name: Storybook
 
 on:
   push:
-    branches-ignore:
-      - l10n_develop
+    branches:
+      - master 
 
 jobs:
   build:
