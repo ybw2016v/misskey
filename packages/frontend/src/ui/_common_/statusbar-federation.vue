@@ -25,7 +25,7 @@ import * as misskey from 'misskey-js';
 import MarqueeText from '@/components/MkMarquee.vue';
 import * as os from '@/os';
 import { useInterval } from '@/scripts/use-interval';
-import { getProxiedImageUrlNullable } from '@/scripts/media-proxy';
+// import { getProxiedImageUrlNullable } from '@/scripts/media-proxy';
 
 const props = defineProps<{
 	display?: 'marquee' | 'oneByOne';
@@ -57,7 +57,8 @@ useInterval(tick, Math.max(5000, props.refreshIntervalSec * 1000), {
 });
 
 function getInstanceIcon(instance): string {
-	return getProxiedImageUrlNullable(instance.iconUrl, 'preview') ?? getProxiedImageUrlNullable(instance.faviconUrl, 'preview') ?? '/client-assets/dummy.png';
+	// return getProxiedImageUrlNullable(instance.iconUrl, 'preview') ?? getProxiedImageUrlNullable(instance.faviconUrl, 'preview') ?? '/client-assets/dummy.png';
+	return instance.iconUrl ?? instance.faviconUrl ?? '/static-assets/user-unknown.png';
 }
 </script>
 

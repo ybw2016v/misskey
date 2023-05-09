@@ -28,7 +28,7 @@ import MkMiniChart from '@/components/MkMiniChart.vue';
 import * as os from '@/os';
 import { useInterval } from '@/scripts/use-interval';
 import { i18n } from '@/i18n';
-import { getProxiedImageUrlNullable } from '@/scripts/media-proxy';
+// import { getProxiedImageUrlNullable } from '@/scripts/media-proxy';
 import { defaultStore } from '@/store';
 
 const name = 'federation';
@@ -75,7 +75,8 @@ useInterval(fetch, 1000 * 60, {
 });
 
 function getInstanceIcon(instance): string {
-	return getProxiedImageUrlNullable(instance.iconUrl, 'preview') ?? getProxiedImageUrlNullable(instance.faviconUrl, 'preview') ?? '/client-assets/dummy.png';
+	// return getProxiedImageUrlNullable(instance.iconUrl, 'preview') ?? getProxiedImageUrlNullable(instance.faviconUrl, 'preview') ?? '/client-assets/dummy.png';
+	return instance.iconUrl ?? instance.faviconUrl ?? '/static-assets/user-unknown.png';
 }
 
 defineExpose<WidgetComponentExpose>({
