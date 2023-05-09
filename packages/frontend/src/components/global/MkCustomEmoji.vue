@@ -5,8 +5,8 @@
 
 <script lang="ts" setup>
 import { computed } from 'vue';
-import { getProxiedImageUrl, getStaticImageUrl } from '@/scripts/media-proxy';
-import { defaultStore } from '@/store';
+// import { getProxiedImageUrl, getStaticImageUrl } from '@/scripts/media-proxy';
+// import { defaultStore } from '@/store';
 import { customEmojis } from '@/custom-emojis';
 
 const props = defineProps<{
@@ -31,22 +31,24 @@ const rawUrl = computed(() => {
 	return props.host ? `/emoji/${customEmojiName.value}@${props.host}.webp` : `/emoji/${customEmojiName.value}.webp`;
 });
 
-const url = computed(() => {
-	if (rawUrl.value == null) return null;
+// const url = computed(() => {
+// 	if (rawUrl.value == null) return null;
 
-	const proxied =
-		(rawUrl.value.startsWith('/emoji/') || (props.useOriginalSize && isLocal.value))
-			? rawUrl.value
-			: getProxiedImageUrl(
-				rawUrl.value,
-				props.useOriginalSize ? undefined : 'emoji',
-				false,
-				true,
-			);
-	return defaultStore.reactiveState.disableShowingAnimatedImages.value
-		? getStaticImageUrl(proxied)
-		: proxied;
-});
+// 	const proxied =
+// 		(rawUrl.value.startsWith('/emoji/') || (props.useOriginalSize && isLocal.value))
+// 			? rawUrl.value
+// 			: getProxiedImageUrl(
+// 				rawUrl.value,
+// 				props.useOriginalSize ? undefined : 'emoji',
+// 				false,
+// 				true,
+// 			);
+// 	return defaultStore.reactiveState.disableShowingAnimatedImages.value
+// 		? getStaticImageUrl(proxied)
+// 		: proxied;
+// });
+
+const url = rawUrl;
 
 const alt = computed(() => `:${customEmojiName.value}:`);
 let errored = $ref(url.value == null);

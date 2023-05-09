@@ -13,7 +13,7 @@
 import * as misskey from 'misskey-js';
 import MkMiniChart from '@/components/MkMiniChart.vue';
 import * as os from '@/os';
-import { getProxiedImageUrlNullable } from '@/scripts/media-proxy';
+// import { getProxiedImageUrlNullable } from '@/scripts/media-proxy';
 
 const props = defineProps<{
 	instance: misskey.entities.Instance;
@@ -28,7 +28,8 @@ os.apiGet('charts/instance', { host: props.instance.host, limit: 16 + 1, span: '
 });
 
 function getInstanceIcon(instance): string {
-	return getProxiedImageUrlNullable(instance.iconUrl, 'preview') ?? getProxiedImageUrlNullable(instance.faviconUrl, 'preview') ?? '/client-assets/dummy.png';
+	return instance.iconUrl ?? instance.faviconUrl ?? '/static-assets/user-unkown.png';
+	// return getProxiedImageUrlNullable(instance.iconUrl, 'preview') ?? getProxiedImageUrlNullable(instance.faviconUrl, 'preview') ?? '/client-assets/dummy.png';
 }
 </script>
 

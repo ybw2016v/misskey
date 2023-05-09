@@ -130,12 +130,14 @@ export class FileServerService {
 					if (isMimeImage(file.mime, 'sharp-convertible-image-with-bmp')) {
 						reply.header('Cache-Control', 'max-age=31536000, immutable');
 
-						const url = new URL(`${this.config.mediaProxy}/static.webp`);
-						url.searchParams.set('url', file.url);
-						url.searchParams.set('static', '1');
+						// const url = new URL(`${this.config.mediaProxy}/static.webp`);
+						// url.searchParams.set('url', file.url);
+						// url.searchParams.set('static', '1');
 
-						file.cleanup();
-						return await reply.redirect(301, url.toString());
+						// file.cleanup();
+						// return await reply.redirect(301, url.toString());
+						image = this.imageProcessingService.convertSharpToWebpStream(await sharpBmp(file.path, file.mime), 498, 422);
+						
 					} else if (file.mime.startsWith('video/')) {
 						const externalThumbnail = this.videoProcessingService.getExternalVideoThumbnailUrl(file.url);
 						if (externalThumbnail) {

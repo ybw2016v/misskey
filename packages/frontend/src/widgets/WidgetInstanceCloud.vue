@@ -20,7 +20,7 @@ import MkContainer from '@/components/MkContainer.vue';
 import MkTagCloud from '@/components/MkTagCloud.vue';
 import * as os from '@/os';
 import { useInterval } from '@/scripts/use-interval';
-import { getProxiedImageUrlNullable } from '@/scripts/media-proxy';
+// import { getProxiedImageUrlNullable } from '@/scripts/media-proxy';
 
 const name = 'instanceCloud';
 
@@ -66,7 +66,8 @@ useInterval(() => {
 });
 
 function getInstanceIcon(instance): string {
-	return getProxiedImageUrlNullable(instance.iconUrl, 'preview') ?? getProxiedImageUrlNullable(instance.faviconUrl, 'preview') ?? '/client-assets/dummy.png';
+	// return getProxiedImageUrlNullable(instance.iconUrl, 'preview') ?? getProxiedImageUrlNullable(instance.faviconUrl, 'preview') ?? '/client-assets/dummy.png';
+	return instance.iconUrl ?? instance.faviconUrl ?? '/static-assets/user-unknown.png';
 }
 
 defineExpose<WidgetComponentExpose>({
