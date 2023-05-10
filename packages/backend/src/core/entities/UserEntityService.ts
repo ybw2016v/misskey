@@ -388,7 +388,7 @@ export class UserEntityService implements OnModuleInit {
 				createdAt: user.createdAt.toISOString(),
 				updatedAt: user.updatedAt ? user.updatedAt.toISOString() : null,
 				lastFetchedAt: user.lastFetchedAt ? user.lastFetchedAt.toISOString() : null,
-				bannerUrl: ((!user.host || me) && user.banner) ? this.driveFileEntityService.getPublicUrl(user.banner) : null,
+				bannerUrl: (!user.host || me) ? user.bannerUrl : null,
 				bannerBlurhash: user.bannerBlurhash,
 				isLocked: user.isLocked,
 				isSilenced: this.roleService.getUserPolicies(user.id).then(r => !r.canPublicNote),
