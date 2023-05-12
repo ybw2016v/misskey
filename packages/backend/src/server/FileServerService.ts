@@ -300,7 +300,8 @@ export class FileServerService {
 			} else if ('badge' in request.query) {
 				const mask = (await sharpBmp(file.path, file.mime))
 					.resize(96, 96, {
-						fit: 'inside',
+						fit: 'contain',
+						position: 'centre',
 						withoutEnlargement: false,
 					})
 					.greyscale()
@@ -456,7 +457,8 @@ export class FileServerService {
 			fileRole: 'original',
 			file,
 			filename: file.name,
-			mime: file.type,
+			// 古いファイルは修正前のmimeを持っているのでできるだけ修正してあげる
+			mime: this.fileInfoService.fixMime(file.type),
 			ext: null,
 			path,
 		};

@@ -2,7 +2,7 @@
 <component :is="link ? MkA : 'span'" v-user-preview="preview ? user.id : undefined" v-bind="bound" class="_noSelect" :class="[$style.root, { [$style.animation]: animation, [$style.cat]: user.isCat, [$style.square]: squareAvatars }]" :style="{ color }" :title="acct(user)" @click="onClick">
 	<img :class="$style.inner" :src="url" decoding="async" @error="onError"/>
 	<MkUserOnlineIndicator v-if="indicator" :class="$style.indicator" :user="user"/>
-	<div v-if="user.isCat" :class="[$style.ears, { [$style.mask]: useBlurEffect }]">
+	<div v-if="user.isCat" :class="[$style.ears]">
 		<div :class="$style.earLeft">
 			<div v-if="false" :class="$style.layer">
 				<div :class="$style.plot" :style="{ backgroundImage: `url(${JSON.stringify(url)})` }"/>
@@ -160,24 +160,6 @@ function onError(ev: Event) {
 		padding: 50%;
 		pointer-events: none;
 
-		&.mask {
-			-webkit-mask:
-				url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><filter id="a"><feGaussianBlur in="SourceGraphic" stdDeviation="1"/></filter><circle cx="16" cy="16" r="15" filter="url(%23a)"/></svg>') center / 50% 50%,
-				linear-gradient(#fff, #fff);
-			-webkit-mask-composite: destination-out, source-over;
-			mask:
-				url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><filter id="a"><feGaussianBlur in="SourceGraphic" stdDeviation="1"/></filter><circle cx="16" cy="16" r="15" filter="url(%23a)"/></svg>') exclude center / 50% 50%,
-				linear-gradient(#fff, #fff); // polyfill of `image(#fff)`
-
-			> .earLeft {
-				animation: eartightleft 6s infinite;
-			}
-
-			> .earRight {
-				animation: eartightright 6s infinite;
-			}
-		}
-
 		> .earLeft,
 		> .earRight {
 			contain: strict;
@@ -228,7 +210,7 @@ function onError(ev: Event) {
 			transform: rotate(37.5deg) skew(30deg);
 
 			&, &::after {
-				border-radius: 0 75% 75%;
+				border-radius: 25% 75% 75%;
 			}
 
 			> .layer {
@@ -257,7 +239,7 @@ function onError(ev: Event) {
 			transform: rotate(-37.5deg) skew(-30deg);
 
 			&, &::after {
-				border-radius: 75% 0 75% 75%;
+				border-radius: 75% 25% 75% 75%;
 			}
 
 			> .layer {
