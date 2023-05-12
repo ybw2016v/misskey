@@ -15,10 +15,7 @@ url: https://example.tld/
 #───┘ Port and TLS settings └───────────────────────────────────
 
 #
-# Misskey supports two deployment options for public.
-#
-
-# Option 1: With Reverse Proxy
+# Misskey requires a reverse proxy to support HTTPS connections.
 #
 #                 +----- https://example.tld/ ------------+
 #   +------+      |+-------------+      +----------------+|
@@ -26,30 +23,12 @@ url: https://example.tld/
 #   +------+      |+-------------+      +----------------+|
 #                 +---------------------------------------+
 #
-#   You need to setup reverse proxy. (eg. nginx)
-#   You do not define 'https' section.
+#   You need to set up a reverse proxy. (e.g. nginx)
+#   An encrypted connection with HTTPS is highly recommended
+#   because tokens may be transferred in GET requests.
 
-# Option 2: Standalone
-#
-#                 +- https://example.tld/ -+
-#   +------+      |   +---------------+    |
-#   | User | ---> |   | Misskey (443) |    |
-#   +------+      |   +---------------+    |
-#                 +------------------------+
-#
-#   You need to run Misskey as root.
-#   You need to set Certificate in 'https' section.
-
-# To use option 1, uncomment below line.
-#port: 3000    # A port that your Misskey server should listen.
-
-# To use option 2, uncomment below lines.
-#port: 443
-
-#https:
-#  # path for certification
-#  key: /etc/letsencrypt/live/example.tld/privkey.pem
-#  cert: /etc/letsencrypt/live/example.tld/fullchain.pem
+# The port that your Misskey server should listen on.
+port: 3000
 
 #   ┌──────────────────────────┐
 #───┘ PostgreSQL configuration └────────────────────────────────
@@ -72,15 +51,49 @@ db:
   #extra:
   #  ssl: true
 
+dbReplications: false
+
+# You can configure any number of replicas here
+#dbSlaves:
+#  -
+#    host: 
+#    port: 
+#    db: 
+#    user: 
+#    pass: 
+#  -
+#    host: 
+#    port: 
+#    db: 
+#    user: 
+#    pass: 
+
 #   ┌─────────────────────┐
 #───┘ Redis configuration └─────────────────────────────────────
 
 redis:
   host: localhost
   port: 6379
+  #family: 0  # 0=Both, 4=IPv4, 6=IPv6
   #pass: example-pass
   #prefix: example-prefix
   #db: 1
+
+#redisForPubsub:
+#  host: localhost
+#  port: 6379
+#  #family: 0  # 0=Both, 4=IPv4, 6=IPv6
+#  #pass: example-pass
+#  #prefix: example-prefix
+#  #db: 1
+
+#redisForJobQueue:
+#  host: localhost
+#  port: 6379
+#  #family: 0  # 0=Both, 4=IPv4, 6=IPv6
+#  #pass: example-pass
+#  #prefix: example-prefix
+#  #db: 1
 
 #   ┌─────────────────────────────┐
 #───┘ Elasticsearch configuration └─────────────────────────────
@@ -134,18 +147,15 @@ id: 'aid'
 # IP address family used for outgoing request (ipv4, ipv6 or dual)
 #outgoingAddressFamily: ipv4
 
-# Syslog option
-#syslog:
-#  host: localhost
-#  port: 514
-
 # Proxy for HTTP/HTTPS
 #proxy: http://127.0.0.1:3128
 
-#proxyBypassHosts: [
-#  'example.com',
-#  '192.0.2.8'
-#]
+proxyBypassHosts:
+  - api.deepl.com
+  - api-free.deepl.com
+  - www.recaptcha.net
+  - hcaptcha.com
+  - challenges.cloudflare.com
 
 # Proxy for SMTP/SMTPS
 #proxySmtp: http://127.0.0.1:3128   # use HTTP/1.1 CONNECT
@@ -153,7 +163,27 @@ id: 'aid'
 #proxySmtp: socks5://127.0.0.1:1080 # use SOCKS5
 
 # Media Proxy
+# Reference Implementation: https://github.com/misskey-dev/media-proxy
+# * Deliver a common cache between instances
+# * Perform image compression (on a different server resource than the main process)
 #mediaProxy: https://example.com/proxy
 
-# Sign to ActivityPub GET request (default: false)
-#signToActivityPubGet: true
+# Proxy remote files (default: false)
+# Proxy remote files by this instance or mediaProxy to prevent remote files from running in remote domains.
+#proxyRemoteFiles: true
+
+# Movie Thumbnail Generation URL
+# There is no reference implementation.
+# For example, Misskey will point to the following URL:
+#   https://example.com/thumbnail.webp?thumbnail=1&url=https%3A%2F%2Fstorage.example.com%2Fpath%2Fto%2Fvideo.mp4
+#videoThumbnailGenerator: https://example.com
+
+# Sign to ActivityPub GET request (default: true)
+signToActivityPubGet: true
+
+#allowedPrivateNetworks: [
+#  '127.0.0.1/32'
+#]
+
+# Upload or download file size limits (bytes)
+#maxFileSize: 262144000

@@ -6,17 +6,41 @@
 /.idea
 
 # Node.js
-/node_modules
+node_modules
 report.*.json
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+packages/frontend/.yarn/cache
+packages/backend/.yarn/cache
+packages/sw/.yarn/cache
+
+# pnpm
+.pnpm-store
+
+# Cypress
+cypress/screenshots
+cypress/videos
+
+# Coverage
+coverage
 
 # config
 /.config/*
 !/.config/example.yml
+!/.config/docker_example.yml
 !/.config/docker_example.env
+docker-compose.yml
+!/.devcontainer/docker-compose.yml
 
 # misskey
 /build
-/built
+built
 /data
 /.cache-loader
 /db
@@ -31,6 +55,8 @@ api-docs.json
 .DS_Store
 /files
 ormconfig.json
+temp
+/packages/frontend/src/**/*.stories.ts
 
 # blender backups
 *.blend1

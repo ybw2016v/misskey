@@ -1,0 +1,99 @@
+name: Lint
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+
+jobs:
+  pnpm_install:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 0
+        submodules: true
+    - name: Setup SSH
+      uses: MrSquaare/ssh-setup-action@v1.0.1
+      with:
+        host: github.com
+        private-key: ${{ secrets.SSHKEY }}
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 7
+        run_install: false
+    - uses: actions/setup-node@v3.6.0
+      with:
+        node-version: 18.x
+        cache: 'pnpm'
+    - run: corepack enable
+    - run: pnpm i --frozen-lockfile
+
+  lint:
+    needs: [pnpm_install]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        workspace:
+        - backend
+        - frontend
+        - sw
+        - misskey-js
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 0
+        submodules: true
+    - name: Replace the github url
+      run: |
+        sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' package.json
+        sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/client/package.json
+        sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/backend/package.json
+        sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/sw/package.json
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 7
+        run_install: false
+    - uses: actions/setup-node@v3.6.0
+      with:
+        node-version: 18.x
+        cache: 'pnpm'
+    - run: corepack enable
+    - run: pnpm i --frozen-lockfile
+    - run: pnpm --filter ${{ matrix.workspace }} run eslint
+
+  typecheck:
+    needs: [pnpm_install]
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    strategy:
+      matrix:
+        workspace:
+        - backend
+        - misskey-js
+    steps:
+    - uses: actions/checkout@v3.3.0
+      with:
+        fetch-depth: 0
+        submodules: true
+    - name: Replace the github url
+      run: |
+        sed -i 's|ssh://git@github.com/|git+https://github.com/|g' package.json
+        sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/frontend/package.json
+        sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/backend/package.json
+        sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/sw/package.json
+        sed -i 's|git@github.com:|https://github.com/|g' .gitmodules
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 7
+        run_install: false
+    - uses: actions/setup-node@v3.6.0
+      with:
+        node-version: 18.x
+        cache: 'pnpm'
+    - run: corepack enable
+    - run: pnpm i --frozen-lockfile
+    - run: pnpm --filter ${{ matrix.workspace }} run lint

@@ -1,0 +1,6 @@
+[submodule "misskey-assets"]
+	path = misskey-assets
+	url = git@github.com:misskey-dev/assets.git
+[submodule "fluent-emojis"]
+	path = fluent-emojis
+	url = git@github.com:misskey-dev/emojis.git
