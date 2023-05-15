@@ -1,6 +1,6 @@
 <template>
 <MkA v-user-preview="canonical" :class="[$style.root, { [$style.isMe]: isMe }]" :to="url" :style="{ background: bgCss }">
-	<img :class="$style.icon" :src="`/avatar/@${username}@${host}`" alt="">
+	<img :class="$style.icon" :src="`/avatar/@${username}@${host}`" alt="" decoding="async" @error="onError">
 	<span>
 		<span :class="$style.username">@{{ username }}</span>
 		<span v-if="(host != localHost) || defaultStore.state.showFullAcct" :class="$style.host">@{{ toUnicode(host) }}</span>
@@ -32,6 +32,12 @@ const isMe = $i && (
 const bg = tinycolor(getComputedStyle(document.documentElement).getPropertyValue(isMe ? '--mentionMe' : '--mention'));
 bg.setAlpha(0.1);
 const bgCss = bg.toRgbString();
+
+function onError(ev: Event) {
+	let img = ev.target as HTMLImageElement;
+	img.src = "/static-assets/user-unknown.png";
+	img.onerror = null;
+}
 </script>
 
 <style lang="scss" module>
