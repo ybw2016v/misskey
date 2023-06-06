@@ -116,9 +116,9 @@
 			}
 		}
 	}
-	const colorSchema = localStorage.getItem('colorSchema');
-	if (colorSchema) {
-		document.documentElement.style.setProperty('color-schema', colorSchema);
+	const colorScheme = localStorage.getItem('colorScheme');
+	if (colorScheme) {
+		document.documentElement.style.setProperty('color-scheme', colorScheme);
 	}
 	//#endregion
 
@@ -163,9 +163,9 @@
 
 						<h1>⚠发生了一些事情</h1>
 						<p>这个页面通常会出现在版本更新后，浏览器缓存的旧的前端文件与新的后端不匹配，通常刷新后恢复正常。如反复刷新后仍然看到这样页面，说明可能出了一些不好的事情，可以通知Email: neko@neko.red来处理。</p>
-			<h1>An error has occurred!</h1>
-			<button class="button-big" onclick="location.reload();">
-				<span class="button-label-big">Refresh</span>
+			<h1>Failed to load<br>読み込みに失敗しました</h1>
+			<button class="button-big" onclick="location.reload(true);">
+				<span class="button-label-big">Reload / リロード</span>
 			</button>
 			<p class="dont-worry">Don't worry, it's (probably) not your fault.</p>
 			<p>If the problem persists after refreshing, please contact your instance's administrator.<br>You may also try the following options:</p>
@@ -195,6 +195,7 @@
 			errorsElement = document.getElementById('errors');
 		}
 		const detailsElement = document.createElement('details');
+		detailsElement.id = 'errorInfo';
 		detailsElement.innerHTML = `
 		<br>
 		<summary>
@@ -251,7 +252,7 @@
 		.button-label-big {
 			color: #222;
 			font-weight: bold;
-			font-size: 20px;
+			font-size: 1.2em;
 			padding: 12px;
 		}
 
@@ -271,11 +272,6 @@
 			font-size: 16px;
 		}
 
-		.dont-worry,
-		#msg {
-			font-size: 18px;
-		}
-
 		.icon-warning {
 			color: #dec340;
 			height: 4rem;
@@ -283,14 +279,15 @@
 		}
 
 		h1 {
-			font-size: 32px;
+			font-size: 1.5em;
+			margin: 1em;
 		}
 
 		code {
 			font-family: Fira, FiraCode, monospace;
 		}
 
-		details {
+		#errorInfo {
 			background: #333;
 			margin-bottom: 2rem;
 			padding: 0.5rem 1rem;
@@ -300,16 +297,16 @@
 			margin: auto;
 		}
 
-		summary {
+		#errorInfo summary {
 			cursor: pointer;
 		}
 
-		summary > * {
+		#errorInfo summary > * {
 			display: inline;
 		}
 
 		@media screen and (max-width: 500px) {
-			details {
+			#errorInfo {
 				width: 50%;
 			}
 		`)
