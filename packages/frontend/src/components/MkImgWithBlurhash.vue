@@ -10,7 +10,7 @@
 		:leaveFromClass="defaultStore.state.animation && props.transition?.leaveFromClass || undefined"
 	>
 		<canvas v-show="hide" key="canvas" ref="canvas" :class="$style.canvas" :width="canvasWidth" :height="canvasHeight" :title="title ?? undefined"/>
-		<img v-show="!hide" key="img" ref="img" :height="imgHeight" :width="imgWidth" :class="$style.img" :src="src ?? undefined" :title="title ?? undefined" :alt="alt ?? undefined" loading="eager" decoding="async"/>
+		<img v-show="!hide" key="img" ref="img" :height="imgHeight" :width="imgWidth" :class="$style.img" :src="src ?? undefined" :title="title ?? undefined" :alt="alt ?? undefined" loading="eager" decoding="async" @error="onError"/>
 	</TransitionGroup>
 </div>
 </template>
@@ -208,6 +208,12 @@ onUnmounted(() => {
 		worker?.removeListener(workerOnMessage);
 	});
 });
+
+function onError(ev: Event) {
+	let img = ev.target as HTMLImageElement;
+	img.src = "/static-assets/user-unknown.png";
+	img.onerror = null;
+}
 </script>
 
 <style lang="scss" module>
