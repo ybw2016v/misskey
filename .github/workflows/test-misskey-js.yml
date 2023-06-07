@@ -39,7 +39,9 @@ jobs:
           cache: 'pnpm'
 
       - name: Install dependencies
-        run: pnpm i --frozen-lockfile
+        run: pnpm i --lockfile-only
+      - name: Install dependencies2
+        run: pnpm i
 
       - name: Check pnpm-lock.yaml
         run: git diff --exit-code pnpm-lock.yaml
