@@ -62,7 +62,8 @@ jobs:
         node-version-file: '.node-version'
         cache: 'pnpm'
     - run: corepack enable
-    - run: pnpm i --frozen-lockfile
+    - run: pnpm i --lockfile-only
+    - run: pnpm i 
     - run: pnpm --filter ${{ matrix.workspace }} run eslint
 
   typecheck:
@@ -95,5 +96,6 @@ jobs:
         node-version-file: '.node-version'
         cache: 'pnpm'
     - run: corepack enable
-    - run: pnpm i --frozen-lockfile
+    - run: pnpm i --lockfile-only
+    - run: pnpm i
     - run: pnpm --filter ${{ matrix.workspace }} run lint
