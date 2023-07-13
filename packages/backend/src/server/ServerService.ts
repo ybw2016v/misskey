@@ -201,7 +201,7 @@ export class ServerService implements OnApplicationShutdown {
 		fastify.server.on('error', err => {
 			switch ((err as any).code) {
 				case 'EACCES':
-					this.logger.error(`You do not have permission to listen on port ${this.config.port}.`);
+					this.logger.error(!this.config.socket ?`You do not have permission to listen on port ${this.config.port}.`: `You do not have permission to listen on socket ${this.config.socket}.`);
 					break;
 				case 'EADDRINUSE':
 					this.logger.error(`Port ${this.config.port} is already in use by another process.`);
@@ -218,15 +218,24 @@ export class ServerService implements OnApplicationShutdown {
 				process.exit(1);
 			}
 		});
+		if (this.config.socket) {
+			fs.unlinkSync(this.config.socket);
+			fastify.listen({ path: this.config.socket }, (err, address) => {
+				if (this.config.chmodSocket) {
+					fs.chmodSync(this.config.socket!, this.config.chmodSocket);
+				}
+			});
+		} else {
+			fastify.listen({ port: this.config.port, host: '0.0.0.0' });
+		}
 
-		fastify.listen({ port: this.config.port, host: '0.0.0.0' });
 
 		await fastify.ready();
 	}
 
 	@bindThis
 	public async dispose(): Promise<void> {
-    await this.streamingApiServerService.detach();
+		await this.streamingApiServerService.detach();
 		await this.#fastify.close();
 	}
 
