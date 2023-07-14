@@ -219,9 +219,12 @@ export class ServerService implements OnApplicationShutdown {
 			}
 		});
 		if (this.config.socket) {
-			fs.unlinkSync(this.config.socket);
+			if (fs.existsSync(this.config.socket)) {
+				fs.unlinkSync(this.config.socket);
+			}
 			fastify.listen({ path: this.config.socket }, (err, address) => {
 				if (this.config.chmodSocket) {
+					console.log(`chmod ${this.config.chmodSocket} ${this.config.socket}`);
 					fs.chmodSync(this.config.socket!, this.config.chmodSocket);
 				}
 			});

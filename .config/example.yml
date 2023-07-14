@@ -32,7 +32,7 @@ port: 3000
 
 # You can also use UNIX domain socket.
 # socket: /path/to/misskey.sock
-# chmodSocket: 0666
+# chmodSocket: '766'
 
 #   ┌──────────────────────────┐
 #───┘ PostgreSQL configuration └────────────────────────────────
