@@ -226,6 +226,7 @@ function onError(ev: Event) {
 	let img = ev.target as HTMLImageElement;
 	img.src = "/static-assets/user-unknown.png";
 	img.onerror = null;
+	loaded = true;
 }
 </script>
 
