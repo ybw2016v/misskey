@@ -63,7 +63,7 @@ export class ApImageService {
 		// 2. or the image is not sensitive
 		const shouldBeCached = instance.cacheRemoteFiles && (instance.cacheRemoteSensitiveFiles || !image.sensitive);
 
-		const file = await this.driveService.uploadFromUrl({
+		let file = await this.driveService.uploadFromUrl({
 			url: image.url,
 			user: actor,
 			uri: image.url,
