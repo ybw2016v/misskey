@@ -2,9 +2,17 @@ import isAnimated from 'is-file-animated';
 import { isWebpSupported } from './isWebpSupported';
 import type { BrowserImageResizerConfig } from 'browser-image-resizer';
 
+// 维持原状更好一些
+// const compressTypeMap = {
+// 	'image/jpeg': { quality: 0.90, mimeType: 'image/webp' },
+// 	'image/png': { quality: 1, mimeType: 'image/webp' },
+// 	'image/webp': { quality: 0.90, mimeType: 'image/webp' },
+// 	'image/svg+xml': { quality: 1, mimeType: 'image/webp' },
+// } as const;
+
 const compressTypeMap = {
-	'image/jpeg': { quality: 0.90, mimeType: 'image/webp' },
-	'image/png': { quality: 1, mimeType: 'image/webp' },
+	'image/jpeg': { quality: 0.85, mimeType: 'image/jpeg' },
+	'image/png': { quality: 1, mimeType: 'image/png' },
 	'image/webp': { quality: 0.90, mimeType: 'image/webp' },
 	'image/svg+xml': { quality: 1, mimeType: 'image/webp' },
 } as const;
