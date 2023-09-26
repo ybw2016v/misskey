@@ -14,7 +14,7 @@ jobs:
     env:
       DOCKER_CONTENT_TRUST: 1
     steps:
-      - uses: actions/checkout@v3.2.0
+      - uses: actions/checkout@v4.1.0
       - name: Replace the github url
         run: |
           sed -i 's|ssh://git@github.com/|git+https://github.com/|g' package.json
