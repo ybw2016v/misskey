@@ -9,7 +9,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3.3.0
+        uses: actions/checkout@v4.1.0
       - name: Replace the github url
         run: |
           sed -i 's|ssh://git@github.com/|git+https://github.com/|g' package.json
@@ -21,7 +21,7 @@ jobs:
       - run: corepack enable
 
       - name: Setup Node.js
-        uses: actions/setup-node@v3.6.0
+        uses: actions/setup-node@v3.8.1
         with:
           node-version-file: '.node-version'
           cache: 'pnpm'
