@@ -22,7 +22,7 @@ jobs:
       with:
         submodules: true
     - name: Setup SSH
-      uses: MrSquaare/ssh-setup-action@v1.0.1
+      uses: MrSquaare/ssh-setup-action@v3.0.0
       with:
         host: github.com
         private-key: ${{ secrets.SSHKEY }}
@@ -85,7 +85,7 @@ jobs:
     #- uses: browser-actions/setup-firefox@latest
     #  if: ${{ matrix.browser == 'firefox' }}
     - name: Setup SSH
-      uses: MrSquaare/ssh-setup-action@v1.0.1
+      uses: MrSquaare/ssh-setup-action@v3.0.0
       with:
         host: github.com
         private-key: ${{ secrets.SSHKEY }}
