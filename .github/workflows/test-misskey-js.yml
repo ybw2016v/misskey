@@ -21,7 +21,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.0
+        uses: actions/checkout@v4
       - name: Replace the github url
         run: |
           sed -i 's|ssh://git@github.com/|git+https://github.com/|g' package.json
