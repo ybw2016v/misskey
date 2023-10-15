@@ -20,6 +20,48 @@ export class RedisTimelineService {
 	}
 
 	@bindThis
+	public isexist(tl: string) {
+		return this.redisForTimelines.exists('list:' + tl);
+		// 检查redis键是否存在
+	}
+
+	@bindThis
+	public async pushexist(tl: string, id: string, maxlen: number, pipeline: Redis.ChainableCommander) {
+		this.redisForTimelines.exists('list:' + tl).then(exist => {
+			if (exist > 0) {
+				if (this.idService.parse(id).date.getTime() > Date.now() - 1000 * 60 * 3) {
+					this.redisForTimelines.lpush('list:' + tl, id);
+					if (Math.random() < 0.1) { // 10%の確率でトリム
+						this.redisForTimelines.ltrim('list:' + tl, 0, maxlen - 1);
+					}
+				} else {
+					// 末尾のIDを取得
+					this.redisForTimelines.lindex('list:' + tl, -1).then(lastId => {
+						if (lastId == null || (this.idService.parse(id).date.getTime() > this.idService.parse(lastId).date.getTime())) {
+							this.redisForTimelines.lpush('list:' + tl, id);
+						} else {
+							Promise.resolve();
+						}
+					});
+				}
+			}
+		})
+		// 只向存在的键插入数据
+	}
+
+	@bindThis
+	public keyexpire(tl: string, extime: number) {
+		this.redisForTimelines.expire('list:' + tl, extime);
+		// 设置过期时间
+	}
+
+	@bindThis
+	public pushall(tl: string, id: string) {
+		this.redisForTimelines.lpush('list:' + tl, id);
+	}
+
+
+	@bindThis
 	public push(tl: string, id: string, maxlen: number, pipeline: Redis.ChainableCommander) {
 		// リモートから遅れて届いた(もしくは後から追加された)投稿日時が古い投稿が追加されるとページネーション時に問題を引き起こすため、
 		// 3分以内に投稿されたものでない場合、Redisにある最古のIDより新しい場合のみ追加する
