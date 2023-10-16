@@ -131,6 +131,9 @@ export type Config = {
 	proxy: string | undefined;
 	proxySmtp: string | undefined;
 	proxyBypassHosts: string[] | undefined;
+	forwordHost: string | undefined;
+	forwordToken: string | undefined;
+	forwordHosts: string[] | undefined;
 	allowedPrivateNetworks: string[] | undefined;
 	maxFileSize: number | undefined;
 	clusterLimit: number | undefined;
@@ -171,6 +174,7 @@ export type Config = {
 	perUserNotificationsMaxCount: number;
 	deactivateAntennaThreshold: number;
 	pidFile: string;
+
 };
 
 const _filename = fileURLToPath(import.meta.url);
@@ -238,6 +242,9 @@ export function loadConfig(): Config {
 		proxy: config.proxy,
 		proxySmtp: config.proxySmtp,
 		proxyBypassHosts: config.proxyBypassHosts,
+		forwordHost: config.forwordHost,
+		forwordToken: config.forwordToken,
+		forwordHosts: config.forwordHosts,
 		allowedPrivateNetworks: config.allowedPrivateNetworks,
 		maxFileSize: config.maxFileSize,
 		clusterLimit: config.clusterLimit,
