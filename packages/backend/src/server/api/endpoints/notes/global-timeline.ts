@@ -63,7 +63,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const policies = await this.roleService.getUserPolicies(me ? me.id : null);
-			if (!policies.gtlAvailable) {
+			if (!policies.gtlAvailable || !me) {
 				throw new ApiError(meta.errors.gtlDisabled);
 			}
 
