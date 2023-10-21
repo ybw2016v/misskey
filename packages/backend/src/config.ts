@@ -47,6 +47,7 @@ type Source = {
 	redis: RedisOptionsSource;
 	redisForPubsub?: RedisOptionsSource;
 	redisForJobQueue?: RedisOptionsSource;
+	redisForTimelines?: RedisOptionsSource;
 	meilisearch?: {
 		host: string;
 		port: string;
@@ -130,6 +131,9 @@ export type Config = {
 	proxy: string | undefined;
 	proxySmtp: string | undefined;
 	proxyBypassHosts: string[] | undefined;
+	forwordHost: string | undefined;
+	forwordToken: string | undefined;
+	forwordHosts: string[] | undefined;
 	allowedPrivateNetworks: string[] | undefined;
 	maxFileSize: number | undefined;
 	clusterLimit: number | undefined;
@@ -165,10 +169,12 @@ export type Config = {
 	redis: RedisOptions & RedisOptionsSource;
 	redisForPubsub: RedisOptions & RedisOptionsSource;
 	redisForJobQueue: RedisOptions & RedisOptionsSource;
+	redisForTimelines: RedisOptions & RedisOptionsSource;
 	perChannelMaxNoteCacheCount: number;
 	perUserNotificationsMaxCount: number;
 	deactivateAntennaThreshold: number;
 	pidFile: string;
+
 };
 
 const _filename = fileURLToPath(import.meta.url);
@@ -231,10 +237,14 @@ export function loadConfig(): Config {
 		redis,
 		redisForPubsub: config.redisForPubsub ? convertRedisOptions(config.redisForPubsub, host) : redis,
 		redisForJobQueue: config.redisForJobQueue ? convertRedisOptions(config.redisForJobQueue, host) : redis,
+		redisForTimelines: config.redisForTimelines ? convertRedisOptions(config.redisForTimelines, host) : redis,
 		id: config.id,
 		proxy: config.proxy,
 		proxySmtp: config.proxySmtp,
 		proxyBypassHosts: config.proxyBypassHosts,
+		forwordHost: config.forwordHost,
+		forwordToken: config.forwordToken,
+		forwordHosts: config.forwordHosts,
 		allowedPrivateNetworks: config.allowedPrivateNetworks,
 		maxFileSize: config.maxFileSize,
 		clusterLimit: config.clusterLimit,
