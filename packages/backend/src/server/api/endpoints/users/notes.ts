@@ -75,6 +75,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private cacheService: CacheService,
 		private idService: IdService,
 		private funoutTimelineService: FunoutTimelineService,
+		private metaService: MetaService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
 			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
