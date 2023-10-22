@@ -10,7 +10,7 @@ import { bindThis } from '@/decorators.js';
 import { IdService } from '@/core/IdService.js';
 
 @Injectable()
-export class RedisTimelineService {
+export class FunoutTimelineService {
 	constructor(
 		@Inject(DI.redisForTimelines)
 		private redisForTimelines: Redis.Redis,
@@ -118,5 +118,10 @@ export class RedisTimelineService {
 							: ids.sort((a, b) => a > b ? -1 : 1),
 			);
 		});
+	}
+
+	@bindThis
+	public purge(name: string) {
+		return this.redisForTimelines.del('list:' + name);
 	}
 }
