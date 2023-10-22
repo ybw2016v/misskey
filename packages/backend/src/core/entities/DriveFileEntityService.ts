@@ -17,6 +17,7 @@ import { deepClone } from '@/misc/clone.js';
 import { bindThis } from '@/decorators.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
 import { isNotNull } from '@/misc/is-not-null.js';
+import { IdService } from '@/core/IdService.js';
 import { UtilityService } from '../UtilityService.js';
 import { VideoProcessingService } from '../VideoProcessingService.js';
 import { UserEntityService } from './UserEntityService.js';
@@ -44,6 +45,7 @@ export class DriveFileEntityService {
 		private utilityService: UtilityService,
 		private driveFolderEntityService: DriveFolderEntityService,
 		private videoProcessingService: VideoProcessingService,
+		private idService: IdService,
 	) {
 	}
 
@@ -88,7 +90,7 @@ export class DriveFileEntityService {
 		if (file.type.startsWith('video')) {
 			if (file.thumbnailUrl) return file.thumbnailUrl;
 
-			return this.videoProcessingService.getExternalVideoThumbnailUrl(file.webpublicUrl ?? file.url ?? file.uri);
+			return this.videoProcessingService.getExternalVideoThumbnailUrl(file.webpublicUrl ?? file.url);
 		} else if (file.uri != null && file.userHost != null && this.config.externalMediaProxyEnabled) {
 			// 動画ではなくリモートかつメディアプロキシ
 			return this.getProxiedUrl(file.uri, 'static');
@@ -149,7 +151,7 @@ export class DriveFileEntityService {
 			.select('SUM(file.size)', 'sum')
 			.getRawOne();
 
-		return parseInt(sum, 10) ?? 0;
+		return parseInt(sum, 10) || 0;
 	}
 
 	@bindThis
@@ -161,7 +163,7 @@ export class DriveFileEntityService {
 			.select('SUM(file.size)', 'sum')
 			.getRawOne();
 
-		return parseInt(sum, 10) ?? 0;
+		return parseInt(sum, 10) || 0;
 	}
 
 	@bindThis
@@ -173,7 +175,7 @@ export class DriveFileEntityService {
 			.select('SUM(file.size)', 'sum')
 			.getRawOne();
 
-		return parseInt(sum, 10) ?? 0;
+		return parseInt(sum, 10) || 0;
 	}
 
 	@bindThis
@@ -185,7 +187,7 @@ export class DriveFileEntityService {
 			.select('SUM(file.size)', 'sum')
 			.getRawOne();
 
-		return parseInt(sum, 10) ?? 0;
+		return parseInt(sum, 10) || 0;
 	}
 
 	@bindThis
@@ -202,7 +204,7 @@ export class DriveFileEntityService {
 
 		return await awaitAll<Packed<'DriveFile'>>({
 			id: file.id,
-			createdAt: file.createdAt.toISOString(),
+			createdAt: this.idService.parse(file.id).date.toISOString(),
 			name: file.name,
 			type: file.type,
 			md5: file.md5,
@@ -237,7 +239,7 @@ export class DriveFileEntityService {
 
 		return await awaitAll<Packed<'DriveFile'>>({
 			id: file.id,
-			createdAt: file.createdAt.toISOString(),
+			createdAt: this.idService.parse(file.id).date.toISOString(),
 			name: file.name,
 			type: file.type,
 			md5: file.md5,
