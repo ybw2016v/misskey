@@ -339,7 +339,7 @@ importers:
         specifier: 0.32.6
         version: 0.32.6
       sharp-read-bmp:
-        specifier: github:misskey-dev/sharp-read-bmp
+        specifier: ssh://github.com:misskey-dev/sharp-read-bmp
         version: github.com/misskey-dev/sharp-read-bmp/02d9dc189fa7df0c4bea09330be26741772dac01
       slacc:
         specifier: 0.0.10
@@ -351,7 +351,7 @@ importers:
         specifier: 2.1.0
         version: 2.1.0
       summaly:
-        specifier: github:misskey-dev/summaly
+        specifier: ssh://github.com:misskey-dev/summaly
         version: github.com/misskey-dev/summaly/d2d8db49943ccb201c1b1b283e9d0a630519fac7
       systeminformation:
         specifier: 5.21.12
@@ -683,7 +683,7 @@ importers:
         specifier: 5.5.0
         version: 5.5.0
       browser-image-resizer:
-        specifier: github:misskey-dev/browser-image-resizer#v2.2.1-misskey.3
+        specifier: ssh://git@github.com/misskey-dev/browser-image-resizer#v2.2.1-misskey.3
         version: github.com/misskey-dev/browser-image-resizer/0227e860621e55cbed0aabe6dc601096a7748c4a
       buraha:
         specifier: 0.0.1
@@ -978,10 +978,10 @@ importers:
         specifier: 7.5.1
         version: 7.5.1
       storybook-addon-misskey-theme:
-        specifier: github:misskey-dev/storybook-addon-misskey-theme
+        specifier: ssh://git@github.com/misskey-dev/storybook-addon-misskey-theme
         version: github.com/misskey-dev/storybook-addon-misskey-theme/cf583db098365b2ccc81a82f63ca9c93bc32b640(@storybook/blocks@7.5.1)(@storybook/components@7.5.1)(@storybook/core-events@7.5.1)(@storybook/manager-api@7.5.1)(@storybook/preview-api@7.5.1)(@storybook/theming@7.5.1)(@storybook/types@7.5.1)(react-dom@18.2.0)(react@18.2.0)
       summaly:
-        specifier: github:misskey-dev/summaly
+        specifier: ssh://git@github.com/misskey-dev/summaly
         version: github.com/misskey-dev/summaly/d2d8db49943ccb201c1b1b283e9d0a630519fac7
       vite-plugin-turbosnap:
         specifier: 1.0.3
