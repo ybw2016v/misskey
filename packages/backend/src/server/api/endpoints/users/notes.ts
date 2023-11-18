@@ -15,7 +15,7 @@ import { IdService } from '@/core/IdService.js';
 import { MetaService } from '@/core/MetaService.js';
 import { isUserRelated } from '@/misc/is-user-related.js';
 import { QueryService } from '@/core/QueryService.js';
-import { RedisTimelineService } from '@/core/RedisTimelineService.js';
+import { FunoutTimelineService } from '@/core/FunoutTimelineService.js';
 import { ApiError } from '../../error.js';
 
 export const meta = {
@@ -74,13 +74,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		private queryService: QueryService,
 		private cacheService: CacheService,
 		private idService: IdService,
-		private redisTimelineService: RedisTimelineService,
-
+		private funoutTimelineService: FunoutTimelineService,
 		private metaService: MetaService,
 	) {
 		super(meta, paramDef, async (ps, me) => {
-			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.genId(new Date(ps.untilDate!)) : null);
-			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.genId(new Date(ps.sinceDate!)) : null);
+			const untilId = ps.untilId ?? (ps.untilDate ? this.idService.gen(ps.untilDate!) : null);
+			const sinceId = ps.sinceId ?? (ps.sinceDate ? this.idService.gen(ps.sinceDate!) : null);
 			const isRangeSpecified = untilId != null && sinceId != null;
 			const isSelf = me && (me.id === ps.userId);
 
@@ -91,7 +90,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					this.cacheService.userMutingsCache.fetch(me.id),
 				]) : [new Set<string>()];
 
-				const usertimelineexist = await this.redisTimelineService.isexist(ps.withFiles ? `userTimelineWithFiles:${ps.userId}` : `userTimeline:${ps.userId}`);
+				const usertimelineexist = await this.funoutTimelineService.isexist(ps.withFiles ? `userTimelineWithFiles:${ps.userId}` : `userTimeline:${ps.userId}`);
 				if (usertimelineexist === 0) {
 					const queryutl = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note')).andWhere('note.userId = :userId', { userId: ps.userId })
 						.innerJoinAndSelect('note.user', 'user')
@@ -114,18 +113,18 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					const timelineutl = await queryutl.limit(limnum).getMany();
 					for (const note of timelineutl) {
 						if (note.replyId == null) {
-							this.redisTimelineService.pushall(ps.withFiles ? `userTimelineWithFiles:${ps.userId}` : `userTimeline:${ps.userId}`, note.id);
+							this.funoutTimelineService.pushall(ps.withFiles ? `userTimelineWithFiles:${ps.userId}` : `userTimeline:${ps.userId}`, note.id);
 						}
 					}
-					const utlrpexist = await this.redisTimelineService.isexist(`userTimelineWithReplies:${ps.userId}`);
+					const utlrpexist = await this.funoutTimelineService.isexist(`userTimelineWithReplies:${ps.userId}`);
 					if (utlrpexist === 0) {
 						for (const note of timelineutl) {
 							if (note.replyId != null) {
-								this.redisTimelineService.pushall(`userTimelineWithReplies:${ps.userId}`, note.id);
+								this.funoutTimelineService.pushall(`userTimelineWithReplies:${ps.userId}`, note.id);
 							}
 						}
 					}
-					const utlcexist = await this.redisTimelineService.isexist(`userTimelineWithChannel:${ps.userId}`);
+					const utlcexist = await this.funoutTimelineService.isexist(`userTimelineWithChannel:${ps.userId}`);
 					if (utlrpexist === 0) {
 						const querycl = this.queryService.makePaginationQuery(this.notesRepository.createQueryBuilder('note')).andWhere('note.userId = :userId', { userId: ps.userId })
 							.innerJoinAndSelect('note.user', 'user')
@@ -142,20 +141,20 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 						if (!isSelf) querycl.andWhere('channel.isSensitive = false');
 						const timelinecl = await querycl.limit(limnum).getMany();
 						for (const note of timelinecl) {
-							this.redisTimelineService.pushall(`userTimelineWithReplies:${ps.userId}`, note.id);
+							this.funoutTimelineService.pushall(`userTimelineWithReplies:${ps.userId}`, note.id);
 						}
 					}
 				}
 
 
 				const [noteIdsRes, repliesNoteIdsRes, channelNoteIdsRes] = await Promise.all([
-					this.redisTimelineService.get(ps.withFiles ? `userTimelineWithFiles:${ps.userId}` : `userTimeline:${ps.userId}`, untilId, sinceId),
-					ps.withReplies ? this.redisTimelineService.get(`userTimelineWithReplies:${ps.userId}`, untilId, sinceId) : Promise.resolve([]),
-					ps.withChannelNotes ? this.redisTimelineService.get(`userTimelineWithChannel:${ps.userId}`, untilId, sinceId) : Promise.resolve([]),
+					this.funoutTimelineService.get(ps.withFiles ? `userTimelineWithFiles:${ps.userId}` : `userTimeline:${ps.userId}`, untilId, sinceId),
+					ps.withReplies ? this.funoutTimelineService.get(`userTimelineWithReplies:${ps.userId}`, untilId, sinceId) : Promise.resolve([]),
+					ps.withChannelNotes ? this.funoutTimelineService.get(`userTimelineWithChannel:${ps.userId}`, untilId, sinceId) : Promise.resolve([]),
 				]);
-				this.redisTimelineService.keyexpire(ps.withFiles ? `userTimelineWithFiles:${ps.userId}` : `userTimeline:${ps.userId}`,60*60*24*7);
-				this.redisTimelineService.keyexpire(`userTimelineWithReplies:${ps.userId}`,60*60*24*7);
-				this.redisTimelineService.keyexpire(`userTimelineWithChannel:${ps.userId}`,60*60*24*7);
+				this.funoutTimelineService.keyexpire(ps.withFiles ? `userTimelineWithFiles:${ps.userId}` : `userTimeline:${ps.userId}`,60*60*24*7);
+				this.funoutTimelineService.keyexpire(`userTimelineWithReplies:${ps.userId}`,60*60*24*7);
+				this.funoutTimelineService.keyexpire(`userTimelineWithChannel:${ps.userId}`,60*60*24*7);
 
 				let noteIds = Array.from(new Set([
 					...noteIdsRes,
@@ -220,7 +219,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 					.leftJoinAndSelect('renote.user', 'renoteUser');
 
 				if (ps.withChannelNotes) {
-					if (!isSelf) query.andWhere('channel.isSensitive = false');
+					if (!isSelf) query.andWhere(new Brackets(qb => {
+					qb.orWhere('note.channelId IS NULL');
+					qb.orWhere('channel.isSensitive = false');
+				}));
 				} else {
 					query.andWhere('note.channelId IS NULL');
 				}
