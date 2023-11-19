@@ -106,75 +106,75 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (exist != 0) {
 				let noteIds = await this.funoutTimelineService.get(ps.withFiles ? `homeTimelineWithFiles:${me.id}` : `homeTimeline:${me.id}`, untilId, sinceId);
-				this.funoutTimelineService.keyexpire(ps.withFiles ? `homeTimelineWithFiles:${me.id}` : `homeTimeline:${me.id}`,60*60*24*7);
-			noteIds = noteIds.slice(0, ps.limit);
+				this.funoutTimelineService.keyexpire(ps.withFiles ? `homeTimelineWithFiles:${me.id}` : `homeTimeline:${me.id}`, 60 * 60 * 24 * 7);
+				noteIds = noteIds.slice(0, ps.limit);
 
-			let redisTimeline: MiNote[] = [];
+				let redisTimeline: MiNote[] = [];
 
-			if (noteIds.length > 0) {
-				const query = this.notesRepository.createQueryBuilder('note')
-					.where('note.id IN (:...noteIds)', { noteIds: noteIds })
-					.innerJoinAndSelect('note.user', 'user')
-					.leftJoinAndSelect('note.reply', 'reply')
-					.leftJoinAndSelect('note.renote', 'renote')
-					.leftJoinAndSelect('reply.user', 'replyUser')
-					.leftJoinAndSelect('renote.user', 'renoteUser')
-					.leftJoinAndSelect('note.channel', 'channel');
+				if (noteIds.length > 0) {
+					const query = this.notesRepository.createQueryBuilder('note')
+						.where('note.id IN (:...noteIds)', { noteIds: noteIds })
+						.innerJoinAndSelect('note.user', 'user')
+						.leftJoinAndSelect('note.reply', 'reply')
+						.leftJoinAndSelect('note.renote', 'renote')
+						.leftJoinAndSelect('reply.user', 'replyUser')
+						.leftJoinAndSelect('renote.user', 'renoteUser')
+						.leftJoinAndSelect('note.channel', 'channel');
 
-				redisTimeline = await query.getMany();
+					redisTimeline = await query.getMany();
 
-				redisTimeline = redisTimeline.filter(note => {
-					if (note.userId === me.id) {
-						return true;
-					}
-					if (isUserRelated(note, userIdsWhoBlockingMe)) return false;
-					if (isUserRelated(note, userIdsWhoMeMuting)) return false;
-					if (note.renoteId) {
-						if (note.text == null && note.fileIds.length === 0 && !note.hasPoll) {
-							if (isUserRelated(note, userIdsWhoMeMutingRenotes)) return false;
-							if (ps.withRenotes === false) return false;
+					redisTimeline = redisTimeline.filter(note => {
+						if (note.userId === me.id) {
+							return true;
 						}
-					}
-					if (note.reply && note.reply.visibility === 'followers') {
-						if (!Object.hasOwn(followings, note.reply.userId)) return false;
-					}
+						if (isUserRelated(note, userIdsWhoBlockingMe)) return false;
+						if (isUserRelated(note, userIdsWhoMeMuting)) return false;
+						if (note.renoteId) {
+							if (note.text == null && note.fileIds.length === 0 && !note.hasPoll) {
+								if (isUserRelated(note, userIdsWhoMeMutingRenotes)) return false;
+								if (ps.withRenotes === false) return false;
+							}
+						}
+						if (note.reply && note.reply.visibility === 'followers') {
+							if (!Object.hasOwn(followings, note.reply.userId)) return false;
+						}
 
-					return true;
-				});
+						return true;
+					});
 
-				redisTimeline.sort((a, b) => a.id > b.id ? -1 : 1);
-			}
-
-			if (redisTimeline.length > 0) {
-				process.nextTick(() => {
-					this.activeUsersChart.read(me);
-				});
-
-				return await this.noteEntityService.packMany(redisTimeline, me);
-			} else {
-				if (serverSettings.enableFanoutTimelineDbFallback) { // fallback to db
-					const timeline =  await this.getFromDb({
-						untilId,
-						sinceId,
-						limit: ps.limit,
-						includeMyRenotes: ps.includeMyRenotes,
-						includeRenotedMyNotes: ps.includeRenotedMyNotes,
-						includeLocalRenotes: ps.includeLocalRenotes,
-						withFiles: ps.withFiles,
-						withRenotes: ps.withRenotes,
-					}, me);
-					
-					return await this.noteEntityService.packMany(timeline, me);
-				} else {
-					return [];
+					redisTimeline.sort((a, b) => a.id > b.id ? -1 : 1);
 				}
-			}
+
+				if (redisTimeline.length > 0) {
+					process.nextTick(() => {
+						this.activeUsersChart.read(me);
+					});
+
+					return await this.noteEntityService.packMany(redisTimeline, me);
+				} else {
+					if (serverSettings.enableFanoutTimelineDbFallback) { // fallback to db
+						const timeline = await this.getFromDb({
+							untilId,
+							sinceId,
+							limit: ps.limit,
+							includeMyRenotes: ps.includeMyRenotes,
+							includeRenotedMyNotes: ps.includeRenotedMyNotes,
+							includeLocalRenotes: ps.includeLocalRenotes,
+							withFiles: ps.withFiles,
+							withRenotes: ps.withRenotes,
+						}, me);
+
+						return await this.noteEntityService.packMany(timeline, me);
+					} else {
+						return [];
+					}
+				}
 
 			} else { // 重建缓存
 				const timeline = await this.getFromDb({
 					untilId,
 					sinceId,
-					limit: ps.withFiles ? serverSettings.perUserHomeTimelineCacheMax/2:serverSettings.perUserHomeTimelineCacheMax,
+					limit: ps.withFiles ? serverSettings.perUserHomeTimelineCacheMax / 2 : serverSettings.perUserHomeTimelineCacheMax,
 					includeMyRenotes: ps.includeMyRenotes,
 					includeRenotedMyNotes: ps.includeRenotedMyNotes,
 					includeLocalRenotes: ps.includeLocalRenotes,
@@ -183,14 +183,14 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				}, me);
 
 				for (const note of timeline) {
-					this.funoutTimelineService.pushall(ps.withFiles ? `homeTimelineWithFiles:${me.id}` : `homeTimeline:${me.id}`,note.id);
+					this.funoutTimelineService.pushall(ps.withFiles ? `homeTimelineWithFiles:${me.id}` : `homeTimeline:${me.id}`, note.id);
 				}
 				const timelines = timeline.slice(0, ps.limit);
-				this.funoutTimelineService.keyexpire(ps.withFiles ? `homeTimelineWithFiles:${me.id}` : `homeTimeline:${me.id}`,60*60*24*7);
+				this.funoutTimelineService.keyexpire(ps.withFiles ? `homeTimelineWithFiles:${me.id}` : `homeTimeline:${me.id}`, 60 * 60 * 24 * 7);
 				return await this.noteEntityService.packMany(timeline, me);
 			}
 
-			
+
 		});
 	}
 
