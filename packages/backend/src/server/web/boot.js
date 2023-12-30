@@ -174,6 +174,7 @@
 			</button>
 			<p class="dont-worry">Don't worry, it's (probably) not your fault.</p>
 			<p>If the problem persists after refreshing, please contact your instance's administrator.<br>You may also try the following options:</p>
+	 		<p>&#40;Tor Browser&#41; Set dom.webaudio.enabled to true / dom.webaudio.enabledをtrueに設定する</p>
 			<p>这个页面通常会出现在版本更新后，浏览器缓存的旧的前端文件与新的后端不匹配，通常刷新后恢复正常。如反复刷新后仍然看到这样页面，说明可能出了一些不好的事情，可以通知Email: neko@neko.red来处理。</p>
 	  <a href="/flush">
 	  <button class="button-small">
