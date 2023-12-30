@@ -19,12 +19,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed, inject } from 'vue';
+import { computed, inject, ref } from 'vue';
 // import { getProxiedImageUrl, getStaticImageUrl } from '@/scripts/media-proxy.js';
 // import { defaultStore } from '@/store.js';
 import { customEmojisMap } from '@/custom-emojis.js';
 import * as os from '@/os.js';
 import copyToClipboard from '@/scripts/copy-to-clipboard.js';
+import * as sound from '@/scripts/sound.js';
 import { i18n } from '@/i18n.js';
 
 const props = defineProps<{
@@ -73,7 +74,7 @@ const rawUrl = computed(() => {
 const url = rawUrl;
 
 const alt = computed(() => `:${customEmojiName.value}:`);
-let errored = $ref(url.value == null);
+const errored = ref(url.value == null);
 
 function onClick(ev: MouseEvent) {
 	if (props.menu) {
@@ -92,6 +93,7 @@ function onClick(ev: MouseEvent) {
 			icon: 'ti ti-plus',
 			action: () => {
 				react(`:${props.name}:`);
+				sound.play('reaction');
 			},
 		}] : [])], ev.currentTarget ?? ev.target);
 	}
