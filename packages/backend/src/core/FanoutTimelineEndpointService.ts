@@ -17,6 +17,7 @@ import { isPureRenote } from '@/misc/is-pure-renote.js';
 import { CacheService } from '@/core/CacheService.js';
 import { isReply } from '@/misc/is-reply.js';
 import { isInstanceMuted } from '@/misc/is-instance-muted.js';
+import { MetaService } from '@/core/MetaService.js';
 
 type TimelineOptions = {
 	untilId: string | null,
@@ -33,7 +34,7 @@ type TimelineOptions = {
 	excludeNoFiles?: boolean;
 	excludeReplies?: boolean;
 	excludePureRenotes: boolean;
-	dbFallback: (untilId: string | null, sinceId: string | null, limit: number) => Promise<MiNote[]>,
+	dbFallback: (untilId: string | null, sinceId: string | null, limit: number,nofilte ? : boolean | null) => Promise<MiNote[]>,
 };
 
 @Injectable()
@@ -45,6 +46,7 @@ export class FanoutTimelineEndpointService {
 		private noteEntityService: NoteEntityService,
 		private cacheService: CacheService,
 		private fanoutTimelineService: FanoutTimelineService,
+		private metaService: MetaService,
 	) {
 	}
 
@@ -57,9 +59,11 @@ export class FanoutTimelineEndpointService {
 	private async getMiNotes(ps: TimelineOptions): Promise<MiNote[]> {
 		let noteIds: string[];
 		let shouldFallbackToDb = false;
+		// let needexpire = false;
 
 		// 呼び出し元と以下の処理をシンプルにするためにdbFallbackを置き換える
 		if (!ps.useDbFallback) ps.dbFallback = () => Promise.resolve([]);
+
 
 		const shouldPrepend = ps.sinceId && !ps.untilId;
 		const idCompare: (a: string, b: string) => number = shouldPrepend ? (a, b) => a < b ? -1 : 1 : (a, b) => a > b ? -1 : 1;
@@ -75,6 +79,13 @@ export class FanoutTimelineEndpointService {
 		shouldFallbackToDb = shouldFallbackToDb || (noteIds.length === 0);
 
 		if (!shouldFallbackToDb) {
+
+			for (const n of ps.redisTimelines) {
+				if (n.startsWith("homeTimeline") || n.startsWith("userTimeline") || n.startsWith("userListTimeline") || n.startsWith("localTimelineWithReplyTo")) {
+					this.fanoutTimelineService.keyexpire(n, 60 * 60 * 24 * 7);
+				}
+			}
+
 			let filter = ps.noteFilter ?? (_note => true);
 
 			if (ps.alwaysIncludeMyNotes && ps.me) {
@@ -162,6 +173,43 @@ export class FanoutTimelineEndpointService {
 			}
 			const gotFromDb = await ps.dbFallback(dbUntil, dbSince, remainingToRead);
 			return shouldPrepend ? [...gotFromDb, ...redisTimeline] : [...redisTimeline, ...gotFromDb];
+		}
+
+		let needInit = false;
+
+		for (const n of ps.redisTimelines) {
+			if (n.startsWith("homeTimeline") || n.startsWith("userTimeline") || n.startsWith("userListTimeline") ) {
+				const exist = await this.fanoutTimelineService.isexist(n);
+				if (exist==0) {
+					needInit = true;
+					break;
+				}
+			}
+		}
+
+		if (needInit) { //重建缓存
+			const serverSettings = await this.metaService.fetch();
+			let maxlimit = 300;
+			if (ps.redisTimelines[0].startsWith('userListTimeline')) {
+				maxlimit = ps.redisTimelines[0].startsWith('userListTimelineWithFiles') ? serverSettings.perUserListTimelineCacheMax / 2 : serverSettings.perUserListTimelineCacheMax;
+			} else if (ps.redisTimelines[0].startsWith('homeTimeline')) {
+				maxlimit = ps.redisTimelines[0].startsWith('homeTimelineWithFiles') ? serverSettings.perUserHomeTimelineCacheMax / 2 : serverSettings.perUserHomeTimelineCacheMax;
+			} else if (ps.redisTimelines[0].startsWith('userTimeline')) {
+				maxlimit = ps.redisTimelines[0].startsWith('userTimelineWithFiles') ? serverSettings.perLocalUserUserTimelineCacheMax / 2 : serverSettings.perLocalUserUserTimelineCacheMax;
+			}
+
+			const notelist = await ps.dbFallback(null,null,maxlimit,true);
+			for (const nn of ps.redisTimelines){
+				if (nn.startsWith("localTimelineWithReplyTo")) {
+					continue;
+				}
+				for (const n in notelist) {
+					this.fanoutTimelineService.pushall(nn, notelist[n].id);
+				}
+				this.fanoutTimelineService.keyexpire(nn, 60 * 60 * 24 * 7);
+			} // 重建完毕
+
+			return notelist.slice(0, ps.limit);
 		}
 
 		return await ps.dbFallback(ps.untilId, ps.sinceId, ps.limit);

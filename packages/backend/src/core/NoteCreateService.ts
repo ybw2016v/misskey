@@ -956,6 +956,7 @@ export class NoteCreateService implements OnApplicationShutdown {
 					this.fanoutTimelineService.push('localTimelineWithReplies', note.id, 300, r);
 					if (note.replyUserHost == null) {
 						this.fanoutTimelineService.push(`localTimelineWithReplyTo:${note.replyUserId}`, note.id, 300 / 10, r);
+						this.fanoutTimelineService.keyexpire(`localTimelineWithReplyTo:${note.replyUserId}`, 60 * 60 * 24 * 7);
 					}
 				}
 			} else {
