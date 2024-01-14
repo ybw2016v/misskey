@@ -193,6 +193,7 @@ export class DriveFileEntityService {
 	@bindThis
 	public async pack(
 		src: MiDriveFile['id'] | MiDriveFile,
+		me?: { id: MiUser['id'] } | null | undefined,
 		options?: PackOptions,
 	): Promise<Packed<'DriveFile'>> {
 		const opts = Object.assign({
@@ -220,7 +221,7 @@ export class DriveFileEntityService {
 				detail: true,
 			}) : null,
 			userId: opts.withUser ? file.userId : null,
-			user: (opts.withUser && file.userId) ? this.userEntityService.pack(file.userId) : null,
+			user: (opts.withUser && file.userId) ? this.userEntityService.pack(file.userId, me) : null,
 		});
 	}
 

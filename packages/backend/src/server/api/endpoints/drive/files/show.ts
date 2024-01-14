@@ -88,7 +88,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.accessDenied);
 			}
 
-			return await this.driveFileEntityService.pack(file, {
+			return await this.driveFileEntityService.pack(file,me , {
 				detail: true,
 				withUser: true,
 				self: true,
