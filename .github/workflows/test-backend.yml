@@ -40,7 +40,7 @@ jobs:
         sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/sw/package.json
         sed -i 's|git@github.com:|https://github.com/|g' .gitmodules
     - name: Install pnpm
-      uses: pnpm/action-setup@v2
+      uses: pnpm/action-setup@v3
       with:
         version: 8
         run_install: false
