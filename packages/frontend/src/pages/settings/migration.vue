@@ -21,7 +21,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<div class="_gaps">
 				<MkInput v-for="(_, i) in accountAliases" v-model="accountAliases[i]">
 					<template #prefix><i class="ti ti-plane-arrival"></i></template>
-					<template #label>{{ i18n.tsx._accountMigration.moveFromLabel({ n: i + 1 }) }}</template>
+					<!-- <template #label>{{ i18n.tsx._accountMigration.moveFromLabel({ n: i + 1 }) }}</template> -->
 				</MkInput>
 			</div>
 		</div>
