@@ -32,7 +32,7 @@ jobs:
       with:
         host: github.com
         private-key: ${{ secrets.SSHKEY }}
-    - uses: pnpm/action-setup@v3
+    - uses: pnpm/action-setup@v4
       with:
         version: 8
         run_install: false
@@ -65,7 +65,7 @@ jobs:
         sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/frontend/package.json
         sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/backend/package.json
         sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/sw/package.json
-    - uses: pnpm/action-setup@v3
+    - uses: pnpm/action-setup@v4
       with:
         version: 7
         run_install: false
@@ -98,7 +98,7 @@ jobs:
         sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/backend/package.json
         sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/sw/package.json
         sed -i 's|git@github.com:|https://github.com/|g' .gitmodules
-    - uses: pnpm/action-setup@v3
+    - uses: pnpm/action-setup@v4
       with:
         version: 7
         run_install: false
