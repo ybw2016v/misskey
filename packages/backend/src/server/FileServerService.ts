@@ -206,17 +206,18 @@ export class FileServerService {
 					}
 				}
 
-				if ('pipe' in image.data && typeof image.data.pipe === 'function') {
-					// image.dataがstreamなら、stream終了後にcleanup
-					image.data.on('end', file.cleanup);
-					image.data.on('close', file.cleanup);
-				} else {
-					// image.dataがstreamでないなら直ちにcleanup
-					file.cleanup();
+				if ('cleanup' in file) {
+					if ('pipe' in image.data && typeof image.data.pipe === 'function') {
+						// image.dataがstreamなら、stream終了後にcleanup
+						image.data.on('end', file.cleanup);
+						image.data.on('close', file.cleanup);
+					} else {
+						// image.dataがstreamでないなら直ちにcleanup
+						file.cleanup();
+					}
 				}
-
-				reply.header('Content-Type', FILE_TYPE_BROWSERSAFE.includes(image.type) ? image.type : 'application/octet-stream');
-				reply.header('Content-Length', file.file.size);
+	
+				reply.header('Content-Type', image.type);
 				reply.header('Cache-Control', 'max-age=31536000, immutable');
 				reply.header('Content-Disposition',
 					contentDisposition(
@@ -224,7 +225,6 @@ export class FileServerService {
 						correctFilename(file.filename, image.ext),
 					),
 				);
-				reply.header('Cache-Control', 'max-age=691200, immutable');
 				return image.data;
 			}
 
