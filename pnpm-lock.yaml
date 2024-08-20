@@ -722,8 +722,8 @@ importers:
         specifier: 5.1.0
         version: 5.1.0(vite@5.3.5)(vue@3.4.34)
       '@vue/compiler-sfc':
-        specifier: 3.4.34
-        version: 3.4.34
+        specifier: 3.4.37
+        version: 3.4.37
       aiscript-vscode:
         specifier: ssh://git@github.com/aiscript-dev/aiscript-vscode#v0.1.11
         version: github.com/aiscript-dev/aiscript-vscode/e1e1b27f2f72cd28a473e004b6da0d8fc0bd40d9
@@ -854,8 +854,8 @@ importers:
         specifier: 5.3.5
         version: 5.3.5(@types/node@20.14.12)(sass@1.77.8)(terser@5.31.3)
       vue:
-        specifier: 3.4.34
-        version: 3.4.34(typescript@5.5.4)
+        specifier: 3.4.37
+        version: 3.4.37(typescript@5.5.4)
       vuedraggable:
         specifier: next
         version: 4.1.0(vue@3.4.34)
@@ -966,8 +966,8 @@ importers:
         specifier: 1.6.0
         version: 1.6.0(vitest@1.6.0)
       '@vue/runtime-core':
-        specifier: 3.4.34
-        version: 3.4.34
+        specifier: 3.4.37
+        version: 3.4.37
       acorn:
         specifier: 8.12.1
         version: 8.12.1
@@ -22281,10 +22281,10 @@ snapshots:
       '@babel/helper-compilation-targets': 7.22.15
       '@babel/helper-module-transforms': 7.23.3(@babel/core@7.23.5)
       '@babel/helpers': 7.23.5
-      '@babel/parser': 7.23.9
+      '@babel/parser': 7.24.7
       '@babel/template': 7.22.15
       '@babel/traverse': 7.23.5
-      '@babel/types': 7.23.5
+      '@babel/types': 7.24.7
       convert-source-map: 2.0.0
       debug: 4.3.4(supports-color@8.1.1)
       gensync: 1.0.0-beta.2
@@ -22313,7 +22313,7 @@ snapshots:
       - supports-color
   '@babel/generator@7.23.5':
     dependencies:
-      '@babel/types': 7.23.5
+      '@babel/types': 7.24.7
       '@jridgewell/gen-mapping': 0.3.2
       '@jridgewell/trace-mapping': 0.3.18
       jsesc: 2.5.2
@@ -22438,7 +22438,7 @@ snapshots:
     dependencies:
       '@babel/template': 7.22.15
       '@babel/traverse': 7.23.5
-      '@babel/types': 7.23.5
+      '@babel/types': 7.24.7
     transitivePeerDependencies:
       - supports-color
   '@babel/helpers@7.24.0':
@@ -22450,7 +22450,7 @@ snapshots:
       - supports-color
   '@babel/highlight@7.23.4':
     dependencies:
-      '@babel/helper-validator-identifier': 7.22.20
+      '@babel/helper-validator-identifier': 7.24.7
       chalk: 2.4.2
       js-tokens: 4.0.0
   '@babel/parser@7.23.9':
@@ -29017,7 +29017,7 @@ snapshots:
       '@babel/generator': 7.23.5
       '@babel/plugin-syntax-jsx': 7.23.3(@babel/core@7.23.5)
       '@babel/plugin-syntax-typescript': 7.23.3(@babel/core@7.23.5)
-      '@babel/types': 7.23.5
+      '@babel/types': 7.24.7
       '@jest/expect-utils': 29.7.0
       '@jest/transform': 29.7.0
       '@jest/types': 29.6.3
