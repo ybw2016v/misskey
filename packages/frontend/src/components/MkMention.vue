@@ -4,7 +4,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 -->
 
 <template>
-<MkA v-user-preview="canonical" :class="[$style.root, { [$style.isMe]: isMe }]" :to="url" :style="{ background: bgCss }" :behavior="navigationBehavior">
+<MkA v-user-preview="canonical" :class="[$style.root, { [$style.isMe]: isMe }]" :to="url" :behavior="navigationBehavior">
 	<img :class="$style.icon" :src="avatarUrl" alt="" decoding="async" @error="onError">
 	<span>
 		<span>@{{ username }}</span>
@@ -16,8 +16,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 <script lang="ts" setup>
 import { toUnicode } from 'punycode';
 import { computed } from 'vue';
-import tinycolor from 'tinycolor2';
-import { host as localHost } from '@/config.js';
+import { host as localHost } from '@@/js/config.js';
 import { $i } from '@/account.js';
 import { defaultStore } from '@/store.js';
 import { getStaticImageUrl } from '@/scripts/media-proxy.js';
@@ -37,9 +36,7 @@ const isMe = $i && (
 	`@${props.username}@${toUnicode(props.host)}` === `@${$i.username}@${toUnicode(localHost)}`.toLowerCase()
 );
 
-const bg = tinycolor(getComputedStyle(document.documentElement).getPropertyValue(isMe ? '--mentionMe' : '--mention'));
-bg.setAlpha(0.1);
-const bgCss = bg.toRgbString();
+
 
 function onError(ev: Event) {
 	let img = ev.target as HTMLImageElement;
@@ -47,7 +44,7 @@ function onError(ev: Event) {
 	img.onerror = null;
 }
 
-const avatarUrl = computed(() => defaultStore.state.disableShowingAnimatedImages
+const avatarUrl = computed(() => defaultStore.state.disableShowingAnimatedImages  || defaultStore.state.dataSaver.avatar
 	? getStaticImageUrl(`/avatar/@${props.username}@${props.host}`)
 	: `/avatar/@${props.username}@${props.host}`,
 );
@@ -59,9 +56,11 @@ const avatarUrl = computed(() => defaultStore.state.disableShowingAnimatedImages
 	padding: 4px 8px 4px 4px;
 	border-radius: 999px;
 	color: var(--mention);
+	background: color(from var(--mention) srgb r g b / 0.1);
 
 	&.isMe {
 		color: var(--mentionMe);
+		background: color(from var(--mentionMe) srgb r g b / 0.1);
 	}
 }
 
