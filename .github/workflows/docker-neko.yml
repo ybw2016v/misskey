@@ -28,7 +28,7 @@ jobs:
           sed -i 's|git@github.com:|https://github.com/|g' .gitmodules
       - name: Docker meta
         id: meta
-        uses: docker/metadata-action@v3
+        uses: docker/metadata-action@v5
         with:
           images: dogcraft/misskey
       - name: Log in to Docker Hub
