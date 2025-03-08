@@ -50,7 +50,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkInput v-model="llmTranslatorMaxTokens" type="number">
 							<template #label>Max Tokens</template>
 						</MkInput>
-						<MkTextarea v-model="llmTranslatorSyStemPrompt">
+						<MkTextarea v-model="llmTranslatorSysPrompt">
 							<template #label>System Prompt</template>
 						</MkTextarea>
 						<MkTextarea v-model="llmTranslatorUserPrompt">
@@ -96,7 +96,7 @@ const llmTranslatorModel = ref<string>('');
 const llmTranslatorTemperature = ref<number>(1);
 const llmTranslatorTopP = ref<number>(1);
 const llmTranslatorMaxTokens = ref<number>(1);
-const llmTranslatorSyStemPrompt = ref<string>('');
+const llmTranslatorSysPrompt = ref<string>('');
 const llmTranslatorUserPrompt = ref<string>('');
 const llmTranslatorRedisCacheEnabled = ref<boolean>(false);
 const llmTranslatorRedisCacheTTL = ref<number>(0);
@@ -113,7 +113,7 @@ async function init() {
 	llmTranslatorTemperature.value = meta.llmTranslatorTemperature;
 	llmTranslatorTopP.value = meta.llmTranslatorTopP;
 	llmTranslatorMaxTokens.value = meta.llmTranslatorMaxTokens;
-	llmTranslatorSyStemPrompt.value = meta.llmTranslatorSyStemPrompt;
+	llmTranslatorSysPrompt.value = meta.llmTranslatorSysPrompt;
 	llmTranslatorUserPrompt.value = meta.llmTranslatorUserPrompt;
 	llmTranslatorRedisCacheEnabled.value = meta.llmTranslatorRedisCacheEnabled;
 	llmTranslatorRedisCacheTTL.value = meta.llmTranslatorRedisCacheTTL;
@@ -137,7 +137,7 @@ function save_llm() {
 		llmTranslatorTemperature: llmTranslatorTemperature.value,
 		llmTranslatorTopP: llmTranslatorTopP.value,
 		llmTranslatorMaxTokens: llmTranslatorMaxTokens.value,
-		llmTranslatorSyStemPrompt: llmTranslatorSyStemPrompt.value,
+		llmTranslatorSysPrompt: llmTranslatorSysPrompt.value,
 		llmTranslatorUserPrompt: llmTranslatorUserPrompt.value,
 		enableLlmTranslatorRedisCache: llmTranslatorRedisCacheEnabled.value,
 		llmTranslatorRedisCacheTtl: llmTranslatorRedisCacheTTL.value,
