@@ -41,13 +41,13 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkInput v-model="llmTranslatorModel">
 							<template #label>Model Name</template>
 						</MkInput>
-						<MkInput v-model="llmTranslatorTemperature">
+						<MkInput v-model="llmTranslatorTemperature" type="number">
 							<template #label>Temperature</template>
 						</MkInput>
-						<MkInput v-model="llmTranslatorTopP">
+						<MkInput v-model="llmTranslatorTopP" type="number">
 							<template #label>Top P</template>
 						</MkInput>
-						<MkInput v-model="llmTranslatorMaxTokens">
+						<MkInput v-model="llmTranslatorMaxTokens" type="number">
 							<template #label>Max Tokens</template>
 						</MkInput>
 						<MkTextarea v-model="llmTranslatorSyStemPrompt">
@@ -59,7 +59,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkSwitch v-model="llmTranslatorRedisCacheEnabled">
 							<template #label>Redis Cache Enable</template>
 						</MkSwitch>
-						<MkInput v-model="llmTranslatorRedisCacheTTL">
+						<MkInput v-model="llmTranslatorRedisCacheTTL" type="number">
 							<template #label>Redis Cache TTL</template>
 						</MkInput>
 						<MkButton primary @click="save_llm">Save</MkButton>
