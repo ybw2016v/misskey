@@ -522,6 +522,50 @@ export const meta = {
 					optional: false, nullable: false,
 				},
 			},
+			enableLlmTranslator: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
+			enableLlmTranslatorRedisCache: {
+				type: 'boolean',
+				optional: false, nullable: false,
+			},
+			llmTranslatorRedisCacheTtl: {
+				type: 'number',
+				optional: false, nullable: false,
+			},
+			llmTranslatorBaseUrl: {
+				type: 'string',
+				optional: false, nullable: true,
+			},
+			llmTranslatorApiKey: {
+				type: 'string',
+				optional: false, nullable: true,
+			},
+			llmTranslatorModel: {
+				type: 'string',
+				optional: false, nullable: true,
+			},
+			llmTranslatorTemperature: {
+				type: 'number',
+				optional: false, nullable: true,
+			},
+			llmTranslatorTopP: {
+				type: 'number',
+				optional: false, nullable: true,
+			},
+			llmTranslatorMaxTokens: {
+				type: 'number',
+				optional: false, nullable: true,
+			},
+			llmTranslatorSysPrompt: {
+				type: 'string',
+				optional: false, nullable: true,
+			},
+			llmTranslatorUserPrompt: {
+				type: 'string',
+				optional: false, nullable: true,
+			},
 		},
 	},
 } as const;
@@ -587,7 +631,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				defaultDarkTheme: instance.defaultDarkTheme,
 				enableEmail: instance.enableEmail,
 				enableServiceWorker: instance.enableServiceWorker,
-				translatorAvailable: instance.deeplAuthKey != null,
+				translatorAvailable: instance.deeplAuthKey != null || instance.enableLlmTranslator,
 				cacheRemoteFiles: instance.cacheRemoteFiles,
 				cacheRemoteSensitiveFiles: instance.cacheRemoteSensitiveFiles,
 				pinnedUsers: instance.pinnedUsers,
@@ -662,6 +706,17 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				urlPreviewSummaryProxyUrl: instance.urlPreviewSummaryProxyUrl,
 				federation: instance.federation,
 				federationHosts: instance.federationHosts,
+				enableLlmTranslator: instance.enableLlmTranslator,
+				enableLlmTranslatorRedisCache: instance.enableLlmTranslatorRedisCache,
+				llmTranslatorRedisCacheTtl: instance.llmTranslatorRedisCacheTtl,
+				llmTranslatorBaseUrl: instance.llmTranslatorBaseUrl,
+				llmTranslatorApiKey: instance.llmTranslatorApiKey,
+				llmTranslatorModel: instance.llmTranslatorModel,
+				llmTranslatorMaxTokens: instance.llmTranslatorMaxTokens,
+				llmTranslatorTemperature: instance.llmTranslatorTemperature,
+				llmTranslatorTopP: instance.llmTranslatorTopP,
+				llmTranslatorSysPrompt: instance.llmTranslatorSysPrompt,
+				llmTranslatorUserPrompt: instance.llmTranslatorUserPrompt,
 			};
 		});
 	}
