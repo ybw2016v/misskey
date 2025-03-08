@@ -115,7 +115,7 @@ async function init() {
 	llmTranslatorMaxTokens.value = meta.llmTranslatorMaxTokens;
 	llmTranslatorSysPrompt.value = meta.llmTranslatorSysPrompt;
 	llmTranslatorUserPrompt.value = meta.llmTranslatorUserPrompt;
-	llmTranslatorRedisCacheEnabled.value = meta.llmTranslatorRedisCacheEnabled;
+	llmTranslatorRedisCacheEnabled.value = meta.enableLlmTranslatorRedisCache;
 	llmTranslatorRedisCacheTTL.value = meta.llmTranslatorRedisCacheTTL;
 }
 
