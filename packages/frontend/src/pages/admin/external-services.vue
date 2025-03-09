@@ -29,10 +29,11 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<div class="_gaps_m">
 						<MkSwitch v-model="llmTranslatorEnabled">
 							<template #label>Enable</template>
+							<template #caption>Enable/disable AI-powered(LLM) translation functionality</template>
 						</MkSwitch>
 						<MkInput v-model="llmTranslatorBaseUrl" :placeholder="'https://example.com'">
 							<template #label>Base URL</template>
-							<template #caption>The base URL for Openai compatible API.</template>
+							<template #caption>The base URL for openai compatible API (e.g., OpenAI or compatible service endpoint)</template>
 						</MkInput>
 						<MkInput v-model="llmTranslatorApiKey">
 							<template #prefix><i class="ti ti-key"></i></template>
@@ -40,27 +41,35 @@ SPDX-License-Identifier: AGPL-3.0-only
 						</MkInput>
 						<MkInput v-model="llmTranslatorModel">
 							<template #label>Model Name</template>
+							<template #caption>Llm model to use (e.g., gpt-3.5-turbo, text-davinci-003, deepseek-chat)</template>
 						</MkInput>
 						<MkInput v-model="llmTranslatorTemperature" type="number">
 							<template #label>Temperature</template>
+							<template #caption>Sampling temperature (higher = more random/creative)</template>
 						</MkInput>
 						<MkInput v-model="llmTranslatorTopP" type="number">
 							<template #label>Top P</template>
+							<template #caption>Nucleus sampling threshold (0-1, alternative to temperature)</template>
 						</MkInput>
 						<MkInput v-model="llmTranslatorMaxTokens" type="number">
 							<template #label>Max Tokens</template>
+							<template #caption>Maximum length of response in tokens (affects response length)</template>
 						</MkInput>
 						<MkTextarea v-model="llmTranslatorSysPrompt">
 							<template #label>System Prompt</template>
+							<template #caption>Initial system-level instructions for the llm (can use {text} and {targetLang} as placeholders)<br>Example: "You are a translation specialist. Translate content between languages while preserving technical terms."</template>
 						</MkTextarea>
 						<MkTextarea v-model="llmTranslatorUserPrompt">
 							<template #label>User Prompt</template>
+							<template #caption>Translation instruction template (may include {text} for source text and {targetLang} for target language)<br>Example: "Translate this to {targetLang}: {text}"</template>
 						</MkTextarea>
 						<MkSwitch v-model="llmTranslatorRedisCacheEnabled">
 							<template #label>Redis Cache Enable</template>
+							<template #caption>Cache translations by using redis to reduce API calls and costs</template>
 						</MkSwitch>
 						<MkInput v-model="llmTranslatorRedisCacheTTL" type="number">
 							<template #label>Redis Cache TTL</template>
+							<template #caption>Cache expiration time in minutes</template>
 						</MkInput>
 						<MkButton primary @click="save_llm">Save</MkButton>
 					</div>
