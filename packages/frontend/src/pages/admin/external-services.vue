@@ -67,7 +67,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 							<template #label>Redis Cache Enable</template>
 							<template #caption>Cache translations by using redis to reduce API calls and costs</template>
 						</MkSwitch>
-						<MkInput v-model="llmTranslatorRedisCacheTTL" type="number">
+						<MkInput v-model="llmTranslatorRedisCacheTtl" type="number">
 							<template #label>Redis Cache TTL</template>
 							<template #caption>Cache expiration time in minutes</template>
 						</MkInput>
@@ -108,7 +108,7 @@ const llmTranslatorMaxTokens = ref<number>(1);
 const llmTranslatorSysPrompt = ref<string>('');
 const llmTranslatorUserPrompt = ref<string>('');
 const llmTranslatorRedisCacheEnabled = ref<boolean>(false);
-const llmTranslatorRedisCacheTTL = ref<number>(0);
+const llmTranslatorRedisCacheTtl = ref<number>(0);
 
 
 async function init() {
@@ -125,7 +125,7 @@ async function init() {
 	llmTranslatorSysPrompt.value = meta.llmTranslatorSysPrompt;
 	llmTranslatorUserPrompt.value = meta.llmTranslatorUserPrompt;
 	llmTranslatorRedisCacheEnabled.value = meta.enableLlmTranslatorRedisCache;
-	llmTranslatorRedisCacheTTL.value = meta.llmTranslatorRedisCacheTTL;
+	llmTranslatorRedisCacheTtl.value = meta.llmTranslatorRedisCacheTtl;
 }
 
 function save_deepl() {
@@ -149,7 +149,7 @@ function save_llm() {
 		llmTranslatorSysPrompt: llmTranslatorSysPrompt.value,
 		llmTranslatorUserPrompt: llmTranslatorUserPrompt.value,
 		enableLlmTranslatorRedisCache: llmTranslatorRedisCacheEnabled.value,
-		llmTranslatorRedisCacheTtl: llmTranslatorRedisCacheTTL.value,
+		llmTranslatorRedisCacheTtl: llmTranslatorRedisCacheTtl.value,
 	}).then(() => {
 		fetchInstance(true);
 	});

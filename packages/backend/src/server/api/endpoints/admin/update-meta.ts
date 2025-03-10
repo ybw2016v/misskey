@@ -187,7 +187,7 @@ export const paramDef = {
 		},
 		enableLlmTranslator: { type: 'boolean' },
 		enableLlmTranslatorRedisCache: { type: 'boolean' },
-		llmTranslatorRedisCacheTtl: { type: 'integer' , nullable: true},
+		llmTranslatorRedisCacheTtl: { type: 'integer' },
 		llmTranslatorBaseUrl: { type: 'string' , nullable: true},
 		llmTranslatorApiKey: { type: 'string' , nullable: true},
 		llmTranslatorModel: { type: 'string' , nullable: true},
