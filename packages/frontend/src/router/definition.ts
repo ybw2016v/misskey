@@ -3,7 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import { AsyncComponentLoader, defineAsyncComponent } from 'vue';
+import { defineAsyncComponent } from 'vue';
+import type { AsyncComponentLoader } from 'vue';
 import type { IRouter, RouteDef } from '@/nirax.js';
 import { Router } from '@/nirax.js';
 import { $i, iAmModerator } from '@/account.js';
@@ -89,9 +90,9 @@ const routes: RouteDef[] = [{
 		name: 'security',
 		component: page(() => import('@/pages/settings/security.vue')),
 	}, {
-		path: '/general',
-		name: 'general',
-		component: page(() => import('@/pages/settings/general.vue')),
+		path: '/preferences',
+		name: 'preferences',
+		component: page(() => import('@/pages/settings/preferences.vue')),
 	}, {
 		path: '/theme/install',
 		name: 'theme',
@@ -105,6 +106,10 @@ const routes: RouteDef[] = [{
 		name: 'theme',
 		component: page(() => import('@/pages/settings/theme.vue')),
 	}, {
+		path: '/appearance',
+		name: 'appearance',
+		component: page(() => import('@/pages/settings/appearance.vue')),
+	}, {
 		path: '/navbar',
 		name: 'navbar',
 		component: page(() => import('@/pages/settings/navbar.vue')),
@@ -116,6 +121,10 @@ const routes: RouteDef[] = [{
 		path: '/sounds',
 		name: 'sounds',
 		component: page(() => import('@/pages/settings/sounds.vue')),
+	}, {
+		path: '/accessibility',
+		name: 'accessibility',
+		component: page(() => import('@/pages/settings/accessibility.vue')),
 	}, {
 		path: '/plugin/install',
 		name: 'plugin',
@@ -161,12 +170,8 @@ const routes: RouteDef[] = [{
 		name: 'preferences-backups',
 		component: page(() => import('@/pages/settings/preferences-backups.vue')),
 	}, {
-		path: '/migration',
-		name: 'migration',
-		component: page(() => import('@/pages/settings/migration.vue')),
-	}, {
 		path: '/custom-css',
-		name: 'general',
+		name: 'preferences',
 		component: page(() => import('@/pages/settings/custom-css.vue')),
 	}, {
 		path: '/accounts',

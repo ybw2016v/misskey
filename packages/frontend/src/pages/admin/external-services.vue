@@ -9,20 +9,33 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<MkSpacer :contentMax="700" :marginMin="16" :marginMax="32">
 		<FormSuspense :p="init">
 			<dev class="_gaps">
+				<div class="_gaps_m">
 				<MkFolder>
-					<template #label>DeepL Translation</template>
+					<template #label>Google Analytics<span class="_beta">{{ i18n.ts.beta }}</span></template>
 
 					<div class="_gaps_m">
-						<MkInput v-model="deeplAuthKey">
+						<MkInput v-model="googleAnalyticsMeasurementId">
 							<template #prefix><i class="ti ti-key"></i></template>
-							<template #label>DeepL Auth Key</template>
+							<template #label>Measurement ID</template>
 						</MkInput>
-						<MkSwitch v-model="deeplIsPro">
-							<template #label>Pro account</template>
-						</MkSwitch>
-						<MkButton primary @click="save_deepl">Save</MkButton>
+						<MkButton primary @click="save_googleAnalytics">Save</MkButton>
 					</div>
 				</MkFolder>
+
+				<MkFolder>
+						<template #label>DeepL Translation</template>
+
+						<div class="_gaps_m">
+							<MkInput v-model="deeplAuthKey">
+								<template #prefix><i class="ti ti-key"></i></template>
+								<template #label>DeepL Auth Key</template>
+							</MkInput>
+							<MkSwitch v-model="deeplIsPro">
+								<template #label>Pro account</template>
+							</MkSwitch>
+							<MkButton primary @click="save_deepl">Save</MkButton>
+						</div>
+					</MkFolder>
 				<MkFolder>
 					<template #label>Llm Translation</template>
 
@@ -75,6 +88,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					</div>
 				</MkFolder>
 			</dev>
+			</div>
 		</FormSuspense>
 	</MkSpacer>
 </MkStickyContainer>
@@ -111,9 +125,11 @@ const llmTranslatorRedisCacheEnabled = ref<boolean>(false);
 const llmTranslatorRedisCacheTtl = ref<number>(0);
 
 
+const googleAnalyticsMeasurementId = ref<string>('');
+
 async function init() {
 	const meta = await misskeyApi('admin/meta');
-	deeplAuthKey.value = meta.deeplAuthKey;
+	deeplAuthKey.value = meta.deeplAuthKey ?? '';
 	deeplIsPro.value = meta.deeplIsPro;
 	llmTranslatorEnabled.value = meta.enableLlmTranslator;
 	llmTranslatorBaseUrl.value = meta.llmTranslatorBaseUrl;
@@ -126,6 +142,7 @@ async function init() {
 	llmTranslatorUserPrompt.value = meta.llmTranslatorUserPrompt;
 	llmTranslatorRedisCacheEnabled.value = meta.enableLlmTranslatorRedisCache;
 	llmTranslatorRedisCacheTtl.value = meta.llmTranslatorRedisCacheTtl;
+	googleAnalyticsMeasurementId.value = meta.googleAnalyticsMeasurementId ?? '';
 }
 
 function save_deepl() {
@@ -150,6 +167,14 @@ function save_llm() {
 		llmTranslatorUserPrompt: llmTranslatorUserPrompt.value,
 		enableLlmTranslatorRedisCache: llmTranslatorRedisCacheEnabled.value,
 		llmTranslatorRedisCacheTtl: llmTranslatorRedisCacheTtl.value,
+	}).then(() => {
+		fetchInstance(true);
+	});
+}
+
+function save_googleAnalytics() {
+	os.apiWithDialog('admin/update-meta', {
+		googleAnalyticsMeasurementId: googleAnalyticsMeasurementId.value,
 	}).then(() => {
 		fetchInstance(true);
 	});
