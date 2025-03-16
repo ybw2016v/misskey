@@ -8,8 +8,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 	<template #header><XHeader :actions="headerActions" :tabs="headerTabs"/></template>
 	<MkSpacer :contentMax="700" :marginMin="16" :marginMax="32">
 		<FormSuspense :p="init">
-			<dev class="_gaps">
-				<div class="_gaps_m">
+			<div class="_gaps">
 				<MkFolder>
 					<template #label>Google Analytics<span class="_beta">{{ i18n.ts.beta }}</span></template>
 
@@ -87,7 +86,6 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<MkButton primary @click="save_llm">Save</MkButton>
 					</div>
 				</MkFolder>
-			</dev>
 			</div>
 		</FormSuspense>
 	</MkSpacer>
