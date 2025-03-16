@@ -28,15 +28,11 @@ on:
       - packages/misskey-reversi/**
       - packages/shared/eslint.config.js
       - .github/workflows/lint.yml
-
-env:
-  COREPACK_DEFAULT_TO_LATEST: 0
-
 jobs:
   pnpm_install:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v4.2.2
       with:
         fetch-depth: 0
         submodules: true
@@ -45,12 +41,12 @@ jobs:
       with:
         host: github.com
         private-key: ${{ secrets.SSHKEY }}
-    - uses: pnpm/action-setup@v4
-    - uses: actions/setup-node@v4.1.0
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+    - uses: actions/setup-node@v4.2.0
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'
-    - run: corepack enable
     - run: pnpm i --frozen-lockfile
 
   lint:
@@ -72,7 +68,7 @@ jobs:
       eslint-cache-version: v1
       eslint-cache-path: ${{ github.workspace }}/node_modules/.cache/eslint-${{ matrix.workspace }}
     steps:
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v4.2.2
       with:
         fetch-depth: 0
         submodules: true
@@ -82,15 +78,15 @@ jobs:
         sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/frontend/package.json
         sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/backend/package.json
         sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/sw/package.json
-    - uses: pnpm/action-setup@v4
-    - uses: actions/setup-node@v4.1.0
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+    - uses: actions/setup-node@v4.2.0
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'
-    - run: corepack enable
     - run: pnpm i --frozen-lockfile
     - name: Restore eslint cache
-      uses: actions/cache@v4.2.0
+      uses: actions/cache@v4.2.2
       with:
         path: ${{ env.eslint-cache-path }}
         key: eslint-${{ env.eslint-cache-version }}-${{ matrix.workspace }}-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ github.ref_name }}-${{ github.sha }}
@@ -108,7 +104,7 @@ jobs:
         - sw
         - misskey-js
     steps:
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v4.2.2
       with:
         fetch-depth: 0
         submodules: true
@@ -119,12 +115,12 @@ jobs:
         sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/backend/package.json
         sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/sw/package.json
         sed -i 's|git@github.com:|https://github.com/|g' .gitmodules
-    - uses: pnpm/action-setup@v4
-    - uses: actions/setup-node@v4.1.0
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+    - uses: actions/setup-node@v4.2.0
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'
-    - run: corepack enable
     - run: pnpm i --frozen-lockfile
     - run: pnpm --filter misskey-js run build
       if: ${{ matrix.workspace == 'backend' || matrix.workspace == 'sw' }}
