@@ -103,7 +103,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 					<MkLoading v-if="translating" mini/>
 					<div v-else-if="translation">
 						<b v-if="translation.sourceLang">{{ i18n.tsx.translatedFrom({ x: translation.sourceLang }) }}: </b>
-						<Mfm :text="translation.text" :author="appearNote.user" :nyaize="'respect'" :emojiUrls="appearNote.emojis"/>
+						<Mfm :text="translation.text" :author="appearNote.user" :nyaize="'respect'" :emojiUrls="appearNote.emojis" class="_selectable"/>
 					</div>
 				</div>
 				<div v-if="appearNote.files && appearNote.files.length > 0">
