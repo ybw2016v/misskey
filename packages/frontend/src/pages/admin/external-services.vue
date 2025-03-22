@@ -162,19 +162,6 @@ import MkFolder from '@/components/MkFolder.vue';
 const deeplAuthKey = ref<string>('');
 const deeplIsPro = ref<boolean>(false);
 
-const llmTranslatorEnabled = ref<boolean>(false);
-const llmTranslatorBaseUrl = ref<string>('');
-const llmTranslatorApiKey = ref<string>('');
-const llmTranslatorModel = ref<string>('');
-const llmTranslatorTemperature = ref<number>(1);
-const llmTranslatorTopP = ref<number>(1);
-const llmTranslatorMaxTokens = ref<number>(1);
-const llmTranslatorSysPrompt = ref<string>('');
-const llmTranslatorUserPrompt = ref<string>('');
-const llmTranslatorRedisCacheEnabled = ref<boolean>(false);
-const llmTranslatorRedisCacheTtl = ref<number>(0);
-
-
 const googleAnalyticsMeasurementId = ref<string>('');
 
 const llmTranslatorEnabled = ref<boolean>(false);
@@ -222,24 +209,6 @@ function save_deepl() {
 	os.apiWithDialog('admin/update-meta', {
 		deeplAuthKey: deeplAuthKey.value,
 		deeplIsPro: deeplIsPro.value,
-	}).then(() => {
-		fetchInstance(true);
-	});
-}
-
-function save_llm() {
-	os.apiWithDialog('admin/update-meta', {
-		enableLlmTranslator: llmTranslatorEnabled.value,
-		llmTranslatorBaseUrl: llmTranslatorBaseUrl.value,
-		llmTranslatorApiKey: llmTranslatorApiKey.value,
-		llmTranslatorModel: llmTranslatorModel.value,
-		llmTranslatorTemperature: llmTranslatorTemperature.value,
-		llmTranslatorTopP: llmTranslatorTopP.value,
-		llmTranslatorMaxTokens: llmTranslatorMaxTokens.value,
-		llmTranslatorSysPrompt: llmTranslatorSysPrompt.value,
-		llmTranslatorUserPrompt: llmTranslatorUserPrompt.value,
-		enableLlmTranslatorRedisCache: llmTranslatorRedisCacheEnabled.value,
-		llmTranslatorRedisCacheTtl: llmTranslatorRedisCacheTtl.value,
 	}).then(() => {
 		fetchInstance(true);
 	});
