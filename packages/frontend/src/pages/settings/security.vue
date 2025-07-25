@@ -6,6 +6,10 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <SearchMarker path="/settings/security" :label="i18n.ts.security" :keywords="['security']" icon="ti ti-lock" :inlining="['2fa']">
 	<div class="_gaps_m">
+		<MkFeatureBanner icon="/client-assets/locked_with_key_3d.png" color="#ffbf00">
+			<SearchKeyword>{{ i18n.ts._settings.securityBanner }}</SearchKeyword>
+		</MkFeatureBanner>
+
 		<SearchMarker :keywords="['password']">
 			<FormSection first>
 				<template #label><SearchLabel>{{ i18n.ts.password }}</SearchLabel></template>
@@ -22,7 +26,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 
 		<FormSection>
 			<template #label>{{ i18n.ts.signinHistory }}</template>
-			<MkPagination :pagination="pagination" disableAutoLoad>
+			<MkPagination :paginator="paginator" withControl>
 				<template #default="{items}">
 					<div>
 						<div v-for="item in items" :key="item.id" v-panel class="timnmucd">
@@ -49,21 +53,22 @@ SPDX-License-Identifier: AGPL-3.0-only
 </template>
 
 <script lang="ts" setup>
-import { computed } from 'vue';
+import { computed, markRaw } from 'vue';
 import X2fa from './2fa.vue';
 import FormSection from '@/components/form/section.vue';
 import FormSlot from '@/components/form/slot.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkPagination from '@/components/MkPagination.vue';
 import * as os from '@/os.js';
-import { misskeyApi } from '@/scripts/misskey-api.js';
+import { misskeyApi } from '@/utility/misskey-api.js';
 import { i18n } from '@/i18n.js';
-import { definePageMetadata } from '@/scripts/page-metadata.js';
+import { definePage } from '@/page.js';
+import MkFeatureBanner from '@/components/MkFeatureBanner.vue';
+import { Paginator } from '@/utility/paginator.js';
 
-const pagination = {
-	endpoint: 'i/signin-history' as const,
+const paginator = markRaw(new Paginator('i/signin-history', {
 	limit: 5,
-};
+}));
 
 async function change() {
 	const { canceled: canceled2, result: newPassword } = await os.inputText({
@@ -112,7 +117,7 @@ const headerActions = computed(() => []);
 
 const headerTabs = computed(() => []);
 
-definePageMetadata(() => ({
+definePage(() => ({
 	title: i18n.ts.security,
 	icon: 'ti ti-lock',
 }));

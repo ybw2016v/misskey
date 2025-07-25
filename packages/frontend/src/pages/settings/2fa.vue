@@ -92,10 +92,11 @@ import FormSection from '@/components/form/section.vue';
 import MkFolder from '@/components/MkFolder.vue';
 import MkLink from '@/components/MkLink.vue';
 import * as os from '@/os.js';
-import { signinRequired, updateAccountPartial } from '@/account.js';
+import { ensureSignin } from '@/i.js';
 import { i18n } from '@/i18n.js';
+import { updateCurrentAccountPartial } from '@/accounts.js';
 
-const $i = signinRequired();
+const $i = ensureSignin();
 
 // メモ: 各エンドポイントはmeUpdatedを発行するため、refreshAccountは不要
 
@@ -116,7 +117,7 @@ async function registerTOTP(): Promise<void> {
 		token: auth.result.token,
 	});
 
-	const { dispose } = os.popup(defineAsyncComponent(() => import('./2fa.qrdialog.vue')), {
+	const { dispose } = await os.popupAsyncWithDialog(import('./2fa.qrdialog.vue').then(x => x.default), {
 		twoFactorData,
 	}, {
 		closed: () => dispose(),
@@ -131,7 +132,7 @@ async function unregisterTOTP(): Promise<void> {
 		password: auth.result.password,
 		token: auth.result.token,
 	}).then(res => {
-		updateAccountPartial({
+		updateCurrentAccountPartial({
 			twoFactorEnabled: false,
 		});
 	}).catch(error => {
