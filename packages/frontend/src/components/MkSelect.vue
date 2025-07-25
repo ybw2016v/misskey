@@ -174,7 +174,7 @@ watch([modelValue, () => props.items], () => {
 }, { immediate: true, deep: true });
 
 function show() {
-	if (opening.value) return;
+	if (opening.value || props.disabled || props.readonly) return;
 	focus();
 
 	opening.value = true;
@@ -268,7 +268,7 @@ function show() {
 .caption {
 	font-size: 0.85em;
 	padding: 8px 0 0 0;
-	color: var(--MI_THEME-fgTransparentWeak);
+	color: color(from var(--MI_THEME-fg) srgb r g b / 0.75);
 
 	&:empty {
 		display: none;

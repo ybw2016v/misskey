@@ -170,6 +170,7 @@ export const paramDef = {
 			description: '[Deprecated] Use "urlPreviewSummaryProxyUrl" instead.',
 		},
 		urlPreviewEnabled: { type: 'boolean' },
+		urlPreviewAllowRedirect: { type: 'boolean' },
 		urlPreviewTimeout: { type: 'integer' },
 		urlPreviewMaximumContentLength: { type: 'integer' },
 		urlPreviewRequireContentLength: { type: 'boolean' },
@@ -196,6 +197,25 @@ export const paramDef = {
 		llmTranslatorMaxTokens: { type: 'integer', nullable: true },
 		llmTranslatorSysPrompt: { type: 'string', nullable: true },
 		llmTranslatorUserPrompt: { type: 'string', nullable: true },
+		deliverSuspendedSoftware: {
+			type: 'array',
+			items: {
+				type: 'object',
+				properties: {
+					software: { type: 'string' },
+					versionRange: { type: 'string' },
+				},
+				required: ['software', 'versionRange'],
+			},
+		},
+		singleUserMode: { type: 'boolean' },
+		ugcVisibilityForVisitor: {
+			type: 'string',
+			enum: ['all', 'local', 'none'],
+		},
+		proxyRemoteFiles: { type: 'boolean' },
+		signToActivityPubGet: { type: 'boolean' },
+		allowExternalApRedirect: { type: 'boolean' },
 	},
 	required: [],
 } as const;
@@ -656,6 +676,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				set.urlPreviewEnabled = ps.urlPreviewEnabled;
 			}
 
+			if (ps.urlPreviewAllowRedirect !== undefined) {
+				set.urlPreviewAllowRedirect = ps.urlPreviewAllowRedirect;
+			}
+
 			if (ps.urlPreviewTimeout !== undefined) {
 				set.urlPreviewTimeout = ps.urlPreviewTimeout;
 			}
@@ -680,6 +704,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.federation !== undefined) {
 				set.federation = ps.federation;
+			}
+
+			if (ps.deliverSuspendedSoftware !== undefined) {
+				set.deliverSuspendedSoftware = ps.deliverSuspendedSoftware;
 			}
 
 			if (Array.isArray(ps.federationHosts)) {
@@ -748,6 +776,26 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				} else {
 					set.llmTranslatorUserPrompt = ps.llmTranslatorUserPrompt;
 				}
+			}
+
+			if (ps.singleUserMode !== undefined) {
+				set.singleUserMode = ps.singleUserMode;
+			}
+
+			if (ps.ugcVisibilityForVisitor !== undefined) {
+				set.ugcVisibilityForVisitor = ps.ugcVisibilityForVisitor;
+			}
+
+			if (ps.proxyRemoteFiles !== undefined) {
+				set.proxyRemoteFiles = ps.proxyRemoteFiles;
+			}
+
+			if (ps.signToActivityPubGet !== undefined) {
+				set.signToActivityPubGet = ps.signToActivityPubGet;
+			}
+
+			if (ps.allowExternalApRedirect !== undefined) {
+				set.allowExternalApRedirect = ps.allowExternalApRedirect;
 			}
 
 			const before = await this.metaService.fetch(true);
