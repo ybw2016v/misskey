@@ -84,11 +84,11 @@ export const paramDef = {
 		turnstileSiteKey: { type: 'string', nullable: true },
 		turnstileSecretKey: { type: 'string', nullable: true },
 		enableTestcaptcha: { type: 'boolean' },
+		googleAnalyticsMeasurementId: { type: 'string', nullable: true },
 		sensitiveMediaDetection: { type: 'string', enum: ['none', 'all', 'local', 'remote'] },
 		sensitiveMediaDetectionSensitivity: { type: 'string', enum: ['medium', 'low', 'high', 'veryLow', 'veryHigh'] },
 		setSensitiveFlagAutomatically: { type: 'boolean' },
 		enableSensitiveMediaDetectionForVideos: { type: 'boolean' },
-		proxyAccountId: { type: 'string', format: 'misskey:id', nullable: true },
 		maintainerName: { type: 'string', nullable: true },
 		maintainerEmail: { type: 'string', nullable: true },
 		langs: {
@@ -117,7 +117,7 @@ export const paramDef = {
 		useObjectStorage: { type: 'boolean' },
 		objectStorageBaseUrl: { type: 'string', nullable: true },
 		objectStorageBucket: { type: 'string', nullable: true },
-		objectStoragePrefix: { type: 'string', nullable: true },
+		objectStoragePrefix: { type: 'string', pattern: /^[a-zA-Z0-9-._]*$/.source, nullable: true },
 		objectStorageEndpoint: { type: 'string', nullable: true },
 		objectStorageRegion: { type: 'string', nullable: true },
 		objectStoragePort: { type: 'integer', nullable: true },
@@ -170,6 +170,7 @@ export const paramDef = {
 			description: '[Deprecated] Use "urlPreviewSummaryProxyUrl" instead.',
 		},
 		urlPreviewEnabled: { type: 'boolean' },
+		urlPreviewAllowRedirect: { type: 'boolean' },
 		urlPreviewTimeout: { type: 'integer' },
 		urlPreviewMaximumContentLength: { type: 'integer' },
 		urlPreviewRequireContentLength: { type: 'boolean' },
@@ -185,6 +186,36 @@ export const paramDef = {
 				type: 'string',
 			},
 		},
+		enableLlmTranslator: { type: 'boolean' },
+		enableLlmTranslatorRedisCache: { type: 'boolean' },
+		llmTranslatorRedisCacheTtl: { type: 'integer' },
+		llmTranslatorBaseUrl: { type: 'string', nullable: true },
+		llmTranslatorApiKey: { type: 'string', nullable: true },
+		llmTranslatorModel: { type: 'string', nullable: true },
+		llmTranslatorTemperature: { type: 'number', nullable: true },
+		llmTranslatorTopP: { type: 'number', nullable: true },
+		llmTranslatorMaxTokens: { type: 'integer', nullable: true },
+		llmTranslatorSysPrompt: { type: 'string', nullable: true },
+		llmTranslatorUserPrompt: { type: 'string', nullable: true },
+		deliverSuspendedSoftware: {
+			type: 'array',
+			items: {
+				type: 'object',
+				properties: {
+					software: { type: 'string' },
+					versionRange: { type: 'string' },
+				},
+				required: ['software', 'versionRange'],
+			},
+		},
+		singleUserMode: { type: 'boolean' },
+		ugcVisibilityForVisitor: {
+			type: 'string',
+			enum: ['all', 'local', 'none'],
+		},
+		proxyRemoteFiles: { type: 'boolean' },
+		signToActivityPubGet: { type: 'boolean' },
+		allowExternalApRedirect: { type: 'boolean' },
 	},
 	required: [],
 } as const;
@@ -371,6 +402,12 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				set.enableTestcaptcha = ps.enableTestcaptcha;
 			}
 
+			if (ps.googleAnalyticsMeasurementId !== undefined) {
+				// 空文字列をnullにしたいので??は使わない
+				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
+				set.googleAnalyticsMeasurementId = ps.googleAnalyticsMeasurementId || null;
+			}
+
 			if (ps.sensitiveMediaDetection !== undefined) {
 				set.sensitiveMediaDetection = ps.sensitiveMediaDetection;
 			}
@@ -385,10 +422,6 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 
 			if (ps.enableSensitiveMediaDetectionForVideos !== undefined) {
 				set.enableSensitiveMediaDetectionForVideos = ps.enableSensitiveMediaDetectionForVideos;
-			}
-
-			if (ps.proxyAccountId !== undefined) {
-				set.proxyAccountId = ps.proxyAccountId;
 			}
 
 			if (ps.maintainerName !== undefined) {
@@ -643,6 +676,10 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				set.urlPreviewEnabled = ps.urlPreviewEnabled;
 			}
 
+			if (ps.urlPreviewAllowRedirect !== undefined) {
+				set.urlPreviewAllowRedirect = ps.urlPreviewAllowRedirect;
+			}
+
 			if (ps.urlPreviewTimeout !== undefined) {
 				set.urlPreviewTimeout = ps.urlPreviewTimeout;
 			}
@@ -669,8 +706,96 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				set.federation = ps.federation;
 			}
 
+			if (ps.deliverSuspendedSoftware !== undefined) {
+				set.deliverSuspendedSoftware = ps.deliverSuspendedSoftware;
+			}
+
 			if (Array.isArray(ps.federationHosts)) {
 				set.federationHosts = ps.federationHosts.filter(Boolean).map(x => x.toLowerCase());
+			}
+
+			if (ps.enableLlmTranslator !== undefined) {
+				set.enableLlmTranslator = ps.enableLlmTranslator;
+			}
+
+			if (ps.enableLlmTranslatorRedisCache !== undefined) {
+				set.enableLlmTranslatorRedisCache = ps.enableLlmTranslatorRedisCache;
+			}
+
+			if (ps.llmTranslatorRedisCacheTtl !== undefined) {
+				set.llmTranslatorRedisCacheTtl = ps.llmTranslatorRedisCacheTtl;
+			}
+
+			if (ps.llmTranslatorBaseUrl !== undefined) {
+				if (ps.llmTranslatorBaseUrl === '') {
+					set.llmTranslatorBaseUrl = null;
+				} else {
+					set.llmTranslatorBaseUrl = ps.llmTranslatorBaseUrl;
+				}
+			}
+
+			if (ps.llmTranslatorApiKey !== undefined) {
+				if (ps.llmTranslatorApiKey === '') {
+					set.llmTranslatorApiKey = null;
+				} else {
+					set.llmTranslatorApiKey = ps.llmTranslatorApiKey;
+				}
+			}
+
+			if (ps.llmTranslatorModel !== undefined) {
+				if (ps.llmTranslatorModel === '') {
+					set.llmTranslatorModel = null;
+				} else {
+					set.llmTranslatorModel = ps.llmTranslatorModel;
+				}
+			}
+
+			if (ps.llmTranslatorTemperature !== undefined) {
+				set.llmTranslatorTemperature = ps.llmTranslatorTemperature;
+			}
+
+			if (ps.llmTranslatorTopP !== undefined) {
+				set.llmTranslatorTopP = ps.llmTranslatorTopP;
+			}
+
+			if (ps.llmTranslatorMaxTokens !== undefined) {
+				set.llmTranslatorMaxTokens = ps.llmTranslatorMaxTokens;
+			}
+
+			if (ps.llmTranslatorSysPrompt !== undefined) {
+				if (ps.llmTranslatorSysPrompt === '') {
+					set.llmTranslatorSysPrompt = null;
+				} else {
+					set.llmTranslatorSysPrompt = ps.llmTranslatorSysPrompt;
+				}
+			}
+
+			if (ps.llmTranslatorUserPrompt !== undefined) {
+				if (ps.llmTranslatorUserPrompt === '') {
+					set.llmTranslatorUserPrompt = null;
+				} else {
+					set.llmTranslatorUserPrompt = ps.llmTranslatorUserPrompt;
+				}
+			}
+
+			if (ps.singleUserMode !== undefined) {
+				set.singleUserMode = ps.singleUserMode;
+			}
+
+			if (ps.ugcVisibilityForVisitor !== undefined) {
+				set.ugcVisibilityForVisitor = ps.ugcVisibilityForVisitor;
+			}
+
+			if (ps.proxyRemoteFiles !== undefined) {
+				set.proxyRemoteFiles = ps.proxyRemoteFiles;
+			}
+
+			if (ps.signToActivityPubGet !== undefined) {
+				set.signToActivityPubGet = ps.signToActivityPubGet;
+			}
+
+			if (ps.allowExternalApRedirect !== undefined) {
+				set.allowExternalApRedirect = ps.allowExternalApRedirect;
 			}
 
 			const before = await this.metaService.fetch(true);

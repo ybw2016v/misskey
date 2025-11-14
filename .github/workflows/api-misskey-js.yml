@@ -9,10 +9,6 @@ on:
     paths:
       - packages/misskey-js/**
       - .github/workflows/api-misskey-js.yml
-
-env:
-  COREPACK_DEFAULT_TO_LATEST: 0
-
 jobs:
   report:
 
@@ -20,7 +16,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4.1.1
+        uses: actions/checkout@v4.2.2
       - name: Replace the github url
         run: |
           sed -i 's|ssh://git@github.com/|git+https://github.com/|g' package.json
@@ -29,10 +25,11 @@ jobs:
           sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/sw/package.json
           sed -i 's|git@github.com:|https://github.com/|g' .gitmodules
 
-      - run: corepack enable
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.1.0
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4.1.0
+        uses: actions/setup-node@v4.4.0
         with:
           node-version-file: '.node-version'
           cache: 'pnpm'

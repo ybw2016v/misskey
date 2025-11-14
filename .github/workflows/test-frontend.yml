@@ -23,22 +23,14 @@ on:
       - packages/backend/**
       - .github/workflows/test-frontend.yml
       - .github/misskey/test.yml
-
-env:
-  COREPACK_DEFAULT_TO_LATEST: 0
-
 jobs:
   vitest:
     name: Unit tests (frontend)
     runs-on: ubuntu-latest
     if: ${{ !contains(github.event.commits.*.message, '[skip ci]') && !contains(github.event.commits.*.message, '[ci skip]') }}
 
-    strategy:
-      matrix:
-        node-version: [22.11.0]
-
     steps:
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v4.2.2
       with:
         submodules: true
     - name: Setup SSH
@@ -46,14 +38,13 @@ jobs:
       with:
         host: github.com
         private-key: ${{ secrets.SSHKEY }}
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4.1.0
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+    - name: Use Node.js
+      uses: actions/setup-node@v4.4.0
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version-file: '.node-version'
         cache: 'pnpm'
-    - run: corepack enable
     - run: pnpm i --lockfile-only
     - run: pnpm i
     - name: Copy Configure
@@ -76,7 +67,6 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        node-version: [22.11.0]
         browser: [chrome]
 
     services:
@@ -93,7 +83,7 @@ jobs:
           - 56312:6379
 
     steps:
-    - uses: actions/checkout@v4.1.1
+    - uses: actions/checkout@v4.2.2
       with:
         submodules: true
     # https://github.com/cypress-io/cypress-docker-images/issues/150
@@ -107,14 +97,13 @@ jobs:
       with:
         host: github.com
         private-key: ${{ secrets.SSHKEY }}
-    - name: Install pnpm
-      uses: pnpm/action-setup@v4
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v4.1.0
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4.1.0
+    - name: Use Node.js
+      uses: actions/setup-node@v4.4.0
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version-file: '.node-version'
         cache: 'pnpm'
-    - run: corepack enable
     - run: pnpm i --frozen-lockfile
     - name: Copy Configure
       run: cp .github/misskey/test.yml .config
