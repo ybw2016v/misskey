@@ -38,7 +38,7 @@ type TimelineOptions = {
 	excludeReplies?: boolean;
 	excludePureRenotes: boolean;
 	ignoreAuthorFromUserSuspension?: boolean;
-	dbFallback: (untilId: string | null, sinceId: string | null, limit: number,nofilte ? : boolean | null) => Promise<MiNote[]>,
+	dbFallback: (untilId: string | null, sinceId: string | null, limit: number,nofilte ? : boolean | null,rebuild ? : boolean | null) => Promise<MiNote[]>,
 };
 
 @Injectable()
@@ -229,7 +229,7 @@ export class FanoutTimelineEndpointService {
 			} else if (ps.redisTimelines[0].startsWith('userTimeline')) {
 				maxlimit = ps.redisTimelines[0].startsWith('userTimelineWithFiles') ? serverSettings.perLocalUserUserTimelineCacheMax / 2 : serverSettings.perLocalUserUserTimelineCacheMax;
 			}
-			const notelist = await ps.dbFallback(null,null,maxlimit,true);
+			const notelist = await ps.dbFallback(null,null,maxlimit,true,true);
 			for (const nn of ps.redisTimelines){
 				if (nn.startsWith("localTimelineWithReplyTo")) {
 					continue;

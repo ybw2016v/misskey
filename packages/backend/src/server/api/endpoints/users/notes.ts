@@ -166,6 +166,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 		withFiles: boolean,
 		withRenotes: boolean,
 		nofilte? : boolean | null,
+		rebuild? : boolean | null,
 	}, me: MiLocalUser | null) {
 		const isSelf = me && (me.id === ps.userId);
 
@@ -194,11 +195,15 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			return await query.limit(ps.limit).getMany();
 		}
 
-		this.queryService.generateVisibilityQuery(query, me);
-		this.queryService.generateBaseNoteFilteringQuery(query, me, {
-			excludeAuthor: true,
-			excludeUserFromMute: ps.userId,
-		});
+		if (!ps.rebuild){
+			this.queryService.generateVisibilityQuery(query, me);
+			this.queryService.generateBaseNoteFilteringQuery(query, me, {
+				excludeAuthor: true,
+				excludeUserFromMute: ps.userId,
+			});
+		}
+
+
 
 		if (ps.withFiles) {
 			query.andWhere('note.fileIds != \'{}\'');
