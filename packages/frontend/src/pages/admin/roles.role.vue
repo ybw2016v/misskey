@@ -71,7 +71,7 @@ import { Paginator } from '@/utility/paginator.js';
 const router = useRouter();
 
 const props = defineProps<{
-	id?: string;
+	id: string;
 }>();
 
 const usersPaginator = markRaw(new Paginator('admin/roles/users', {
@@ -88,7 +88,11 @@ const role = reactive(await misskeyApi('admin/roles/show', {
 }));
 
 function edit() {
-	router.push('/admin/roles/' + role.id + '/edit');
+	router.push('/admin/roles/:id/edit', {
+		params: {
+			id: role.id,
+		}
+	});
 }
 
 async function del() {
@@ -111,15 +115,15 @@ async function assign() {
 	const { canceled: canceled2, result: period } = await os.select({
 		title: i18n.ts.period + ': ' + role.name,
 		items: [{
-			value: 'indefinitely', text: i18n.ts.indefinitely,
+			value: 'indefinitely', label: i18n.ts.indefinitely,
 		}, {
-			value: 'oneHour', text: i18n.ts.oneHour,
+			value: 'oneHour', label: i18n.ts.oneHour,
 		}, {
-			value: 'oneDay', text: i18n.ts.oneDay,
+			value: 'oneDay', label: i18n.ts.oneDay,
 		}, {
-			value: 'oneWeek', text: i18n.ts.oneWeek,
+			value: 'oneWeek', label: i18n.ts.oneWeek,
 		}, {
-			value: 'oneMonth', text: i18n.ts.oneMonth,
+			value: 'oneMonth', label: i18n.ts.oneMonth,
 		}],
 		default: 'indefinitely',
 	});

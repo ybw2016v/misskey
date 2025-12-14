@@ -62,7 +62,6 @@ export class NoteDeleteService {
 	 */
 	async delete(user: { id: MiUser['id']; uri: MiUser['uri']; host: MiUser['host']; isBot: MiUser['isBot']; }, note: MiNote, quiet = false, deleter?: MiUser) {
 		const deletedAt = new Date();
-		const cascadingNotes = await this.findCascadingNotes(note);
 
 		if (note.replyId) {
 			await this.notesRepository.decrement({ id: note.replyId }, 'repliesCount', 1);
@@ -90,15 +89,6 @@ export class NoteDeleteService {
 
 				this.deliverToConcerned(user, note, content);
 			}
-
-			// also deliver delete activity to cascaded notes
-			const federatedLocalCascadingNotes = (cascadingNotes).filter(note => !note.localOnly && note.userHost == null); // filter out local-only notes
-			for (const cascadingNote of federatedLocalCascadingNotes) {
-				if (!cascadingNote.user) continue;
-				if (!this.userEntityService.isLocalUser(cascadingNote.user)) continue;
-				const content = this.apRendererService.addContext(this.apRendererService.renderDelete(this.apRendererService.renderTombstone(`${this.config.url}/notes/${cascadingNote.id}`), cascadingNote.user));
-				this.deliverToConcerned(cascadingNote.user, cascadingNote, content);
-			}
 			//#endregion
 
 			this.notesChart.update(note, false);
@@ -118,9 +108,6 @@ export class NoteDeleteService {
 			}
 		}
 
-		for (const cascadingNote of cascadingNotes) {
-			this.searchService.unindexNote(cascadingNote);
-		}
 		this.searchService.unindexNote(note);
 
 		await this.notesRepository.delete({
