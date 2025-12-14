@@ -185,7 +185,7 @@
 			<p>${messages.solution2}</p>
 			<p>${messages.solution3}</p>
 			<p>${messages.solution4}</p>
-			<details style="color: #86b300;">
+			<details style="color: #7fbbff;">
 				<summary>${messages.otherOption}</summary>
 				<a href="${safeModeUrl}">
 					<button class="button-small">

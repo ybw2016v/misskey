@@ -25,7 +25,7 @@ export function UserPage(props: CommonProps<{
 			<>
 				<meta property="og:type" content="blog" />
 				<meta property="og:title" content={title} />
-				{props.user.description != null ? <meta property="og:description" content={props.user.description} /> : null}
+				{props.user.description != null ? <meta property="og:description" content={props.user.host ? null : props.user.description} /> : null}
 				<meta property="og:url" content={`${props.config.url}/@${props.user.username}`} />
 				<meta property="og:image" content={props.user.avatarUrl} />
 				<meta property="twitter:card" content="summary" />

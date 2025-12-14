@@ -51,7 +51,7 @@ const canShare = computed(() => navigator.canShare && navigator.canShare(shareDa
 
 const qrCodeEl = useTemplateRef('qrCodeEl');
 
-const qrColor = computed(() => tinycolor(instance.themeColor ?? '#86b300'));
+const qrColor = computed(() => tinycolor(instance.themeColor ?? '#7fbbff'));
 const qrHsl = computed(() => qrColor.value.toHsl());
 
 function share() {

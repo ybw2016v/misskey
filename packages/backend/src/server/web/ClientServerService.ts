@@ -149,7 +149,7 @@ export class ClientServerService {
 			'background_color': '#313a42',
 			// 空文字列の場合右辺を使いたいため
 			// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-			'theme_color': this.meta.themeColor || '#86b300',
+			'theme_color': this.meta.themeColor || '#7fbbff',
 			'icons': [{
 				// 空文字列の場合右辺を使いたいため
 				// eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
@@ -491,7 +491,7 @@ export class ClientServerService {
 				const profile = await this.userProfilesRepository.findOneByOrFail({ userId: user.id });
 
 				reply.header('Cache-Control', 'public, max-age=15');
-				if (!(host == null) || (host === this.config.host)){
+				if (!(host == null) || (host === this.config.host)) {
 					user.name = username;
 					user.avatarUrl = this.userEntityService.getIdenticonUrl(user);
 					profile.description = '';
