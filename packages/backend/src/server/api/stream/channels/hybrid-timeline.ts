@@ -53,63 +53,70 @@ class HybridTimelineChannel extends Channel {
 
 		if (this.withFiles && (note.fileIds == null || note.fileIds.length === 0)) return;
 
-		// チャンネルの投稿ではなく、自分自身の投稿 または
-		// チャンネルの投稿ではなく、その投稿のユーザーをフォローしている または
-		// チャンネルの投稿ではなく、全体公開のローカルの投稿 または
-		// フォローしているチャンネルの投稿 の場合だけ
-		if (!(
-			(note.channelId == null && isMe) ||
-			(note.channelId == null && Object.hasOwn(this.following, note.userId)) ||
-			(note.channelId == null && (note.user.host == null && note.visibility === 'public')) ||
-			(note.channelId != null && this.followingChannels.has(note.channelId))
-		)) return;
-		note = await this.noteEntityService.pack(note.id, this.user!, {
-			detail: true,
-		});
-		
-		if (note.isHidden) {
-			return;
-		}
-
-		if (note.visibility === 'followers') {
-			if (!isMe && !Object.hasOwn(this.following, note.userId)) return;
-		} else if (note.visibility === 'specified') {
-			if (!isMe && !note.visibleUserIds!.includes(this.user!.id)) return;
-		}
-
-		if (this.isNoteMutedOrBlocked(note)) return;
-
-		if (note.reply) {
-			const reply = note.reply;
-			if ((this.following[note.userId]?.withReplies ?? false) || this.withReplies) {
-				// 自分のフォローしていないユーザーの visibility: followers な投稿への返信は弾く
-				if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId) && reply.userId !== this.user!.id) return;
-			} else {
-				// 「チャンネル接続主への返信」でもなければ、「チャンネル接続主が行った返信」でもなければ、「投稿者の投稿者自身への返信」でもない場合
-				if (reply.userId !== this.user!.id && !isMe && reply.userId !== note.userId) return;
+		if (!note.channelId) {
+			// 以下の条件に該当するノートのみ後続処理に通す（ので、以下のif文は該当しないノートをすべて弾くようにする）
+			// - 自分自身の投稿
+			// - その投稿のユーザーをフォローしている
+			// - 全体公開のローカルの投稿
+			if (!(
+				isMe ||
+				Object.hasOwn(this.following, note.userId) ||
+				(note.user.host == null && note.visibility === 'public')
+			)) {
+				return;
 			}
-		}
-
-		// 純粋なリノート（引用リノートでないリノート）の場合
-		if (isRenotePacked(note) && !isQuotePacked(note) && note.renote) {
-			if (!this.withRenotes) return;
-			if (note.renote.reply) {
-				const reply = note.renote.reply;
-				// 自分のフォローしていないユーザーの visibility: followers な投稿への返信のリノートは弾く
-				if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId) && reply.userId !== this.user!.id) return;
+		} else {
+			// 以下の条件に該当するノートのみ後続処理に通す（ので、以下のif文は該当しないノートをすべて弾くようにする）
+			// - フォローしているチャンネルの投稿
+			if (!this.followingChannels.has(note.channelId)) {
+				return;
 			}
-		}
+			note = await this.noteEntityService.pack(note.id, this.user!, {
+				detail: true,
+			});
 
-		if (this.user && note.renoteId && !note.text) {
-			if (note.renote && Object.keys(note.renote.reactions).length > 0) {
-				const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
-				note.renote.myReaction = myRenoteReaction;
+			if (note.isHidden) {
+				return;
 			}
+
+			if (note.visibility === 'followers') {
+				if (!isMe && !Object.hasOwn(this.following, note.userId)) return;
+			} else if (note.visibility === 'specified') {
+				if (!isMe && !note.visibleUserIds!.includes(this.user!.id)) return;
+			}
+
+			if (this.isNoteMutedOrBlocked(note)) return;
+
+			if (note.reply) {
+				const reply = note.reply;
+				if ((this.following[note.userId]?.withReplies ?? false) || this.withReplies) {
+					// 自分のフォローしていないユーザーの visibility: followers な投稿への返信は弾く
+					if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId) && reply.userId !== this.user!.id) return;
+				} else {
+					// 「チャンネル接続主への返信」でもなければ、「チャンネル接続主が行った返信」でもなければ、「投稿者の投稿者自身への返信」でもない場合
+					if (reply.userId !== this.user!.id && !isMe && reply.userId !== note.userId) return;
+				}
+			}
+
+			// 純粋なリノート（引用リノートでないリノート）の場合
+			if (isRenotePacked(note) && !isQuotePacked(note) && note.renote) {
+				if (!this.withRenotes) return;
+				if (note.renote.reply) {
+					const reply = note.renote.reply;
+					// 自分のフォローしていないユーザーの visibility: followers な投稿への返信のリノートは弾く
+					if (reply.visibility === 'followers' && !Object.hasOwn(this.following, reply.userId) && reply.userId !== this.user!.id) return;
+				}
+			}
+
+			if (this.user && note.renoteId && !note.text) {
+				if (note.renote && Object.keys(note.renote.reactions).length > 0) {
+					const myRenoteReaction = await this.noteEntityService.populateMyReaction(note.renote, this.user.id);
+					note.renote.myReaction = myRenoteReaction;
+				}
+			}
+
+			this.send('note', note);
 		}
-
-		this.connection.cacheNote(note);
-
-		this.send('note', note);
 	}
 
 	@bindThis

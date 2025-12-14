@@ -54,8 +54,6 @@ class HashtagChannel extends Channel {
 			}
 		}
 
-		this.connection.cacheNote(note);
-
 		this.send('note', note);
 	}
 

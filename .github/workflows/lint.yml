@@ -9,6 +9,7 @@ on:
       - packages/backend/**
       - packages/frontend/**
       - packages/frontend-shared/**
+      - packages/frontend-builder/**
       - packages/frontend-embed/**
       - packages/icons-subsetter/**
       - packages/sw/**
@@ -22,6 +23,7 @@ on:
       - packages/backend/**
       - packages/frontend/**
       - packages/frontend-shared/**
+      - packages/frontend-builder/**
       - packages/frontend-embed/**
       - packages/icons-subsetter/**
       - packages/sw/**
@@ -34,7 +36,7 @@ jobs:
   pnpm_install:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v4.3.0
       with:
         fetch-depth: 0
         submodules: true
@@ -44,7 +46,7 @@ jobs:
         host: github.com
         private-key: ${{ secrets.SSHKEY }}
     - name: Setup pnpm
-      uses: pnpm/action-setup@v4.1.0
+      uses: pnpm/action-setup@v4.2.0
     - uses: actions/setup-node@v4.4.0
       with:
         node-version-file: '.node-version'
@@ -61,6 +63,7 @@ jobs:
         - backend
         - frontend
         - frontend-shared
+        - frontend-builder
         - frontend-embed
         - icons-subsetter
         - sw
@@ -71,7 +74,7 @@ jobs:
       eslint-cache-version: v1
       eslint-cache-path: ${{ github.workspace }}/node_modules/.cache/eslint-${{ matrix.workspace }}
     steps:
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v4.3.0
       with:
         fetch-depth: 0
         submodules: true
@@ -82,14 +85,14 @@ jobs:
         sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/backend/package.json
         sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/sw/package.json
     - name: Setup pnpm
-      uses: pnpm/action-setup@v4.1.0
+      uses: pnpm/action-setup@v4.2.0
     - uses: actions/setup-node@v4.4.0
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
     - name: Restore eslint cache
-      uses: actions/cache@v4.2.3
+      uses: actions/cache@v4.3.0
       with:
         path: ${{ env.eslint-cache-path }}
         key: eslint-${{ env.eslint-cache-version }}-${{ matrix.workspace }}-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ github.ref_name }}-${{ github.sha }}
@@ -104,10 +107,11 @@ jobs:
       matrix:
         workspace:
         - backend
+        - frontend
         - sw
         - misskey-js
     steps:
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v4.3.0
       with:
         fetch-depth: 0
         submodules: true
@@ -119,14 +123,11 @@ jobs:
         sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/sw/package.json
         sed -i 's|git@github.com:|https://github.com/|g' .gitmodules
     - name: Setup pnpm
-      uses: pnpm/action-setup@v4.1.0
+      uses: pnpm/action-setup@v4.2.0
     - uses: actions/setup-node@v4.4.0
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'
     - run: pnpm i --frozen-lockfile
-    - run: pnpm --filter misskey-js run build
-      if: ${{ matrix.workspace == 'backend' || matrix.workspace == 'sw' }}
-    - run: pnpm --filter misskey-reversi run build
-      if: ${{ matrix.workspace == 'backend' }}
+    - run: pnpm --filter "${{ matrix.workspace }}^..." run build
     - run: pnpm --filter ${{ matrix.workspace }} run typecheck

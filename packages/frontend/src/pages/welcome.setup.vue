@@ -10,7 +10,7 @@ SPDX-License-Identifier: AGPL-3.0-only
 			<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="z-index:1;position:relative" viewBox="0 0 854 300">
 				<defs>
 					<linearGradient id="linear" x1="0%" y1="0%" x2="100%" y2="0%">
-						<stop offset="0%" stop-color="#86b300"/><stop offset="100%" stop-color="#4ab300"/>
+						<stop offset="0%" stop-color="#7fbbff"/><stop offset="100%" stop-color="#4ab300"/>
 					</linearGradient>
 				</defs>
 
@@ -87,7 +87,14 @@ SPDX-License-Identifier: AGPL-3.0-only
 						<div>{{ i18n.ts._serverSetupWizard.settingsYouMakeHereCanBeChangedLater }}</div>
 					</div>
 
-					<MkServerSetupWizard :token="token" @finished="onWizardFinished"/>
+					<Suspense>
+						<template #default>
+							<MkServerSetupWizard :token="token" @finished="onWizardFinished"/>
+						</template>
+						<template #fallback>
+							<MkLoading/>
+						</template>
+					</Suspense>
 
 					<MkButton rounded style="margin: 0 auto;" @click="skipSettings">
 						{{ i18n.ts._serverSetupWizard.skipSettings }}

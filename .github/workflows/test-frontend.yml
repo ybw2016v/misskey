@@ -30,7 +30,7 @@ jobs:
     if: ${{ !contains(github.event.commits.*.message, '[skip ci]') && !contains(github.event.commits.*.message, '[ci skip]') }}
 
     steps:
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v4.3.0
       with:
         submodules: true
     - name: Setup SSH
@@ -39,7 +39,7 @@ jobs:
         host: github.com
         private-key: ${{ secrets.SSHKEY }}
     - name: Setup pnpm
-      uses: pnpm/action-setup@v4.1.0
+      uses: pnpm/action-setup@v4.2.0
     - name: Use Node.js
       uses: actions/setup-node@v4.4.0
       with:
@@ -71,7 +71,7 @@ jobs:
 
     services:
       postgres:
-        image: postgres:15
+        image: postgres:18
         ports:
           - 54312:5432
         env:
@@ -83,7 +83,7 @@ jobs:
           - 56312:6379
 
     steps:
-    - uses: actions/checkout@v4.2.2
+    - uses: actions/checkout@v4.3.0
       with:
         submodules: true
     # https://github.com/cypress-io/cypress-docker-images/issues/150
@@ -98,7 +98,7 @@ jobs:
         host: github.com
         private-key: ${{ secrets.SSHKEY }}
     - name: Setup pnpm
-      uses: pnpm/action-setup@v4.1.0
+      uses: pnpm/action-setup@v4.2.0
     - name: Use Node.js
       uses: actions/setup-node@v4.4.0
       with:
