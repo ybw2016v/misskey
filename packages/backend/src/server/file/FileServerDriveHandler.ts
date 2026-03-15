@@ -5,8 +5,9 @@
 
 import * as fs from 'node:fs';
 import rename from 'rename';
+import { sharpBmp } from '@misskey-dev/sharp-read-bmp';
 import type { Config } from '@/config.js';
-import type { IImageStreamable } from '@/core/ImageProcessingService.js';
+import type { IImageStreamable, ImageProcessingService } from '@/core/ImageProcessingService.js';
 import { contentDisposition } from '@/misc/content-disposition.js';
 import { correctFilename } from '@/misc/correct-filename.js';
 import { isMimeImage } from '@/misc/is-mime-image.js';
@@ -21,6 +22,7 @@ export class FileServerDriveHandler {
 		private fileResolver: FileServerFileResolver,
 		private assetsPath: string,
 		private videoProcessingService: VideoProcessingService,
+		private imageProcessingService: ImageProcessingService,
 	) {}
 
 	public async handle(request: FastifyRequest<{ Params: { key: string } }>, reply: FastifyReply) {
@@ -47,12 +49,14 @@ export class FileServerDriveHandler {
 					if (isMimeImage(file.mime, 'sharp-convertible-image-with-bmp')) {
 						reply.header('Cache-Control', 'max-age=31536000, immutable');
 
-						const url = new URL(`${this.config.mediaProxy}/static.webp`);
-						url.searchParams.set('url', file.url);
-						url.searchParams.set('static', '1');
+						image = this.imageProcessingService.convertSharpToWebpStream(await sharpBmp(file.path, file.mime), 498, 422);
 
-						file.cleanup();
-						return await reply.redirect(url.toString(), 301);
+						// const url = new URL(`${this.config.mediaProxy}/static.webp`);
+						// url.searchParams.set('url', file.url);
+						// url.searchParams.set('static', '1');
+
+						// file.cleanup();
+						// return await reply.redirect(url.toString(), 301);
 					} else if (file.mime.startsWith('video/')) {
 						const externalThumbnail = this.videoProcessingService.getExternalVideoThumbnailUrl(file.url);
 						if (externalThumbnail) {
