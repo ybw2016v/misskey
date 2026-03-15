@@ -20,6 +20,10 @@ import { CacheService } from '@/core/CacheService.js';
 import { isReply } from '@/misc/is-reply.js';
 import { isInstanceMuted } from '@/misc/is-instance-muted.js';
 import { MetaService } from '@/core/MetaService.js';
+import { ChannelMutingService } from '@/core/ChannelMutingService.js';
+import { isChannelRelated } from '@/misc/is-channel-related.js';
+
+type NoteFilter = (note: MiNote) => boolean;
 
 type TimelineOptions = {
 	untilId: string | null,
@@ -29,16 +33,17 @@ type TimelineOptions = {
 	me?: { id: MiUser['id'] } | undefined | null,
 	useDbFallback: boolean,
 	redisTimelines: FanoutTimelineName[],
-	noteFilter?: (note: MiNote) => boolean,
+	noteFilter?: NoteFilter,
 	alwaysIncludeMyNotes?: boolean;
 	ignoreAuthorFromBlock?: boolean;
 	ignoreAuthorFromMute?: boolean;
 	ignoreAuthorFromInstanceBlock?: boolean;
+	ignoreAuthorChannelFromMute?: boolean;
 	excludeNoFiles?: boolean;
 	excludeReplies?: boolean;
 	excludePureRenotes: boolean;
 	ignoreAuthorFromUserSuspension?: boolean;
-	dbFallback: (untilId: string | null, sinceId: string | null, limit: number,nofilte ? : boolean | null) => Promise<MiNote[]>,
+	dbFallback: (untilId: string | null, sinceId: string | null, limit: number, nofilte ? : boolean | null, rebuild ? : boolean | null) => Promise<MiNote[]>,
 };
 
 @Injectable()
@@ -55,6 +60,7 @@ export class FanoutTimelineEndpointService {
 		private fanoutTimelineService: FanoutTimelineService,
 		private metaService: MetaService,
 		private utilityService: UtilityService,
+		private channelMutingService: ChannelMutingService,
 	) {
 	}
 
@@ -67,7 +73,6 @@ export class FanoutTimelineEndpointService {
 	async getMiNotes(ps: TimelineOptions): Promise<MiNote[]> {
 		// 呼び出し元と以下の処理をシンプルにするためにdbFallbackを置き換える
 		if (!ps.useDbFallback) ps.dbFallback = () => Promise.resolve([]);
-
 
 		const ascending = ps.sinceId && !ps.untilId;
 		const idCompare: (a: string, b: string) => number = ascending ? (a, b) => a < b ? -1 : 1 : (a, b) => a > b ? -1 : 1;
@@ -82,14 +87,13 @@ export class FanoutTimelineEndpointService {
 		const shouldFallbackToDb = noteIds.length === 0 || ps.sinceId != null && ps.sinceId < oldestNoteId;
 
 		if (!shouldFallbackToDb) {
-
 			for (const n of ps.redisTimelines) {
-				if (n.startsWith("homeTimeline") || n.startsWith("userTimeline") || n.startsWith("userListTimeline") || n.startsWith("localTimelineWithReplyTo")) {
+				if (n.startsWith('homeTimeline') || n.startsWith('userTimeline') || n.startsWith('userListTimeline') || n.startsWith('localTimelineWithReplyTo')) {
 					this.fanoutTimelineService.keyexpire(n, 60 * 60 * 24 * 7);
 				}
 			}
 
-			let filter = ps.noteFilter ?? (_note => true);
+			let filter = ps.noteFilter ?? (_note => true) as NoteFilter;
 
 			if (ps.alwaysIncludeMyNotes && ps.me) {
 				const me = ps.me;
@@ -119,11 +123,13 @@ export class FanoutTimelineEndpointService {
 					userIdsWhoMeMutingRenotes,
 					userIdsWhoBlockingMe,
 					userMutedInstances,
+					userMutedChannels,
 				] = await Promise.all([
 					this.cacheService.userMutingsCache.fetch(ps.me.id),
 					this.cacheService.renoteMutingsCache.fetch(ps.me.id),
 					this.cacheService.userBlockedCache.fetch(ps.me.id),
 					this.cacheService.userProfileCache.fetch(me.id).then(p => new Set(p.mutedInstances)),
+					this.channelMutingService.mutingChannelsCache.fetch(me.id),
 				]);
 
 				const parentFilter = filter;
@@ -134,6 +140,7 @@ export class FanoutTimelineEndpointService {
 					if (isUserRelated(note.renote, userIdsWhoMeMuting, ps.ignoreAuthorFromMute)) return false;
 					if (!ps.ignoreAuthorFromMute && isRenote(note) && !isQuote(note) && userIdsWhoMeMutingRenotes.has(note.userId)) return false;
 					if (isInstanceMuted(note, userMutedInstances)) return false;
+					if (isChannelRelated(note, userMutedChannels, ps.ignoreAuthorChannelFromMute)) return false;
 
 					return parentFilter(note);
 				};
@@ -155,15 +162,11 @@ export class FanoutTimelineEndpointService {
 			{
 				const parentFilter = filter;
 				filter = (note) => {
-					const noteJoined = note as MiNote & {
-						renoteUser: MiUser | null;
-						replyUser: MiUser | null;
-					};
 					if (!ps.ignoreAuthorFromUserSuspension) {
 						if (note.user!.isSuspended) return false;
 					}
-					if (note.userId !== note.renoteUserId && noteJoined.renoteUser?.isSuspended) return false;
-					if (note.userId !== note.replyUserId && noteJoined.replyUser?.isSuspended) return false;
+					if (note.userId !== note.renoteUserId && note.renote?.user?.isSuspended) return false;
+					if (note.userId !== note.replyUserId && note.reply?.user?.isSuspended) return false;
 
 					return parentFilter(note);
 				};
@@ -210,9 +213,9 @@ export class FanoutTimelineEndpointService {
 		let needInit = false;
 
 		for (const n of ps.redisTimelines) {
-			if (n.startsWith("homeTimeline") || n.startsWith("userTimeline") || n.startsWith("userListTimeline") ) {
+			if (n.startsWith('homeTimeline') || n.startsWith('userTimeline') || n.startsWith('userListTimeline') ) {
 				const exist = await this.fanoutTimelineService.isexist(n);
-				if (exist==0) {
+				if (exist == 0) {
 					needInit = true;
 					break;
 				}
@@ -229,9 +232,9 @@ export class FanoutTimelineEndpointService {
 			} else if (ps.redisTimelines[0].startsWith('userTimeline')) {
 				maxlimit = ps.redisTimelines[0].startsWith('userTimelineWithFiles') ? serverSettings.perLocalUserUserTimelineCacheMax / 2 : serverSettings.perLocalUserUserTimelineCacheMax;
 			}
-			const notelist = await ps.dbFallback(null,null,maxlimit,true);
-			for (const nn of ps.redisTimelines){
-				if (nn.startsWith("localTimelineWithReplyTo")) {
+			const notelist = await ps.dbFallback(null, null, maxlimit, true, true);
+			for (const nn of ps.redisTimelines) {
+				if (nn.startsWith('localTimelineWithReplyTo')) {
 					continue;
 				}
 				for (const n in notelist) {
@@ -246,7 +249,7 @@ export class FanoutTimelineEndpointService {
 		return await ps.dbFallback(ps.untilId, ps.sinceId, ps.limit);
 	}
 
-	private async getAndFilterFromDb(noteIds: string[], noteFilter: (note: MiNote) => boolean, idCompare: (a: string, b: string) => number): Promise<MiNote[]> {
+	private async getAndFilterFromDb(noteIds: string[], noteFilter: NoteFilter, idCompare: (a: string, b: string) => number): Promise<MiNote[]> {
 		const query = this.notesRepository.createQueryBuilder('note')
 			.where('note.id IN (:...noteIds)', { noteIds: noteIds })
 			.innerJoinAndSelect('note.user', 'user')

@@ -6,87 +6,138 @@ SPDX-License-Identifier: AGPL-3.0-only
 <template>
 <PageWithHeader :actions="headerActions" :tabs="headerTabs">
 	<div class="_spacer" style="--MI_SPACER-w: 700px; --MI_SPACER-min: 16px; --MI_SPACER-max: 32px;">
-		<FormSuspense :p="init">
-			<div class="_gaps">
-				<MkFolder>
-					<template #label>Google Analytics<span class="_beta">{{ i18n.ts.beta }}</span></template>
-
-					<div class="_gaps_m">
-						<MkInput v-model="googleAnalyticsMeasurementId">
-							<template #prefix><i class="ti ti-key"></i></template>
-							<template #label>Measurement ID</template>
-						</MkInput>
-						<MkButton primary @click="save_googleAnalytics">Save</MkButton>
-					</div>
-				</MkFolder>
-
-				<MkFolder>
-						<template #label>DeepL Translation</template>
+		<SearchMarker path="/admin/external-services" :label="i18n.ts.externalServices" :keywords="['external', 'services', 'thirdparty']" icon="ti ti-link">
+			<div class="_gaps_m">
+				<SearchMarker v-slot="slotProps">
+					<MkFolder :defaultOpen="slotProps.isParentOfTarget">
+						<template #label><SearchLabel>Google Analytics</SearchLabel><span class="_beta">{{ i18n.ts.beta }}</span></template>
 
 						<div class="_gaps_m">
-							<MkInput v-model="deeplAuthKey">
-								<template #prefix><i class="ti ti-key"></i></template>
-								<template #label>DeepL Auth Key</template>
-							</MkInput>
-							<MkSwitch v-model="deeplIsPro">
-								<template #label>Pro account</template>
-							</MkSwitch>
+							<SearchMarker>
+								<MkInput v-model="googleAnalyticsMeasurementId">
+									<template #prefix><i class="ti ti-key"></i></template>
+									<template #label><SearchLabel>Measurement ID</SearchLabel></template>
+								</MkInput>
+							</SearchMarker>
+
+							<MkButton primary @click="save_googleAnalytics">Save</MkButton>
+						</div>
+					</MkFolder>
+				</SearchMarker>
+
+				<SearchMarker v-slot="slotProps">
+					<MkFolder :defaultOpen="slotProps.isParentOfTarget">
+						<template #label><SearchLabel>DeepL Translation</SearchLabel></template>
+
+						<div class="_gaps_m">
+							<SearchMarker>
+								<MkInput v-model="deeplAuthKey">
+									<template #prefix><i class="ti ti-key"></i></template>
+									<template #label><SearchLabel>Auth Key</SearchLabel></template>
+								</MkInput>
+							</SearchMarker>
+
+							<SearchMarker>
+								<MkSwitch v-model="deeplIsPro">
+									<template #label><SearchLabel>Pro account</SearchLabel></template>
+								</MkSwitch>
+							</SearchMarker>
+
 							<MkButton primary @click="save_deepl">Save</MkButton>
 						</div>
 					</MkFolder>
-				<MkFolder>
-					<template #label>Llm Translation</template>
+				</SearchMarker>
 
-					<div class="_gaps_m">
-						<MkSwitch v-model="llmTranslatorEnabled">
-							<template #label>Enable</template>
-							<template #caption>Enable/disable AI-powered(LLM) translation functionality</template>
-						</MkSwitch>
-						<MkInput v-model="llmTranslatorBaseUrl" :placeholder="'https://example.com'">
-							<template #label>Base URL</template>
-							<template #caption>The base URL for openai compatible API (e.g., OpenAI or compatible service endpoint)</template>
-						</MkInput>
-						<MkInput v-model="llmTranslatorApiKey">
-							<template #prefix><i class="ti ti-key"></i></template>
-							<template #label>API Key</template>
-						</MkInput>
-						<MkInput v-model="llmTranslatorModel">
-							<template #label>Model Name</template>
-							<template #caption>Llm model to use (e.g., gpt-3.5-turbo, text-davinci-003, deepseek-chat)</template>
-						</MkInput>
-						<MkInput v-model="llmTranslatorTemperature" type="number">
-							<template #label>Temperature</template>
-							<template #caption>Sampling temperature (higher = more random/creative)</template>
-						</MkInput>
-						<MkInput v-model="llmTranslatorTopP" type="number">
-							<template #label>Top P</template>
-							<template #caption>Nucleus sampling threshold (0-1, alternative to temperature)</template>
-						</MkInput>
-						<MkInput v-model="llmTranslatorMaxTokens" type="number">
-							<template #label>Max Tokens</template>
-							<template #caption>Maximum length of response in tokens (affects response length)</template>
-						</MkInput>
-						<MkTextarea v-model="llmTranslatorSysPrompt">
-							<template #label>System Prompt</template>
-							<template #caption>Initial system-level instructions for the llm (can use {text} and {targetLang} as placeholders)<br>Example: "You are a translation specialist. Translate content between languages while preserving technical terms."</template>
-						</MkTextarea>
-						<MkTextarea v-model="llmTranslatorUserPrompt">
-							<template #label>User Prompt</template>
-							<template #caption>Translation instruction template (may include {text} for source text and {targetLang} for target language)<br>Example: "Translate this to {targetLang}: {text}"</template>
-						</MkTextarea>
-						<MkSwitch v-model="llmTranslatorRedisCacheEnabled">
-							<template #label>Redis Cache Enable</template>
-							<template #caption>Cache translations by using redis to reduce API calls and costs</template>
-						</MkSwitch>
-						<MkInput v-model="llmTranslatorRedisCacheTtl" type="number">
-							<template #label>Redis Cache TTL</template>
-							<template #caption>Cache expiration time in minutes</template>
-						</MkInput>
-						<MkButton primary @click="save_llm">Save</MkButton>
-					</div>
-				</MkFolder>
+				<SearchMarker v-slot="slotProps"> 
+					<MkFolder :defaultOpen="slotProps.isParentOfTarget">
+						<template #label>Llm Translation</template>
+
+						<div class="_gaps_m">
+							<SearchMarker> 
+								<MkSwitch v-model="llmTranslatorEnabled">
+									<template #label>Enable</template>
+									<template #caption>Enable/disable AI-powered(LLM) translation functionality</template>
+								</MkSwitch>
+							</SearchMarker>
+
+							<SearchMarker> 	
+								<MkInput v-model="llmTranslatorBaseUrl" :placeholder="'https://example.com'">
+									<template #label>Base URL</template>
+									<template #caption>The base URL for openai compatible API (e.g., OpenAI or compatible service endpoint)</template>
+								</MkInput>
+							</SearchMarker>
+							
+							<SearchMarker> 
+								<MkInput v-model="llmTranslatorApiKey">
+									<template #prefix><i class="ti ti-key"></i></template>
+									<template #label>API Key</template>
+								</MkInput>
+							</SearchMarker>
+
+							<SearchMarker> 
+								<MkInput v-model="llmTranslatorModel">
+									<template #label>Model Name</template>
+									<template #caption>Llm model to use (e.g., gpt-3.5-turbo, text-davinci-003, deepseek-chat)</template>
+								</MkInput>
+							</SearchMarker>
+
+							<SearchMarker> 
+								<MkInput v-model="llmTranslatorTemperature" type="number">
+									<template #label>Temperature</template>
+									<template #caption>Sampling temperature (higher = more random/creative)</template>
+								</MkInput>
+							</SearchMarker>
+
+							<SearchMarker> 
+								<MkInput v-model="llmTranslatorTopP" type="number">
+									<template #label>Top P</template>
+									<template #caption>Nucleus sampling threshold (0-1, alternative to temperature)</template>
+								</MkInput>
+							</SearchMarker>
+
+							<SearchMarker> 
+								<MkInput v-model="llmTranslatorMaxTokens" type="number">
+									<template #label>Max Tokens</template>
+									<template #caption>Maximum length of response in tokens (affects response length)</template>
+								</MkInput>
+							</SearchMarker>
+
+							<SearchMarker> 
+								<MkTextarea v-model="llmTranslatorSysPrompt">
+									<template #label>System Prompt</template>
+									<template #caption>Initial system-level instructions for the llm (can use {text} and {targetLang} as placeholders)<br>Example: "You are a translation specialist. Translate content between languages while preserving technical terms."</template>
+								</MkTextarea>
+							</SearchMarker>
+
+							<SearchMarker> 
+								<MkTextarea v-model="llmTranslatorUserPrompt">
+									<template #label>User Prompt</template>
+									<template #caption>Translation instruction template (may include {text} for source text and {targetLang} for target language)<br>Example: "Translate this to {targetLang}: {text}"</template>
+								</MkTextarea>
+							</SearchMarker>
+
+							<SearchMarker> 
+								<MkSwitch v-model="llmTranslatorRedisCacheEnabled">
+									<template #label>Redis Cache Enable</template>
+									<template #caption>Cache translations by using redis to reduce API calls and costs</template>
+								</MkSwitch>
+							</SearchMarker>
+
+							<SearchMarker> 
+								<MkInput v-model="llmTranslatorRedisCacheTtl" type="number">
+									<template #label>Redis Cache TTL</template>
+									<template #caption>Cache expiration time in minutes</template>
+								</MkInput>
+							</SearchMarker>
+
+							<SearchMarker> 
+								<MkButton primary @click="save_llm">Save</MkButton>
+							</SearchMarker>
+						</div>
+					</MkFolder>
+				</SearchMarker>
 			</div>
-		</FormSuspense>
+		</SearchMarker>
 	</div>
 </PageWithHeader>
 </template>
@@ -97,7 +148,6 @@ import MkInput from '@/components/MkInput.vue';
 import MkTextarea from '@/components/MkTextarea.vue';
 import MkButton from '@/components/MkButton.vue';
 import MkSwitch from '@/components/MkSwitch.vue';
-import FormSuspense from '@/components/form/suspense.vue';
 import * as os from '@/os.js';
 import { misskeyApi } from '@/utility/misskey-api.js';
 import { fetchInstance } from '@/instance.js';
