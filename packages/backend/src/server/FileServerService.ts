@@ -63,6 +63,7 @@ export class FileServerService {
 			this.fileResolver,
 			assets,
 			this.videoProcessingService,
+			this.imageProcessingService,
 		);
 		this.proxyHandler = new FileServerProxyHandler(
 			this.config,
