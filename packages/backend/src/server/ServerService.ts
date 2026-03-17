@@ -75,7 +75,7 @@ export class ServerService implements OnApplicationShutdown {
 	@bindThis
 	public async launch(): Promise<void> {
 		const fastify = Fastify({
-			trustProxy: this.config.trustProxy,
+			trustProxy: true, //this.config.trustProxy,
 			logger: false,
 		});
 		this.#fastify = fastify;
@@ -247,7 +247,7 @@ export class ServerService implements OnApplicationShutdown {
 		fastify.server.on('error', err => {
 			switch ((err as any).code) {
 				case 'EACCES':
-					this.logger.error(!this.config.socket ?`You do not have permission to listen on port ${this.config.port}.`: `You do not have permission to listen on socket ${this.config.socket}.`);
+					this.logger.error(!this.config.socket ? `You do not have permission to listen on port ${this.config.port}.` : `You do not have permission to listen on socket ${this.config.socket}.`);
 					break;
 				case 'EADDRINUSE':
 					this.logger.error(`Port ${this.config.port} is already in use by another process.`);
