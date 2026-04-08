@@ -172,23 +172,21 @@ const llmTranslatorUserPrompt = ref<string>('');
 const llmTranslatorRedisCacheEnabled = ref<boolean>(false);
 const llmTranslatorRedisCacheTtl = ref<number>(0);
 
-async function init() {
-	const meta = await misskeyApi('admin/meta');
-	deeplAuthKey.value = meta.deeplAuthKey ?? '';
-	deeplIsPro.value = meta.deeplIsPro;
-	googleAnalyticsMeasurementId.value = meta.googleAnalyticsMeasurementId ?? '';
-	llmTranslatorEnabled.value = meta.enableLlmTranslator;
-	llmTranslatorBaseUrl.value = meta.llmTranslatorBaseUrl ?? '';
-	llmTranslatorApiKey.value = meta.llmTranslatorApiKey ?? '';
-	llmTranslatorModel.value = meta.llmTranslatorModel ?? '';
-	llmTranslatorTemperature.value = meta.llmTranslatorTemperature;
-	llmTranslatorTopP.value = meta.llmTranslatorTopP;
-	llmTranslatorMaxTokens.value = meta.llmTranslatorMaxTokens;
-	llmTranslatorSysPrompt.value = meta.llmTranslatorSysPrompt ?? '';
-	llmTranslatorUserPrompt.value = meta.llmTranslatorUserPrompt ?? '';
-	llmTranslatorRedisCacheEnabled.value = meta.enableLlmTranslatorRedisCache;
-	llmTranslatorRedisCacheTtl.value = meta.llmTranslatorRedisCacheTtl;
-}
+const meta = await misskeyApi('admin/meta');
+deeplAuthKey.value = meta.deeplAuthKey ?? '';
+deeplIsPro.value = meta.deeplIsPro;
+googleAnalyticsMeasurementId.value = meta.googleAnalyticsMeasurementId ?? '';
+llmTranslatorEnabled.value = meta.enableLlmTranslator;
+llmTranslatorBaseUrl.value = meta.llmTranslatorBaseUrl ?? '';
+llmTranslatorApiKey.value = meta.llmTranslatorApiKey ?? '';
+llmTranslatorModel.value = meta.llmTranslatorModel ?? '';
+llmTranslatorTemperature.value = meta.llmTranslatorTemperature;
+llmTranslatorTopP.value = meta.llmTranslatorTopP;
+llmTranslatorMaxTokens.value = meta.llmTranslatorMaxTokens;
+llmTranslatorSysPrompt.value = meta.llmTranslatorSysPrompt ?? '';
+llmTranslatorUserPrompt.value = meta.llmTranslatorUserPrompt ?? '';
+llmTranslatorRedisCacheEnabled.value = meta.enableLlmTranslatorRedisCache;
+llmTranslatorRedisCacheTtl.value = meta.llmTranslatorRedisCacheTtl;
 
 function save_deepl() {
 	os.apiWithDialog('admin/update-meta', {
