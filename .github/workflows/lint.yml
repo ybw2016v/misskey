@@ -46,8 +46,8 @@ jobs:
         host: github.com
         private-key: ${{ secrets.SSHKEY }}
     - name: Setup pnpm
-      uses: pnpm/action-setup@v4.2.0
-    - uses: actions/setup-node@v6.2.0
+      uses: pnpm/action-setup@v4.4.0
+    - uses: actions/setup-node@v6.3.0
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'
@@ -85,8 +85,8 @@ jobs:
         sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/backend/package.json
         sed -i 's|git+ssh://git@github.com:|git+https://github.com/|g' packages/sw/package.json
     - name: Setup pnpm
-      uses: pnpm/action-setup@v4.2.0
-    - uses: actions/setup-node@v6.2.0
+      uses: pnpm/action-setup@v4.4.0
+    - uses: actions/setup-node@v6.3.0
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'
@@ -123,8 +123,8 @@ jobs:
         sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/sw/package.json
         sed -i 's|git@github.com:|https://github.com/|g' .gitmodules
     - name: Setup pnpm
-      uses: pnpm/action-setup@v4.2.0
-    - uses: actions/setup-node@v6.2.0
+      uses: pnpm/action-setup@v4.4.0
+    - uses: actions/setup-node@v6.3.0
       with:
         node-version-file: '.node-version'
         cache: 'pnpm'
