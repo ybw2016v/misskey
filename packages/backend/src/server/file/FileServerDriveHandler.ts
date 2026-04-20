@@ -23,7 +23,7 @@ export class FileServerDriveHandler {
 		private assetsPath: string,
 		private videoProcessingService: VideoProcessingService,
 		private imageProcessingService: ImageProcessingService,
-	) {}
+	) { }
 
 	public async handle(request: FastifyRequest<{ Params: { key: string } }>, reply: FastifyReply) {
 		const key = request.params.key;
@@ -50,7 +50,19 @@ export class FileServerDriveHandler {
 						reply.header('Cache-Control', 'max-age=31536000, immutable');
 
 						image = this.imageProcessingService.convertSharpToWebpStream(await sharpBmp(file.path, file.mime), 498, 422);
+						if (needsCleanup(file)) {
+							attachStreamCleanup(image.data, file.cleanup);
+						}
 
+						reply.header('Content-Type', image.type);
+						reply.header('Cache-Control', 'max-age=31536000, immutable');
+						reply.header('Content-Disposition',
+							contentDisposition(
+								'inline',
+								correctFilename(file.filename, image.ext),
+							),
+						);
+						return image.data;
 						// const url = new URL(`${this.config.mediaProxy}/static.webp`);
 						// url.searchParams.set('url', file.url);
 						// url.searchParams.set('static', '1');
