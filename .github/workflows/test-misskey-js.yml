@@ -22,20 +22,19 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@v7.0.1
       - name: Replace the github url
         run: |
           sed -i 's|ssh://git@github.com/|git+https://github.com/|g' package.json
           sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/frontend/package.json
           sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/backend/package.json
           sed -i 's|ssh://git@github.com/|git+https://github.com/|g' packages/sw/package.json
-          sed -i 's|git@github.com:|https://github.com/|g' .gitmodules
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v4.4.0
+        uses: pnpm/action-setup@v6.0.10
 
       - name: Setup Node.js
-        uses: actions/setup-node@v6.3.0
+        uses: actions/setup-node@v7.0.0
         with:
           node-version-file: '.node-version'
           cache: 'pnpm'
@@ -57,7 +56,7 @@ jobs:
           CI: true
 
       - name: Upload Coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./packages/misskey-js/coverage/coverage-final.json

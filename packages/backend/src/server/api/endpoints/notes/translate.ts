@@ -88,12 +88,23 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 				throw new ApiError(meta.errors.cannotTranslateInvisibleNote);
 			}
 
-			if (note.text == null) {
+			// makeNotesHiddenBefore などで中身が隠されるノート
+			const packedNote = await this.noteEntityService.pack(note, me);
+			if (packedNote.isHidden) {
+				throw new ApiError(meta.errors.cannotTranslateInvisibleNote);
+			}
+
+			let text = note.text ?? '';
+			if (note.cw != null) {
+				text = `${note.cw}\n-----\n${text}`;
+			}
+
+			if (text.trim() === '') {
 				return;
 			}
 
 			if (this.serverSettings.enableLlmTranslator) {
-				const res = await this.llmTranslate(note.text, ps.targetLang, note.id);
+				const res = await this.llmTranslate(text, ps.targetLang, note.id);
 				return {
 					text: res,
 				};
@@ -107,7 +118,7 @@ export default class extends Endpoint<typeof meta, typeof paramDef> { // eslint-
 			if (targetLang.includes('-')) targetLang = targetLang.split('-')[0];
 
 			const params = new URLSearchParams();
-			params.append('text', note.text);
+			params.append('text', text);
 			params.append('target_lang', targetLang);
 
 			const endpoint = this.serverSettings.deeplIsPro ? 'https://api.deepl.com/v2/translate' : 'https://api-free.deepl.com/v2/translate';
