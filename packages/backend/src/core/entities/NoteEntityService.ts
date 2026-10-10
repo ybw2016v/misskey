@@ -133,6 +133,9 @@ export class NoteEntityService implements OnModuleInit {
 		if (meId === packedNote.userId) return false;
 		// TODO: isVisibleForMe を使うようにしても良さそう(型違うけど)
 
+		// TODO: ugcVisibilityForVisitor が local の場合も、付随するリモートのノートをリンクだけ残して内容を隠せるようにする
+		if (meId == null && this.meta.ugcVisibilityForVisitor === 'none') return true;
+
 		if (packedNote.user.requireSigninToViewContents && meId == null) {
 			return true;
 		}
@@ -174,9 +177,26 @@ export class NoteEntityService implements OnModuleInit {
 				}
 			}
 		}
-		// 对非登录用户隐藏其他实例信息
+		// [fork 专有行为 / fork-specific behavior] 匿名（未登录）访客不看来自其他实例（远程）的笔记。
+		// [fork 專有行為 / fork-specific behavior] 未ログインのビジターには他インスタンス（リモート）のノートを見せない。
+		//
+		// 历史经过:
+		//   - 旧 fork 代码此处为 `hide = true;`，但 `hide` 在文件内从未声明（TS2304）。
+		//     它后面紧接着 `return false`，因此即便声明了也是一个空操作（死代码）。
+		//     旧 fork 使用 swc 构建、不做类型检查，所以这个错误长期未被发现；本次合并后
+		//     后端改用 tsc（`pnpm --filter backend typecheck`）才暴露出来。
+		//   - 本次合并（upstream 2026.10.0）决定采用方案 (a)：改为 `return true`，让旧 fork 的
+		//     意图真正生效——即无论上游的 `ugcVisibilityForVisitor` 设置为何，
+		//     匿名访客一律不显示远程实例的笔记。
+		//
+		// 备选方案 (b)（未采用，供将来参考 / alternative considered, for future reference）:
+		//   直接删除下面这 3 行，把判断完全交给上游策略——
+		//   即仅当 `meId == null && this.meta.ugcVisibilityForVisitor === 'none'` 时隐藏（见上方第 136 行附近）。
+		//   选 (b) 的好处是尊重 `ugcVisibilityForVisitor` 这个可配置项；代价是放弃本 fork 的
+		//   「匿名用户不看远程笔记」行为（含 `local` 设置的场景）。
+		//   若将来要与上游行为完全对齐，请改用方案 (b)。
 		if (meId == null && packedNote.user.host != null) {
-			hide = true;
+			return true;
 		}
 
 		return false;
@@ -295,7 +315,7 @@ export class NoteEntityService implements OnModuleInit {
 				return false;
 			} else if (meId === note.userId) {
 				return true;
-			} else if (note.reply && (meId === note.reply.userId)) {
+			} else if (note.replyUserId && (meId === note.replyUserId)) {
 				// 自分の投稿に対するリプライ
 				return true;
 			} else if (note.mentions && note.mentions.some(id => meId === id)) {
@@ -466,7 +486,7 @@ export class NoteEntityService implements OnModuleInit {
 
 		this.treatVisibility(packed);
 
-		if (!opts.skipHide && await this.shouldHideNote(packed, meId)) {
+		if (!opts.skipHide && (await this.shouldHideNote(packed, meId))) {
 			this.hideNote(packed);
 		}
 
@@ -593,25 +613,43 @@ export class NoteEntityService implements OnModuleInit {
 	private findNoteOrFail(id: string): Promise<MiNote> {
 		return this.notesRepository.findOneOrFail({
 			where: { id },
-			relations: ['user', 'renote', 'reply'],
+			relations: {
+				user: true,
+				renote: true,
+				reply: true,
+			},
 		});
 	}
 
 	@bindThis
-	public async fetchDiffs(noteIds: MiNote['id'][]) {
+	public async fetchDiffs(noteIds: MiNote['id'][], meId: MiUser['id'] | null = null) {
 		if (noteIds.length === 0) return [];
+		// TODO: ugcVisibilityForVisitor が local の場合の扱いを shouldHideNote と揃える
+		if (meId == null && this.meta.ugcVisibilityForVisitor === 'none') return [];
 
-		const notes = await this.notesRepository.find({
+		const fetched = await this.notesRepository.find({
 			where: {
 				id: In(noteIds),
 			},
 			select: {
 				id: true,
+				userId: true,
 				userHost: true,
+				visibility: true,
+				visibleUserIds: true,
+				mentions: true,
+				replyUserId: true,
 				reactions: true,
 				reactionAndUserPairCache: true,
 			},
 		});
+
+		const notes: MiNote[] = [];
+		for (const note of fetched) {
+			if (await this.isVisibleForMe(note, meId)) {
+				notes.push(note);
+			}
+		}
 
 		const bufferedReactionsMap = this.meta.enableReactionsBuffering ? await this.reactionsBufferingService.getMany(noteIds) : null;
 
